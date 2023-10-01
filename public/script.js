@@ -330,8 +330,6 @@ const default_avatar = "img/ai4.png";
 export const system_avatar = "img/five.png";
 export const comment_avatar = "img/quill.png";
 export let CLIENT_VERSION = "SillyTavern:UNKNOWN:Cohee#1207"; // For Horde header
-let is_colab = false;
-let is_checked_colab = false;
 let optionsPopper = Popper.createPopper(
     document.getElementById("options_button"),
     document.getElementById("options"),
@@ -1175,31 +1173,6 @@ function getBackgroundFromTemplate(bg) {
     template.css("background-image", `url('${thumbPath}')`);
     template.find(".BGSampleTitle").text(bg.slice(0, bg.lastIndexOf(".")));
     return template;
-}
-
-async function isColab() {
-    is_checked_colab = true;
-    const response = await fetch("/iscolab", {
-        method: "POST",
-        headers: getRequestHeaders(),
-        body: JSON.stringify({
-            "": "",
-        }),
-    });
-    if (response.ok === true) {
-        const getData = await response.json();
-        if (getData.colaburl != false) {
-            $("#colab_shadow_popup").css("display", "none");
-            is_colab = true;
-            let url =
-                String(getData.colaburl).split("flare.com")[0] + "flare.com";
-            url = String(url).split("loca.lt")[0] + "loca.lt";
-            $("#api_url_text").val(url);
-            setTimeout(function () {
-                $("#api_button").click();
-            }, 2000);
-        }
-    }
 }
 
 async function setBackground(bg) {
@@ -6176,8 +6149,6 @@ async function getSettings(type) {
             eventSource.emit(event_types.EXTENSION_SETTINGS_LOADED);
         }
     }
-
-    if (!is_checked_colab) isColab();
 
     eventSource.emit(event_types.SETTINGS_LOADED);
 }

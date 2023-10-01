@@ -313,7 +313,6 @@ function humanizedISO8601DateTime() {
     return HumanizedDateTime;
 }
 
-var is_colab = process.env.colaburl !== undefined;
 var charactersPath = "public/characters/";
 var chatsPath = "public/chats/";
 const AVATAR_WIDTH = 400;
@@ -428,31 +427,6 @@ app.use(function (req, res, next) {
             );
     }
     next();
-});
-
-app.use((req, res, next) => {
-    if (
-        req.url.startsWith("/characters/") &&
-        is_colab &&
-        process.env.googledrive == 2
-    ) {
-        const filePath = path.join(
-            charactersPath,
-            decodeURIComponent(req.url.substr("/characters".length)),
-        );
-        console.log("req.url: " + req.url);
-        console.log(filePath);
-        fs.access(filePath, fs.constants.R_OK, (err) => {
-            if (!err) {
-                res.sendFile(filePath, { root: process.cwd() });
-            } else {
-                res.send("Character not found: " + filePath);
-                //next();
-            }
-        });
-    } else {
-        next();
-    }
 });
 
 app.use(express.static(process.cwd() + "/public", { refresh: true }));
@@ -1651,13 +1625,7 @@ app.post("/getbackgrounds", jsonParser, function (request, response) {
     var images = getImages("public/backgrounds");
     response.send(JSON.stringify(images));
 });
-app.post("/iscolab", jsonParser, function (request, response) {
-    let send_data = false;
-    if (is_colab) {
-        send_data = String(process.env.colaburl).trim();
-    }
-    response.send({ colaburl: send_data });
-});
+
 app.post("/getuseravatars", jsonParser, function (request, response) {
     var images = getImages("public/User Avatars");
     response.send(JSON.stringify(images));
@@ -4221,9 +4189,6 @@ const setupTasks = async function () {
     await ensureThumbnailCache();
     contentManager.checkForNewContent();
 
-    // Colab users could run the embedded tool
-    if (!is_colab) await convertWebp();
-
     [spp_llama, spp_nerd, spp_nerd_v2, claude_tokenizer] = await Promise.all([
         loadSentencepieceTokenizer("src/sentencepiece/tokenizer.model"),
         loadSentencepieceTokenizer("src/sentencepiece/nerdstash.model"),
@@ -5243,8 +5208,9 @@ app.post("/get_extension", jsonParser, async (request, response) => {
         await git.clone(url, extensionPath);
         console.log(`Extension has been cloned at ${extensionPath}`);
 
-        const { version, author, display_name } =
-            await getManifest(extensionPath);
+        const { version, author, display_name } = await getManifest(
+            extensionPath,
+        );
 
         return response.send({ version, author, display_name, extensionPath });
     } catch (error) {
@@ -5288,8 +5254,9 @@ app.post("/update_extension", jsonParser, async (request, response) => {
                 .send(`Directory does not exist at ${extensionPath}`);
         }
 
-        const { isUpToDate, remoteUrl } =
-            await checkIfRepoIsUpToDate(extensionPath);
+        const { isUpToDate, remoteUrl } = await checkIfRepoIsUpToDate(
+            extensionPath,
+        );
         const currentBranch = await git.cwd(extensionPath).branch();
         if (!isUpToDate) {
             await git.cwd(extensionPath).pull("origin", currentBranch.current);
@@ -5355,8 +5322,9 @@ app.post("/get_extension_version", jsonParser, async (request, response) => {
             .cwd(extensionPath)
             .revparse(["HEAD"]);
         console.log(currentBranch, currentCommitHash);
-        const { isUpToDate, remoteUrl } =
-            await checkIfRepoIsUpToDate(extensionPath);
+        const { isUpToDate, remoteUrl } = await checkIfRepoIsUpToDate(
+            extensionPath,
+        );
 
         return response.send({
             currentBranchName,

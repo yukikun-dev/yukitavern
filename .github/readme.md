@@ -27,7 +27,7 @@ If you're not familiar with using the git CLI or don't understand what a branch 
 
 ### What do I need other than Tavern?
 
-On its own Tavern is useless, as it's just a user interface. You have to have access to an AI system backend that can act as the roleplay character. There are various supported backends: OpenAPI API (GPT), KoboldAI (either running locally or on Google Colab), and more. You can read more about this in [the FAQ](https://docs.sillytavern.app/usage/faq/).
+On its own Tavern is useless, as it's just a user interface. You have to have access to an AI system backend that can act as the roleplay character. There are various supported backends: OpenAPI API (GPT), KoboldAI, and more. You can read more about this in [the FAQ](https://docs.sillytavern.app/usage/faq/).
 
 ### Do I need a powerful PC to run Tavern?
 
@@ -125,8 +125,6 @@ A full list of included extensions and tutorials on how to use them can be found
     -   Customizable UI background color and blur amount
 
 ## Installation
-
-_NOTE: This software is intended for local install purposes, and has not been thoroughly tested on a colab or other cloud notebook service._
 
 > **Warning**
 
