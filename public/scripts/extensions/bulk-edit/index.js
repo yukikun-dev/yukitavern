@@ -1,4 +1,9 @@
-import { characters, getCharacters, handleDeleteCharacter, callPopup } from "../../../script.js";
+import {
+    characters,
+    getCharacters,
+    handleDeleteCharacter,
+    callPopup,
+} from "../../../script.js";
 
 let is_bulk_edit = false;
 
@@ -45,10 +50,13 @@ async function onDeleteButtonClick() {
         toDelete.push(avatar);
     });
 
-    const confirm = await callPopup('<h3>Are you sure you want to delete these characters?</h3>You would need to delete the chat files manually.<br>', 'confirm');
+    const confirm = await callPopup(
+        "<h3>Are you sure you want to delete these characters?</h3>You would need to delete the chat files manually.<br>",
+        "confirm",
+    );
 
     if (!confirm) {
-        console.log('User cancelled delete');
+        console.log("User cancelled delete");
         return;
     }
 
@@ -58,7 +66,9 @@ async function onDeleteButtonClick() {
         await getCharacters();
 
         //chid should be the key of the character with the given avatar
-        const chid = Object.keys(characters).find((key) => characters[key].avatar === avatar);
+        const chid = Object.keys(characters).find(
+            (key) => characters[key].avatar === avatar,
+        );
         console.log(`Deleting character with chid ${chid}`);
         await deleteCharacter(chid);
     }
@@ -69,10 +79,10 @@ async function onDeleteButtonClick() {
  */
 function addButtons() {
     const editButton = $(
-        "<i id='bulkEditButton' class='fa-solid fa-edit menu_button bulkEditButton' title='Bulk edit characters'></i>"
+        "<i id='bulkEditButton' class='fa-solid fa-edit menu_button bulkEditButton' title='Bulk edit characters'></i>",
     );
     const deleteButton = $(
-        "<i id='bulkDeleteButton' class='fa-solid fa-trash menu_button bulkDeleteButton' title='Bulk delete characters' style='display: none;'></i>"
+        "<i id='bulkDeleteButton' class='fa-solid fa-trash menu_button bulkDeleteButton' title='Bulk delete characters' style='display: none;'></i>",
     );
 
     $("#charListGridToggle").after(editButton, deleteButton);
@@ -87,7 +97,9 @@ function addButtons() {
 function enableBulkSelect() {
     $("#rm_print_characters_block .character_select").each((i, el) => {
         const character = $(el).text();
-        const checkbox = $("<input type='checkbox' class='bulk_select_checkbox'>");
+        const checkbox = $(
+            "<input type='checkbox' class='bulk_select_checkbox'>",
+        );
         checkbox.on("change", () => {
             // Do something when the checkbox is changed
         });

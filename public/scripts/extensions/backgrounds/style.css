@@ -12,7 +12,7 @@
 }
 
 #custom_bg_preview::before {
-    content: 'No Background';
+    content: "No Background";
     color: white;
     position: relative;
     width: 100%;

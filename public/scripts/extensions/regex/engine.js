@@ -1,35 +1,31 @@
 import { substituteParams } from "../../../script.js";
 import { extension_settings } from "../../extensions.js";
-export {
-    regex_placement,
-    getRegexedString,
-    runRegexScript
-}
+export { regex_placement, getRegexedString, runRegexScript };
 
 const regex_placement = {
     // MD Display is deprecated. Do not use.
     MD_DISPLAY: 0,
     USER_INPUT: 1,
     AI_OUTPUT: 2,
-    SLASH_COMMAND: 3
-}
+    SLASH_COMMAND: 3,
+};
 
 const regex_replace_strategy = {
     REPLACE: 0,
-    OVERLAY: 1
-}
+    OVERLAY: 1,
+};
 
 // Originally from: https://github.com/IonicaBizau/regex-parser.js/blob/master/lib/index.js
 function regexFromString(input) {
     try {
         // Parse input
         var m = input.match(/(\/?)(.+)\1([a-z]*)/i);
-    
+
         // Invalid flags
         if (m[3] && !/^(?!.*?(.).*?\1)[gmixXsuUAJ]+$/.test(m[3])) {
             return RegExp(input);
         }
-    
+
         // Create the regular expression
         return new RegExp(m[2], m[3]);
     } catch {
@@ -38,19 +34,32 @@ function regexFromString(input) {
 }
 
 // Parent function to fetch a regexed version of a raw string
-function getRegexedString(rawString, placement, { characterOverride, isMarkdown } = {}) {
+function getRegexedString(
+    rawString,
+    placement,
+    { characterOverride, isMarkdown } = {},
+) {
     let finalString = rawString;
-    if (extension_settings.disabledExtensions.includes("regex") || !rawString || placement === undefined) {
+    if (
+        extension_settings.disabledExtensions.includes("regex") ||
+        !rawString ||
+        placement === undefined
+    ) {
         return finalString;
     }
 
     extension_settings.regex.forEach((script) => {
-        if ((script.markdownOnly && !isMarkdown) || (!script.markdownOnly && isMarkdown)) {
+        if (
+            (script.markdownOnly && !isMarkdown) ||
+            (!script.markdownOnly && isMarkdown)
+        ) {
             return;
         }
 
         if (script.placement.includes(placement)) {
-            finalString = runRegexScript(script, finalString, { characterOverride });
+            finalString = runRegexScript(script, finalString, {
+                characterOverride,
+            });
         }
     });
 
@@ -60,12 +69,21 @@ function getRegexedString(rawString, placement, { characterOverride, isMarkdown 
 // Runs the provided regex script on the given string
 function runRegexScript(regexScript, rawString, { characterOverride } = {}) {
     let newString = rawString;
-    if (!regexScript || !!(regexScript.disabled) || !regexScript?.findRegex || !rawString) {
+    if (
+        !regexScript ||
+        !!regexScript.disabled ||
+        !regexScript?.findRegex ||
+        !rawString
+    ) {
         return newString;
     }
 
     let match;
-    const findRegex = regexFromString(regexScript.substituteRegex ? substituteParams(regexScript.findRegex) : regexScript.findRegex);
+    const findRegex = regexFromString(
+        regexScript.substituteRegex
+            ? substituteParams(regexScript.findRegex)
+            : regexScript.findRegex,
+    );
 
     // The user skill issued. Return with nothing.
     if (!findRegex) {
@@ -79,11 +97,22 @@ function runRegexScript(regexScript, rawString, { characterOverride } = {}) {
         let trimCapturedMatch;
         let trimFencedMatch;
         if (capturedMatch) {
-            const tempTrimCapture = filterString(capturedMatch, regexScript.trimStrings, { characterOverride });
-            trimFencedMatch = fencedMatch.replaceAll(capturedMatch, tempTrimCapture);
+            const tempTrimCapture = filterString(
+                capturedMatch,
+                regexScript.trimStrings,
+                { characterOverride },
+            );
+            trimFencedMatch = fencedMatch.replaceAll(
+                capturedMatch,
+                tempTrimCapture,
+            );
             trimCapturedMatch = tempTrimCapture;
         } else {
-            trimFencedMatch = filterString(fencedMatch, regexScript.trimStrings, { characterOverride });
+            trimFencedMatch = filterString(
+                fencedMatch,
+                regexScript.trimStrings,
+                { characterOverride },
+            );
         }
 
         // TODO: Use substrings for replacement. But not necessary at this time.
@@ -91,10 +120,12 @@ function runRegexScript(regexScript, rawString, { characterOverride } = {}) {
         const subReplaceString = substituteRegexParams(
             regexScript.replaceString,
             trimCapturedMatch ?? trimFencedMatch,
-            { 
+            {
                 characterOverride,
-                replaceStrategy: regexScript.replaceStrategy ?? regex_replace_strategy.REPLACE
-            }
+                replaceStrategy:
+                    regexScript.replaceStrategy ??
+                    regex_replace_strategy.REPLACE,
+            },
         );
         if (!newString) {
             newString = rawString.replace(fencedMatch, subReplaceString);
@@ -103,7 +134,7 @@ function runRegexScript(regexScript, rawString, { characterOverride } = {}) {
         }
 
         // If the regex isn't global, break out of the loop
-        if (!findRegex.flags.includes('g')) {
+        if (!findRegex.flags.includes("g")) {
             break;
         }
     }
@@ -115,7 +146,11 @@ function runRegexScript(regexScript, rawString, { characterOverride } = {}) {
 function filterString(rawString, trimStrings, { characterOverride } = {}) {
     let finalString = rawString;
     trimStrings.forEach((trimString) => {
-        const subTrimString = substituteParams(trimString, undefined, characterOverride);
+        const subTrimString = substituteParams(
+            trimString,
+            undefined,
+            characterOverride,
+        );
         finalString = finalString.replaceAll(subTrimString, "");
     });
 
@@ -123,7 +158,11 @@ function filterString(rawString, trimStrings, { characterOverride } = {}) {
 }
 
 // Substitutes regex-specific and normal parameters
-function substituteRegexParams(rawString, regexMatch, { characterOverride, replaceStrategy } = {}) {
+function substituteRegexParams(
+    rawString,
+    regexMatch,
+    { characterOverride, replaceStrategy } = {},
+) {
     let finalString = rawString;
     finalString = substituteParams(finalString, undefined, characterOverride);
 
@@ -148,7 +187,9 @@ function substituteRegexParams(rawString, regexMatch, { characterOverride, repla
                 }
             }
 
-            overlaidMatch = splitMatch.slice(sliceNum, splitMatch.length).join(splicedPrefix);
+            overlaidMatch = splitMatch
+                .slice(sliceNum, splitMatch.length)
+                .join(splicedPrefix);
         }
 
         // There's a suffix
@@ -167,12 +208,16 @@ function substituteRegexParams(rawString, regexMatch, { characterOverride, repla
                 }
             }
 
-            overlaidMatch = splitMatch.slice(0, splitMatch.length - sliceNum).join(splicedSuffix);
+            overlaidMatch = splitMatch
+                .slice(0, splitMatch.length - sliceNum)
+                .join(splicedSuffix);
         }
     }
 
     // Only one match is replaced. This is by design
-    finalString = finalString.replace("{{match}}", overlaidMatch) || finalString.replace("{{match}}", regexMatch);
+    finalString =
+        finalString.replace("{{match}}", overlaidMatch) ||
+        finalString.replace("{{match}}", regexMatch);
 
     return finalString;
 }
@@ -182,7 +227,7 @@ function substituteRegexParams(rawString, regexMatch, { characterOverride, repla
 function spliceSymbols(rawString, isSuffix) {
     let offset = 0;
 
-    for (const ch of isSuffix ? rawString.split('').reverse() : rawString) {
+    for (const ch of isSuffix ? rawString.split("").reverse() : rawString) {
         if (ch.match(/[^\w.,?'!]/)) {
             offset++;
         } else {
@@ -190,5 +235,7 @@ function spliceSymbols(rawString, isSuffix) {
         }
     }
 
-    return isSuffix ? rawString.substring(0, rawString.length - offset) : rawString.substring(offset);
+    return isSuffix
+        ? rawString.substring(0, rawString.length - offset)
+        : rawString.substring(offset);
 }

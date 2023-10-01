@@ -50,161 +50,185 @@
   we can support any values in array keys, because `Map`s do.
 */
 
-const dataSymbol = Symbol('path-store-trunk')
+const dataSymbol = Symbol("path-store-trunk");
 
 //
 // This class represents the external API
 //
 
 class ArrayKeyedMap {
-  constructor (initialEntries = []) {
-    this._root = new Map()
-    this._size = 0
-    for (const [k, v] of initialEntries) { this.set(k, v) }
-  }
+    constructor(initialEntries = []) {
+        this._root = new Map();
+        this._size = 0;
+        for (const [k, v] of initialEntries) {
+            this.set(k, v);
+        }
+    }
 
-  set (path, value) { return set.call(this, path, value) }
+    set(path, value) {
+        return set.call(this, path, value);
+    }
 
-  has (path) { return has.call(this, path) }
+    has(path) {
+        return has.call(this, path);
+    }
 
-  get (path) { return get.call(this, path) }
+    get(path) {
+        return get.call(this, path);
+    }
 
-  delete (path) { return del.call(this, path) }
+    delete(path) {
+        return del.call(this, path);
+    }
 
-  get size () { return this._size }
+    get size() {
+        return this._size;
+    }
 
-  clear () {
-    this._root.clear()
-    this._size = 0
-  }
+    clear() {
+        this._root.clear();
+        this._size = 0;
+    }
 
-  hasPrefix (path) { return hasPrefix.call(this, path) }
+    hasPrefix(path) {
+        return hasPrefix.call(this, path);
+    }
 
-  get [Symbol.toStringTag] () { return 'ArrayKeyedMap' }
+    get [Symbol.toStringTag]() {
+        return "ArrayKeyedMap";
+    }
 
-  * [Symbol.iterator] () { yield * entries.call(this) }
+    *[Symbol.iterator]() {
+        yield* entries.call(this);
+    }
 
-  * entries () { yield * entries.call(this) }
+    *entries() {
+        yield* entries.call(this);
+    }
 
-  * keys () { yield * keys.call(this) }
+    *keys() {
+        yield* keys.call(this);
+    }
 
-  * values () { yield * values.call(this) }
+    *values() {
+        yield* values.call(this);
+    }
 
-  forEach (callback, thisArg) { forEach.call(this, callback, thisArg) }
+    forEach(callback, thisArg) {
+        forEach.call(this, callback, thisArg);
+    }
 }
 
 //
 // These stateless functions implement the internals
 //
 
-function set (path, value) {
-  let map = this._root
-  for (const item of path) {
-    let nextMap = map.get(item)
-    if (!nextMap) {
-      // Create next map if none exists
-      nextMap = new Map()
-      map.set(item, nextMap)
+function set(path, value) {
+    let map = this._root;
+    for (const item of path) {
+        let nextMap = map.get(item);
+        if (!nextMap) {
+            // Create next map if none exists
+            nextMap = new Map();
+            map.set(item, nextMap);
+        }
+        map = nextMap;
     }
-    map = nextMap
-  }
 
-  // Reached end of path.  Set the data symbol to the given value, and
-  // increment size if nothing was here before.
-  if (!map.has(dataSymbol)) this._size += 1
-  map.set(dataSymbol, value)
-  return this
+    // Reached end of path.  Set the data symbol to the given value, and
+    // increment size if nothing was here before.
+    if (!map.has(dataSymbol)) this._size += 1;
+    map.set(dataSymbol, value);
+    return this;
 }
 
-function has (path) {
-  let map = this._root
-  for (const item of path) {
-    const nextMap = map.get(item)
-    if (nextMap) {
-      map = nextMap
-    } else {
-      return false
+function has(path) {
+    let map = this._root;
+    for (const item of path) {
+        const nextMap = map.get(item);
+        if (nextMap) {
+            map = nextMap;
+        } else {
+            return false;
+        }
     }
-  }
-  return map.has(dataSymbol)
+    return map.has(dataSymbol);
 }
 
-function get (path) {
-  let map = this._root
-  for (const item of path) {
-    map = map.get(item)
-    if (!map) return undefined
-  }
-  return map.get(dataSymbol)
-}
-
-function del (path) {
-  let map = this._root
-
-  // Maintain a stack of maps we visited, so we can go back and trim empty ones
-  // if we delete something.
-  const stack = []
-
-  for (const item of path) {
-    const nextMap = map.get(item)
-    if (nextMap) {
-      stack.unshift({ parent: map, child: nextMap, item })
-      map = nextMap
-    } else {
-      // Nothing to delete
-      return false
+function get(path) {
+    let map = this._root;
+    for (const item of path) {
+        map = map.get(item);
+        if (!map) return undefined;
     }
-  }
+    return map.get(dataSymbol);
+}
 
-  // Reached end of path.  Delete data, if it exists.
-  const hadPreviousValue = map.delete(dataSymbol)
+function del(path) {
+    let map = this._root;
 
-  // If something was deleted, decrement size and go through the stack of
-  // visited maps, trimming any that are now empty.
-  if (hadPreviousValue) {
-    this._size -= 1
+    // Maintain a stack of maps we visited, so we can go back and trim empty ones
+    // if we delete something.
+    const stack = [];
 
-    for (const { parent, child, item } of stack) {
-      if (child.size === 0) {
-        parent.delete(item)
-      }
+    for (const item of path) {
+        const nextMap = map.get(item);
+        if (nextMap) {
+            stack.unshift({ parent: map, child: nextMap, item });
+            map = nextMap;
+        } else {
+            // Nothing to delete
+            return false;
+        }
     }
-  }
-  return hadPreviousValue
-}
 
-function hasPrefix (path) {
-  let map = this._root
-  for (const item of path) {
-    map = map.get(item)
-    if (!map) return false
-  }
-  return true
-}
+    // Reached end of path.  Delete data, if it exists.
+    const hadPreviousValue = map.delete(dataSymbol);
 
-function * entries () {
-  const stack = [{ path: [], map: this._root }]
-  while (stack.length > 0) {
-    const { path, map } = stack.pop()
-    for (const [k, v] of map.entries()) {
-      if (k === dataSymbol) yield [path, v]
-      else stack.push({ path: path.concat([k]), map: v })
+    // If something was deleted, decrement size and go through the stack of
+    // visited maps, trimming any that are now empty.
+    if (hadPreviousValue) {
+        this._size -= 1;
+
+        for (const { parent, child, item } of stack) {
+            if (child.size === 0) {
+                parent.delete(item);
+            }
+        }
     }
-  }
+    return hadPreviousValue;
 }
 
-function * keys () {
-  for (const [k] of this.entries()) yield k
+function hasPrefix(path) {
+    let map = this._root;
+    for (const item of path) {
+        map = map.get(item);
+        if (!map) return false;
+    }
+    return true;
 }
 
-function * values () {
-  for (const [, v] of this.entries()) yield v
+function* entries() {
+    const stack = [{ path: [], map: this._root }];
+    while (stack.length > 0) {
+        const { path, map } = stack.pop();
+        for (const [k, v] of map.entries()) {
+            if (k === dataSymbol) yield [path, v];
+            else stack.push({ path: path.concat([k]), map: v });
+        }
+    }
 }
 
-function forEach (callback, thisArg) {
-  for (const [k, v] of this.entries()) callback.call(thisArg, v, k, this)
+function* keys() {
+    for (const [k] of this.entries()) yield k;
 }
 
-export {
-    ArrayKeyedMap
+function* values() {
+    for (const [, v] of this.entries()) yield v;
 }
+
+function forEach(callback, thisArg) {
+    for (const [k, v] of this.entries()) callback.call(thisArg, v, k, this);
+}
+
+export { ArrayKeyedMap };

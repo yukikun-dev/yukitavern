@@ -1,9 +1,7 @@
 {
     "display_name": "Smart Context",
     "loading_order": 11,
-    "requires": [
-        "chromadb"
-    ],
+    "requires": ["chromadb"],
     "optional": [],
     "generate_interceptor": "chromadb_interceptGeneration",
     "js": "index.js",

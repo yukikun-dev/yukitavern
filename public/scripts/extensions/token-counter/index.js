@@ -3,9 +3,10 @@ import { getContext } from "../../extensions.js";
 import { getTokenizerModel } from "../../openai.js";
 
 async function doTokenCounter() {
-    const selectedTokenizer = main_api == 'openai'
-        ? `tiktoken (${getTokenizerModel()})`
-        : $("#tokenizer").find(':selected').text();
+    const selectedTokenizer =
+        main_api == "openai"
+            ? `tiktoken (${getTokenizerModel()})`
+            : $("#tokenizer").find(":selected").text();
     const html = `
     <div class="wide100p">
         <h3>Token Counter</h3>
@@ -18,15 +19,15 @@ async function doTokenCounter() {
     </div>`;
 
     const dialog = $(html);
-    dialog.find('#token_counter_textarea').on('input', () => {
-        const text = $('#token_counter_textarea').val();
+    dialog.find("#token_counter_textarea").on("input", () => {
+        const text = $("#token_counter_textarea").val();
         const context = getContext();
         const count = context.getTokenCount(text);
-        $('#token_counter_result').text(count);
+        $("#token_counter_result").text(count);
     });
 
-    $('#dialogue_popup').addClass('wide_dialogue_popup');
-    callPopup(dialog, 'text');
+    $("#dialogue_popup").addClass("wide_dialogue_popup");
+    callPopup(dialog, "text");
 }
 
 jQuery(() => {
@@ -35,6 +36,6 @@ jQuery(() => {
             <div class="fa-solid fa-1 extensionsMenuExtensionButton" /></div>
             Token Counter
         </div>`;
-    $('#extensionsMenu').prepend(buttonHtml);
-    $('#token_counter').on('click', doTokenCounter);
+    $("#extensionsMenu").prepend(buttonHtml);
+    $("#token_counter").on("click", doTokenCounter);
 });

@@ -12,135 +12,140 @@ import { extension_settings, getContext } from "../../extensions.js";
 import { secret_state, writeSecret } from "../../secrets.js";
 
 const autoModeOptions = {
-    NONE: 'none',
-    RESPONSES: 'responses',
-    INPUT: 'inputs',
-    BOTH: 'both',
+    NONE: "none",
+    RESPONSES: "responses",
+    INPUT: "inputs",
+    BOTH: "both",
 };
 
 const incomingTypes = [autoModeOptions.RESPONSES, autoModeOptions.BOTH];
 const outgoingTypes = [autoModeOptions.INPUT, autoModeOptions.BOTH];
 
 const defaultSettings = {
-    target_language: 'en',
-    internal_language: 'en',
-    provider: 'google',
+    target_language: "en",
+    internal_language: "en",
+    provider: "google",
     auto_mode: autoModeOptions.NONE,
 };
 
 const languageCodes = {
-    'Afrikaans': 'af',
-    'Albanian': 'sq',
-    'Amharic': 'am',
-    'Arabic': 'ar',
-    'Armenian': 'hy',
-    'Azerbaijani': 'az',
-    'Basque': 'eu',
-    'Belarusian': 'be',
-    'Bengali': 'bn',
-    'Bosnian': 'bs',
-    'Bulgarian': 'bg',
-    'Catalan': 'ca',
-    'Cebuano': 'ceb',
-    'Chinese (Simplified)': 'zh-CN',
-    'Chinese (Traditional)': 'zh-TW',
-    'Corsican': 'co',
-    'Croatian': 'hr',
-    'Czech': 'cs',
-    'Danish': 'da',
-    'Dutch': 'nl',
-    'English': 'en',
-    'Esperanto': 'eo',
-    'Estonian': 'et',
-    'Finnish': 'fi',
-    'French': 'fr',
-    'Frisian': 'fy',
-    'Galician': 'gl',
-    'Georgian': 'ka',
-    'German': 'de',
-    'Greek': 'el',
-    'Gujarati': 'gu',
-    'Haitian Creole': 'ht',
-    'Hausa': 'ha',
-    'Hawaiian': 'haw',
-    'Hebrew': 'iw',
-    'Hindi': 'hi',
-    'Hmong': 'hmn',
-    'Hungarian': 'hu',
-    'Icelandic': 'is',
-    'Igbo': 'ig',
-    'Indonesian': 'id',
-    'Irish': 'ga',
-    'Italian': 'it',
-    'Japanese': 'ja',
-    'Javanese': 'jw',
-    'Kannada': 'kn',
-    'Kazakh': 'kk',
-    'Khmer': 'km',
-    'Korean': 'ko',
-    'Kurdish': 'ku',
-    'Kyrgyz': 'ky',
-    'Lao': 'lo',
-    'Latin': 'la',
-    'Latvian': 'lv',
-    'Lithuanian': 'lt',
-    'Luxembourgish': 'lb',
-    'Macedonian': 'mk',
-    'Malagasy': 'mg',
-    'Malay': 'ms',
-    'Malayalam': 'ml',
-    'Maltese': 'mt',
-    'Maori': 'mi',
-    'Marathi': 'mr',
-    'Mongolian': 'mn',
-    'Myanmar (Burmese)': 'my',
-    'Nepali': 'ne',
-    'Norwegian': 'no',
-    'Nyanja (Chichewa)': 'ny',
-    'Pashto': 'ps',
-    'Persian': 'fa',
-    'Polish': 'pl',
-    'Portuguese (Portugal, Brazil)': 'pt',
-    'Punjabi': 'pa',
-    'Romanian': 'ro',
-    'Russian': 'ru',
-    'Samoan': 'sm',
-    'Scots Gaelic': 'gd',
-    'Serbian': 'sr',
-    'Sesotho': 'st',
-    'Shona': 'sn',
-    'Sindhi': 'sd',
-    'Sinhala (Sinhalese)': 'si',
-    'Slovak': 'sk',
-    'Slovenian': 'sl',
-    'Somali': 'so',
-    'Spanish': 'es',
-    'Sundanese': 'su',
-    'Swahili': 'sw',
-    'Swedish': 'sv',
-    'Tagalog (Filipino)': 'tl',
-    'Tajik': 'tg',
-    'Tamil': 'ta',
-    'Telugu': 'te',
-    'Thai': 'th',
-    'Turkish': 'tr',
-    'Ukrainian': 'uk',
-    'Urdu': 'ur',
-    'Uzbek': 'uz',
-    'Vietnamese': 'vi',
-    'Welsh': 'cy',
-    'Xhosa': 'xh',
-    'Yiddish': 'yi',
-    'Yoruba': 'yo',
-    'Zulu': 'zu',
+    Afrikaans: "af",
+    Albanian: "sq",
+    Amharic: "am",
+    Arabic: "ar",
+    Armenian: "hy",
+    Azerbaijani: "az",
+    Basque: "eu",
+    Belarusian: "be",
+    Bengali: "bn",
+    Bosnian: "bs",
+    Bulgarian: "bg",
+    Catalan: "ca",
+    Cebuano: "ceb",
+    "Chinese (Simplified)": "zh-CN",
+    "Chinese (Traditional)": "zh-TW",
+    Corsican: "co",
+    Croatian: "hr",
+    Czech: "cs",
+    Danish: "da",
+    Dutch: "nl",
+    English: "en",
+    Esperanto: "eo",
+    Estonian: "et",
+    Finnish: "fi",
+    French: "fr",
+    Frisian: "fy",
+    Galician: "gl",
+    Georgian: "ka",
+    German: "de",
+    Greek: "el",
+    Gujarati: "gu",
+    "Haitian Creole": "ht",
+    Hausa: "ha",
+    Hawaiian: "haw",
+    Hebrew: "iw",
+    Hindi: "hi",
+    Hmong: "hmn",
+    Hungarian: "hu",
+    Icelandic: "is",
+    Igbo: "ig",
+    Indonesian: "id",
+    Irish: "ga",
+    Italian: "it",
+    Japanese: "ja",
+    Javanese: "jw",
+    Kannada: "kn",
+    Kazakh: "kk",
+    Khmer: "km",
+    Korean: "ko",
+    Kurdish: "ku",
+    Kyrgyz: "ky",
+    Lao: "lo",
+    Latin: "la",
+    Latvian: "lv",
+    Lithuanian: "lt",
+    Luxembourgish: "lb",
+    Macedonian: "mk",
+    Malagasy: "mg",
+    Malay: "ms",
+    Malayalam: "ml",
+    Maltese: "mt",
+    Maori: "mi",
+    Marathi: "mr",
+    Mongolian: "mn",
+    "Myanmar (Burmese)": "my",
+    Nepali: "ne",
+    Norwegian: "no",
+    "Nyanja (Chichewa)": "ny",
+    Pashto: "ps",
+    Persian: "fa",
+    Polish: "pl",
+    "Portuguese (Portugal, Brazil)": "pt",
+    Punjabi: "pa",
+    Romanian: "ro",
+    Russian: "ru",
+    Samoan: "sm",
+    "Scots Gaelic": "gd",
+    Serbian: "sr",
+    Sesotho: "st",
+    Shona: "sn",
+    Sindhi: "sd",
+    "Sinhala (Sinhalese)": "si",
+    Slovak: "sk",
+    Slovenian: "sl",
+    Somali: "so",
+    Spanish: "es",
+    Sundanese: "su",
+    Swahili: "sw",
+    Swedish: "sv",
+    "Tagalog (Filipino)": "tl",
+    Tajik: "tg",
+    Tamil: "ta",
+    Telugu: "te",
+    Thai: "th",
+    Turkish: "tr",
+    Ukrainian: "uk",
+    Urdu: "ur",
+    Uzbek: "uz",
+    Vietnamese: "vi",
+    Welsh: "cy",
+    Xhosa: "xh",
+    Yiddish: "yi",
+    Yoruba: "yo",
+    Zulu: "zu",
 };
 
-const KEY_REQUIRED = ['deepl'];
+const KEY_REQUIRED = ["deepl"];
 
 function showKeyButton() {
-    const providerRequiresKey = KEY_REQUIRED.includes(extension_settings.translate.provider);
+    const providerRequiresKey = KEY_REQUIRED.includes(
+        extension_settings.translate.provider,
+    );
     $("#translate_key_button").toggle(providerRequiresKey);
-    $("#translate_key_button").toggleClass('success', Boolean(secret_state[extension_settings.translate.provider]));
+    $("#translate_key_button").toggleClass(
+        "success",
+        Boolean(secret_state[extension_settings.translate.provider]),
+    );
 }
 
 function loadSettings() {
@@ -150,14 +155,23 @@ function loadSettings() {
         }
     }
 
-    $(`#translation_provider option[value="${extension_settings.translate.provider}"]`).attr('selected', true);
-    $(`#translation_target_language option[value="${extension_settings.translate.target_language}"]`).attr('selected', true);
-    $(`#translation_auto_mode option[value="${extension_settings.translate.auto_mode}"]`).attr('selected', true);
+    $(
+        `#translation_provider option[value="${extension_settings.translate.provider}"]`,
+    ).attr("selected", true);
+    $(
+        `#translation_target_language option[value="${extension_settings.translate.target_language}"]`,
+    ).attr("selected", true);
+    $(
+        `#translation_auto_mode option[value="${extension_settings.translate.auto_mode}"]`,
+    ).attr("selected", true);
     showKeyButton();
 }
 
 async function translateImpersonate(text) {
-    const translatedText = await translate(text, extension_settings.translate.target_language);
+    const translatedText = await translate(
+        text,
+        extension_settings.translate.target_language,
+    );
     $("#send_textarea").val(translatedText);
 }
 
@@ -165,25 +179,32 @@ async function translateIncomingMessage(messageId) {
     const context = getContext();
     const message = context.chat[messageId];
 
-    if (typeof message.extra !== 'object') {
+    if (typeof message.extra !== "object") {
         message.extra = {};
     }
 
     // New swipe is being generated. Don't translate that
-    if ($(`#chat .mes[mesid="${messageId}"] .mes_text`).text() == '...') {
+    if ($(`#chat .mes[mesid="${messageId}"] .mes_text`).text() == "...") {
         return;
     }
 
-    const textToTranslate = substituteParams(message.mes, context.name1, message.name);
-    const translation = await translate(textToTranslate, extension_settings.translate.target_language);
+    const textToTranslate = substituteParams(
+        message.mes,
+        context.name1,
+        message.name,
+    );
+    const translation = await translate(
+        textToTranslate,
+        extension_settings.translate.target_language,
+    );
     message.extra.display_text = translation;
 
     updateMessageBlock(messageId, message);
 }
 
 async function translateProviderGoogle(text, lang) {
-    const response = await fetch('/google_translate', {
-        method: 'POST',
+    const response = await fetch("/google_translate", {
+        method: "POST",
         headers: getRequestHeaders(),
         body: JSON.stringify({ text: text, lang: lang }),
     });
@@ -198,11 +219,11 @@ async function translateProviderGoogle(text, lang) {
 
 async function translateProviderDeepl(text, lang) {
     if (!secret_state.deepl) {
-        throw new Error('No DeepL API key');
+        throw new Error("No DeepL API key");
     }
 
-    const response = await fetch('/deepl_translate', {
-        method: 'POST',
+    const response = await fetch("/deepl_translate", {
+        method: "POST",
         headers: getRequestHeaders(),
         body: JSON.stringify({ text: text, lang: lang }),
     });
@@ -218,17 +239,20 @@ async function translateProviderDeepl(text, lang) {
 async function translate(text, lang) {
     try {
         switch (extension_settings.translate.provider) {
-            case 'google':
+            case "google":
                 return await translateProviderGoogle(text, lang);
-            case 'deepl':
+            case "deepl":
                 return await translateProviderDeepl(text, lang);
             default:
-                console.error('Unknown translation provider', extension_settings.translate.provider);
+                console.error(
+                    "Unknown translation provider",
+                    extension_settings.translate.provider,
+                );
                 return text;
         }
     } catch (error) {
         console.log(error);
-        toastr.error(String(error), 'Failed to translate message');
+        toastr.error(String(error), "Failed to translate message");
     }
 }
 
@@ -236,16 +260,19 @@ async function translateOutgoingMessage(messageId) {
     const context = getContext();
     const message = context.chat[messageId];
 
-    if (typeof message.extra !== 'object') {
+    if (typeof message.extra !== "object") {
         message.extra = {};
     }
 
     const originalText = message.mes;
     message.extra.display_text = originalText;
-    message.mes = await translate(originalText, extension_settings.translate.internal_language);
+    message.mes = await translate(
+        originalText,
+        extension_settings.translate.internal_language,
+    );
     updateMessageBlock(messageId, message);
 
-    console.log('translateOutgoingMessage', messageId);
+    console.log("translateOutgoingMessage", messageId);
 }
 
 function shouldTranslate(types) {
@@ -273,7 +300,10 @@ async function onTranslateChatClick() {
         const context = getContext();
         const chat = context.chat;
 
-        toastr.info(`${chat.length} message(s) queued for translation.`, 'Please wait...');
+        toastr.info(
+            `${chat.length} message(s) queued for translation.`,
+            "Please wait...",
+        );
 
         for (let i = 0; i < chat.length; i++) {
             await translateIncomingMessage(i);
@@ -282,14 +312,17 @@ async function onTranslateChatClick() {
         await context.saveChat();
     } catch (error) {
         console.log(error);
-        toastr.error('Failed to translate chat');
+        toastr.error("Failed to translate chat");
     } finally {
         translateChatExecuting = false;
     }
 }
 
 async function onTranslationsClearClick() {
-    const confirm = await callPopup('<h3>Are you sure?</h3>This will remove translated text from all messages in the current chat. This action cannot be undone.', 'confirm');
+    const confirm = await callPopup(
+        "<h3>Are you sure?</h3>This will remove translated text from all messages in the current chat. This action cannot be undone.",
+        "confirm",
+    );
 
     if (!confirm) {
         return;
@@ -313,18 +346,24 @@ async function translateMessageEdit(messageId) {
     const chat = context.chat;
     const message = chat[messageId];
 
-    if (message.is_system || extension_settings.translate.auto_mode == autoModeOptions.NONE) {
+    if (
+        message.is_system ||
+        extension_settings.translate.auto_mode == autoModeOptions.NONE
+    ) {
         return;
     }
 
-    if ((message.is_user && shouldTranslate(outgoingTypes)) || (!message.is_user && shouldTranslate(incomingTypes))) {
+    if (
+        (message.is_user && shouldTranslate(outgoingTypes)) ||
+        (!message.is_user && shouldTranslate(incomingTypes))
+    ) {
         await translateIncomingMessage(messageId);
     }
 }
 
 async function onMessageTranslateClick() {
     const context = getContext();
-    const messageId = $(this).closest('.mes').attr('mesid');
+    const messageId = $(this).closest(".mes").attr("mesid");
     const message = context.chat[messageId];
 
     // If the message is already translated, revert it back to the original text
@@ -340,9 +379,15 @@ async function onMessageTranslateClick() {
     await context.saveChat();
 }
 
-const handleIncomingMessage = createEventHandler(translateIncomingMessage, () => shouldTranslate(incomingTypes));
-const handleOutgoingMessage = createEventHandler(translateOutgoingMessage, () => shouldTranslate(outgoingTypes));
-const handleImpersonateReady = createEventHandler(translateImpersonate, () => shouldTranslate(incomingTypes));
+const handleIncomingMessage = createEventHandler(translateIncomingMessage, () =>
+    shouldTranslate(incomingTypes),
+);
+const handleOutgoingMessage = createEventHandler(translateOutgoingMessage, () =>
+    shouldTranslate(outgoingTypes),
+);
+const handleImpersonateReady = createEventHandler(translateImpersonate, () =>
+    shouldTranslate(incomingTypes),
+);
 const handleMessageEdit = createEventHandler(translateMessageEdit, () => true);
 
 jQuery(() => {
@@ -384,39 +429,41 @@ jQuery(() => {
             <div class="fa-solid fa-language extensionsMenuExtensionButton" /></div>
             Translate Chat
         </div>`;
-    $('#extensionsMenu').append(buttonHtml);
-    $('#extensions_settings2').append(html);
-    $('#translate_chat').on('click', onTranslateChatClick);
-    $('#translation_clear').on('click', onTranslationsClearClick);
+    $("#extensionsMenu").append(buttonHtml);
+    $("#extensions_settings2").append(html);
+    $("#translate_chat").on("click", onTranslateChatClick);
+    $("#translation_clear").on("click", onTranslationsClearClick);
 
     for (const [key, value] of Object.entries(languageCodes)) {
-        $('#translation_target_language').append(`<option value="${value}">${key}</option>`);
+        $("#translation_target_language").append(
+            `<option value="${value}">${key}</option>`,
+        );
     }
 
-    $('#translation_auto_mode').on('change', (event) => {
+    $("#translation_auto_mode").on("change", (event) => {
         extension_settings.translate.auto_mode = event.target.value;
         saveSettingsDebounced();
     });
-    $('#translation_provider').on('change', (event) => {
+    $("#translation_provider").on("change", (event) => {
         extension_settings.translate.provider = event.target.value;
         showKeyButton();
         saveSettingsDebounced();
     });
-    $('#translation_target_language').on('change', (event) => {
+    $("#translation_target_language").on("change", (event) => {
         extension_settings.translate.target_language = event.target.value;
         saveSettingsDebounced();
     });
-    $(document).on('click', '.mes_translate', onMessageTranslateClick);
-    $('#translate_key_button').on('click', async () => {
-        const optionText = $('#translation_provider option:selected').text();
-        const key = await callPopup(`<h3>${optionText} API Key</h3>`, 'input');
+    $(document).on("click", ".mes_translate", onMessageTranslateClick);
+    $("#translate_key_button").on("click", async () => {
+        const optionText = $("#translation_provider option:selected").text();
+        const key = await callPopup(`<h3>${optionText} API Key</h3>`, "input");
 
         if (key == false) {
             return;
         }
 
         await writeSecret(extension_settings.translate.provider, key);
-        toastr.success('API Key saved');
+        toastr.success("API Key saved");
     });
 
     loadSettings();
@@ -427,5 +474,5 @@ jQuery(() => {
     eventSource.on(event_types.IMPERSONATE_READY, handleImpersonateReady);
     eventSource.on(event_types.MESSAGE_EDITED, handleMessageEdit);
 
-    document.body.classList.add('translate');
+    document.body.classList.add("translate");
 });

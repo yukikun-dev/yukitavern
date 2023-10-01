@@ -323,15 +323,9 @@
         }
     ],
     "tag_map": {
-        "default_FluxTheCat.png": [
-            "1345561466591"
-        ],
-        "default_Seraphina.png": [
-            "1345561466591"
-        ],
-        "default_CodingSensei.png": [
-            "1345561466591"
-        ]
+        "default_FluxTheCat.png": ["1345561466591"],
+        "default_Seraphina.png": ["1345561466591"],
+        "default_CodingSensei.png": ["1345561466591"]
     },
     "nai_settings": {
         "temperature": 0.63,
@@ -363,15 +357,7 @@
         "single_line": false,
         "use_stop_sequence": false,
         "streaming_kobold": false,
-        "sampler_order": [
-            6,
-            0,
-            1,
-            2,
-            3,
-            4,
-            5
-        ]
+        "sampler_order": [6, 0, 1, 2, 3, 4, 5]
     },
     "preset_settings_openai": "Default",
     "temp_openai": "0.9",

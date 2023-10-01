@@ -1,24 +1,24 @@
 const SATURATION_BOUND = [0, 100];
 const LIGHTNESS_BOUND = [0, 100];
 
-const pad2 = str => `${str.length === 1 ? '0' : ''}${str}`;
+const pad2 = (str) => `${str.length === 1 ? "0" : ""}${str}`;
 
 const clamp = (num, min, max) => Math.max(Math.min(num, max), min);
 
-const random = (min, max) => Math.floor(Math.random() * ((max - min) + 1)) + min;
+const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 const randomExclude = (min, max, exclude) => {
-  const r = random(min, max);
+    const r = random(min, max);
 
-  for (let i = 0; i < exclude?.length; i++) {
-    const value = exclude[i];
+    for (let i = 0; i < exclude?.length; i++) {
+        const value = exclude[i];
 
-    if (value?.length === 2 && r >= value[0] && r <= value[1]) {
-      return randomExclude(min, max, exclude);
+        if (value?.length === 2 && r >= value[0] && r <= value[1]) {
+            return randomExclude(min, max, exclude);
+        }
     }
-  }
 
-  return r;
+    return r;
 };
 
 /**
@@ -26,30 +26,30 @@ const randomExclude = (min, max, exclude) => {
  * @param  {string} str
  * @return {number}
  */
-const hashCode = str => {
-  const len = str.length;
-  let hash = 0;
+const hashCode = (str) => {
+    const len = str.length;
+    let hash = 0;
 
-  for (let i = 0; i < len; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash &= hash; // Convert to 32bit integer
-  }
+    for (let i = 0; i < len; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash &= hash; // Convert to 32bit integer
+    }
 
-  return hash;
+    return hash;
 };
 
 /**
-* Clamps `num` within the inclusive `range` bounds
-* @param  {number}       num
-* @param  {number|Array} range
-* @return {number}
-*/
+ * Clamps `num` within the inclusive `range` bounds
+ * @param  {number}       num
+ * @param  {number|Array} range
+ * @return {number}
+ */
 const boundHashCode = (num, range) => {
-  if (typeof range === 'number') {
-    return range;
-  }
+    if (typeof range === "number") {
+        return range;
+    }
 
-  return (num % Math.abs(range[1] - range[0])) + range[0];
+    return (num % Math.abs(range[1] - range[0])) + range[0];
 };
 
 /**
@@ -59,18 +59,18 @@ const boundHashCode = (num, range) => {
  * @return {number|Array}
  */
 const sanitizeRange = (range, bound) => {
-  if (typeof range === 'number') {
-    return clamp(Math.abs(range), ...bound);
-  }
+    if (typeof range === "number") {
+        return clamp(Math.abs(range), ...bound);
+    }
 
-  if (range.length === 1 || range[0] === range[1]) {
-    return clamp(Math.abs(range[0]), ...bound);
-  }
+    if (range.length === 1 || range[0] === range[1]) {
+        return clamp(Math.abs(range[0]), ...bound);
+    }
 
-  return [
-    Math.abs(clamp(range[0], ...bound)),
-    clamp(Math.abs(range[1]), ...bound),
-  ];
+    return [
+        Math.abs(clamp(range[0], ...bound)),
+        clamp(Math.abs(range[1]), ...bound),
+    ];
 };
 
 /**
@@ -80,25 +80,25 @@ const sanitizeRange = (range, bound) => {
  * @return {number}
  */
 const hueToRgb = (p, q, t) => {
-  if (t < 0) {
-    t += 1;
-  } else if (t > 1) {
-    t -= 1;
-  }
+    if (t < 0) {
+        t += 1;
+    } else if (t > 1) {
+        t -= 1;
+    }
 
-  if (t < 1 / 6) {
-    return p + ((q - p) * 6 * t);
-  }
+    if (t < 1 / 6) {
+        return p + (q - p) * 6 * t;
+    }
 
-  if (t < 1 / 2) {
-    return q;
-  }
+    if (t < 1 / 2) {
+        return q;
+    }
 
-  if (t < 2 / 3) {
-    return p + ((q - p) * ((2 / 3) - t) * 6);
-  }
+    if (t < 2 / 3) {
+        return p + (q - p) * (2 / 3 - t) * 6;
+    }
 
-  return p;
+    return p;
 };
 
 /**
@@ -109,33 +109,27 @@ const hueToRgb = (p, q, t) => {
  * @return {Array}
  */
 const hslToRgb = (h, s, l) => {
-  let r;
-  let g;
-  let b;
+    let r;
+    let g;
+    let b;
 
-  h /= 360;
-  s /= 100;
-  l /= 100;
+    h /= 360;
+    s /= 100;
+    l /= 100;
 
-  if (s === 0) {
-    // achromatic
-    r = g = b = l;
-  } else {
-    const q = l < 0.5
-      ? l * (1 + s)
-      : (l + s) - (l * s);
-    const p = (2 * l) - q;
+    if (s === 0) {
+        // achromatic
+        r = g = b = l;
+    } else {
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
 
-    r = hueToRgb(p, q, h + (1 / 3));
-    g = hueToRgb(p, q, h);
-    b = hueToRgb(p, q, h - (1 / 3));
-  }
+        r = hueToRgb(p, q, h + 1 / 3);
+        g = hueToRgb(p, q, h);
+        b = hueToRgb(p, q, h - 1 / 3);
+    }
 
-  return [
-    Math.round(r * 255),
-    Math.round(g * 255),
-    Math.round(b * 255),
-  ];
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 };
 
 /**
@@ -147,7 +141,8 @@ const hslToRgb = (h, s, l) => {
  * @param  {number}  differencePoint
  * @return {boolean}
  */
-const rgbIsLight = (r, g, b, differencePoint) => ((r * 299) + (g * 587) + (b * 114)) / 1000 >= differencePoint; // eslint-disable-line max-len
+const rgbIsLight = (r, g, b, differencePoint) =>
+    (r * 299 + g * 587 + b * 114) / 1000 >= differencePoint; // eslint-disable-line max-len
 
 /**
  * Converts an HSL color to string format
@@ -167,13 +162,15 @@ const hslToString = (h, s, l) => `hsl(${h}, ${s}%, ${l}%)`;
  * @return {string}
  */
 const rgbFormat = (r, g, b, format) => {
-  switch (format) {
-    case 'rgb':
-      return `rgb(${r}, ${g}, ${b})`;
-    case 'hex':
-    default:
-      return `#${pad2(r.toString(16))}${pad2(g.toString(16))}${pad2(b.toString(16))}`;
-  }
+    switch (format) {
+        case "rgb":
+            return `rgb(${r}, ${g}, ${b})`;
+        case "hex":
+        default:
+            return `#${pad2(r.toString(16))}${pad2(g.toString(16))}${pad2(
+                b.toString(16),
+            )}`;
+    }
 };
 
 /**
@@ -213,24 +210,28 @@ const rgbFormat = (r, g, b, format) => {
  * // { color: "#afd2ac", isLight: false }
  * ```
  */
-const uniqolor = (value, {
-  format = 'hex',
-  saturation = [50, 55],
-  lightness = [50, 60],
-  differencePoint = 130,
-} = {}) => {
-  const hash = Math.abs(hashCode(String(value)));
-  const h = boundHashCode(hash, [0, 360]);
-  const s = boundHashCode(hash, sanitizeRange(saturation, SATURATION_BOUND));
-  const l = boundHashCode(hash, sanitizeRange(lightness, LIGHTNESS_BOUND));
-  const [r, g, b] = hslToRgb(h, s, l);
+const uniqolor = (
+    value,
+    {
+        format = "hex",
+        saturation = [50, 55],
+        lightness = [50, 60],
+        differencePoint = 130,
+    } = {},
+) => {
+    const hash = Math.abs(hashCode(String(value)));
+    const h = boundHashCode(hash, [0, 360]);
+    const s = boundHashCode(hash, sanitizeRange(saturation, SATURATION_BOUND));
+    const l = boundHashCode(hash, sanitizeRange(lightness, LIGHTNESS_BOUND));
+    const [r, g, b] = hslToRgb(h, s, l);
 
-  return {
-    color: format === 'hsl'
-      ? hslToString(h, s, l)
-      : rgbFormat(r, g, b, format),
-    isLight: rgbIsLight(r, g, b, differencePoint),
-  };
+    return {
+        color:
+            format === "hsl"
+                ? hslToString(h, s, l)
+                : rgbFormat(r, g, b, format),
+        isLight: rgbIsLight(r, g, b, differencePoint),
+    };
 };
 
 /**
@@ -274,30 +275,28 @@ const uniqolor = (value, {
  * ```
  */
 uniqolor.random = ({
-  format = 'hex',
-  saturation = [50, 55],
-  lightness = [50, 60],
-  differencePoint = 130,
-  excludeHue,
+    format = "hex",
+    saturation = [50, 55],
+    lightness = [50, 60],
+    differencePoint = 130,
+    excludeHue,
 } = {}) => {
-  saturation = sanitizeRange(saturation, SATURATION_BOUND);
-  lightness = sanitizeRange(lightness, LIGHTNESS_BOUND);
+    saturation = sanitizeRange(saturation, SATURATION_BOUND);
+    lightness = sanitizeRange(lightness, LIGHTNESS_BOUND);
 
-  const h = excludeHue ? randomExclude(0, 359, excludeHue) : random(0, 359);
-  const s = typeof saturation === 'number'
-    ? saturation
-    : random(...saturation);
-  const l = typeof lightness === 'number'
-    ? lightness
-    : random(...lightness);
-  const [r, g, b] = hslToRgb(h, s, l);
+    const h = excludeHue ? randomExclude(0, 359, excludeHue) : random(0, 359);
+    const s =
+        typeof saturation === "number" ? saturation : random(...saturation);
+    const l = typeof lightness === "number" ? lightness : random(...lightness);
+    const [r, g, b] = hslToRgb(h, s, l);
 
-  return {
-    color: format === 'hsl'
-      ? hslToString(h, s, l)
-      : rgbFormat(r, g, b, format),
-    isLight: rgbIsLight(r, g, b, differencePoint),
-  };
+    return {
+        color:
+            format === "hsl"
+                ? hslToString(h, s, l)
+                : rgbFormat(r, g, b, format),
+        isLight: rgbIsLight(r, g, b, differencePoint),
+    };
 };
 
 export default uniqolor;

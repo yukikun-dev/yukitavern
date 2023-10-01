@@ -2,9 +2,8 @@
 name: Feature request
 about: Suggest an idea for this project
 title: "[Feature Request] "
-labels: ''
-assignees: ''
-
+labels: ""
+assignees: ""
 ---
 
 **Have you searched for similar [requests](https://github.com/SillyTavern/SillyTavern/issues?q=)?**

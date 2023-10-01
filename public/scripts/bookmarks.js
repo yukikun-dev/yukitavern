@@ -25,33 +25,28 @@ import {
 } from "./group-chats.js";
 import { createTagMapFromList } from "./tags.js";
 
-import {
-    delay,
-    getUniqueName,
-    stringFormat,
-} from "./utils.js";
+import { delay, getUniqueName, stringFormat } from "./utils.js";
 
-export {
-    createNewBookmark,
-    showBookmarksButtons,
-}
+export { createNewBookmark, showBookmarksButtons };
 
-const bookmarkNameToken = 'Bookmark #';
+const bookmarkNameToken = "Bookmark #";
 
 async function getExistingChatNames() {
     if (selected_group) {
         const data = await getGroupPastChats(selected_group);
-        return data.map(x => x.file_name);
+        return data.map((x) => x.file_name);
     } else {
         const response = await fetch("/getallchatsofcharacter", {
-            method: 'POST',
+            method: "POST",
             headers: getRequestHeaders(),
-            body: JSON.stringify({ avatar_url: characters[this_chid].avatar })
+            body: JSON.stringify({ avatar_url: characters[this_chid].avatar }),
         });
 
         if (response.ok) {
             const data = await response.json();
-            return Object.values(data).map(x => x.file_name.replace('.jsonl', ''));
+            return Object.values(data).map((x) =>
+                x.file_name.replace(".jsonl", ""),
+            );
         }
     }
 }
@@ -60,12 +55,11 @@ async function getBookmarkName() {
     const chatNames = await getExistingChatNames();
     const popupText = `<h3>Enter the bookmark name:<h3>
     <small>Leave empty to auto-generate.</small>`;
-    let name = await callPopup(popupText, 'input');
+    let name = await callPopup(popupText, "input");
 
     if (name === false) {
         return null;
-    }
-    else if (name === '') {
+    } else if (name === "") {
         for (let i = chatNames.length; i < 1000; i++) {
             name = bookmarkNameToken + i;
             if (!chatNames.includes(name)) {
@@ -79,17 +73,22 @@ async function getBookmarkName() {
 
 function getMainChatName() {
     if (chat_metadata) {
-        if (chat_metadata['main_chat']) {
-            return chat_metadata['main_chat'];
+        if (chat_metadata["main_chat"]) {
+            return chat_metadata["main_chat"];
         }
         // groups didn't support bookmarks before chat metadata was introduced
         else if (selected_group) {
             return null;
-        }
-        else if (characters[this_chid].chat && characters[this_chid].chat.includes(bookmarkNameToken)) {
-            const tokenIndex = characters[this_chid].chat.lastIndexOf(bookmarkNameToken);
-            chat_metadata['main_chat'] = characters[this_chid].chat.substring(0, tokenIndex).trim();
-            return chat_metadata['main_chat'];
+        } else if (
+            characters[this_chid].chat &&
+            characters[this_chid].chat.includes(bookmarkNameToken)
+        ) {
+            const tokenIndex =
+                characters[this_chid].chat.lastIndexOf(bookmarkNameToken);
+            chat_metadata["main_chat"] = characters[this_chid].chat
+                .substring(0, tokenIndex)
+                .trim();
+            return chat_metadata["main_chat"];
         }
     }
     return null;
@@ -103,7 +102,7 @@ function showBookmarksButtons() {
             $("#option_convert_to_group").show();
         }
 
-        if (chat_metadata['main_chat']) {
+        if (chat_metadata["main_chat"]) {
             // In bookmark chat
             $("#option_back_to_main").show();
             $("#option_new_bookmark").show();
@@ -116,8 +115,7 @@ function showBookmarksButtons() {
             $("#option_back_to_main").hide();
             $("#option_new_bookmark").show();
         }
-    }
-    catch {
+    } catch {
         $("#option_back_to_main").hide();
         $("#option_new_bookmark").hide();
         $("#option_convert_to_group").hide();
@@ -126,7 +124,7 @@ function showBookmarksButtons() {
 
 async function saveBookmarkMenu() {
     if (!chat.length) {
-        toastr.warning('The chat is empty.', 'Bookmark creation failed');
+        toastr.warning("The chat is empty.", "Bookmark creation failed");
         return;
     }
 
@@ -135,23 +133,26 @@ async function saveBookmarkMenu() {
 
 async function createNewBookmark(mesId) {
     if (!chat.length) {
-        toastr.warning('The chat is empty.', 'Bookmark creation failed');
+        toastr.warning("The chat is empty.", "Bookmark creation failed");
         return;
     }
 
     if (mesId < 0 || mesId >= chat.length) {
-        toastr.warning('Invalid message ID.', 'Bookmark creation failed');
+        toastr.warning("Invalid message ID.", "Bookmark creation failed");
         return;
     }
 
     const lastMes = chat[mesId];
 
-    if (typeof lastMes.extra !== 'object') {
+    if (typeof lastMes.extra !== "object") {
         lastMes.extra = {};
     }
 
     if (lastMes.extra.bookmark_link) {
-        const confirm = await callPopup('Bookmark checkpoint for the last message already exists. Would you like to replace it?', 'confirm');
+        const confirm = await callPopup(
+            "Bookmark checkpoint for the last message already exists. Would you like to replace it?",
+            "confirm",
+        );
 
         if (!confirm) {
             return;
@@ -165,7 +166,9 @@ async function createNewBookmark(mesId) {
         return;
     }
 
-    const mainChat = selected_group ? groups?.find(x => x.id == selected_group)?.chat_id : characters[this_chid].chat;
+    const mainChat = selected_group
+        ? groups?.find((x) => x.id == selected_group)?.chat_id
+        : characters[this_chid].chat;
     const newMetadata = { main_chat: mainChat };
 
     if (selected_group) {
@@ -174,11 +177,15 @@ async function createNewBookmark(mesId) {
         await saveChat(name, newMetadata, mesId);
     }
 
-    lastMes.extra['bookmark_link'] = name;
-    $(`.mes[mesid="${mesId}"]`).attr('bookmark_link', name);
+    lastMes.extra["bookmark_link"] = name;
+    $(`.mes[mesid="${mesId}"]`).attr("bookmark_link", name);
 
     await saveChatConditional();
-    toastr.success('Click the bookmark icon in the last message to open the checkpoint chat.', 'Bookmark created', { timeOut: 10000 });
+    toastr.success(
+        "Click the bookmark icon in the last message to open the checkpoint chat.",
+        "Bookmark created",
+        { timeOut: 10000 },
+    );
 }
 
 async function backToMainChat() {
@@ -196,26 +203,29 @@ async function backToMainChat() {
 
 async function convertSoloToGroupChat() {
     if (selected_group) {
-        console.log('Already in group. No need for conversion');
+        console.log("Already in group. No need for conversion");
         return;
     }
 
     if (this_chid === undefined) {
-        console.log('Need to have a character selected');
+        console.log("Need to have a character selected");
         return;
     }
 
     const character = characters[this_chid];
 
     // Populate group required fields
-    const name = getUniqueName(`Group: ${character.name}`, y => groups.findIndex(x => x.name === y) !== -1);
-    const avatar = getThumbnailUrl('avatar', character.avatar);
+    const name = getUniqueName(
+        `Group: ${character.name}`,
+        (y) => groups.findIndex((x) => x.name === y) !== -1,
+    );
+    const avatar = getThumbnailUrl("avatar", character.avatar);
     const chatName = humanizedDateTime();
     const chats = [chatName];
     const members = [character.avatar];
     const activationStrategy = group_activation_strategy.NATURAL;
     const allowSelfResponses = false;
-    const favChecked = character.fav || character.fav == 'true';
+    const favChecked = character.fav || character.fav == "true";
     const metadata = Object.assign({}, chat_metadata);
     delete metadata.main_chat;
 
@@ -237,7 +247,7 @@ async function convertSoloToGroupChat() {
     });
 
     if (!createGroupResponse.ok) {
-        console.error('Group creation unsuccessful');
+        console.error("Group creation unsuccessful");
         return;
     }
 
@@ -258,7 +268,7 @@ async function convertSoloToGroupChat() {
         const newMessage = {
             ...system_messages[system_message_types.GROUP],
             send_date: humanizedDateTime(),
-            extra: { type: system_message_types.GROUP }
+            extra: { type: system_message_types.GROUP },
         };
         groupChat.push(newMessage);
     }
@@ -272,18 +282,23 @@ async function convertSoloToGroupChat() {
         }
 
         // Skip messages we don't care about
-        if (message.is_user || message.is_system || message.extra?.type === system_message_types.NARRATOR || message.force_avatar !== undefined) {
+        if (
+            message.is_user ||
+            message.is_system ||
+            message.extra?.type === system_message_types.NARRATOR ||
+            message.force_avatar !== undefined
+        ) {
             continue;
         }
 
         // Set force fields for solo character
         message.name = character.name;
         message.original_avatar = character.avatar;
-        message.force_avatar = getThumbnailUrl('avatar', character.avatar);
+        message.force_avatar = getThumbnailUrl("avatar", character.avatar);
         message.is_name = true;
 
         // Allow regens of a single message in group
-        if (typeof message.extra !== 'object') {
+        if (typeof message.extra !== "object") {
             message.extra = { gen_id: genIdFirst + index };
         }
     }
@@ -296,7 +311,7 @@ async function convertSoloToGroupChat() {
     });
 
     if (!createChatResponse.ok) {
-        console.error('Group chat creation unsuccessful');
+        console.error("Group chat creation unsuccessful");
         return;
     }
 
@@ -304,11 +319,11 @@ async function convertSoloToGroupChat() {
     $(`.group_select[grid="${group.id}"]`).click();
 
     await delay(1);
-    toastr.success('The chat has been successfully converted!');
+    toastr.success("The chat has been successfully converted!");
 }
 
 $(document).ready(function () {
-    $('#option_new_bookmark').on('click', saveBookmarkMenu);
-    $('#option_back_to_main').on('click', backToMainChat);
-    $('#option_convert_to_group').on('click', convertSoloToGroupChat);
+    $("#option_new_bookmark").on("click", saveBookmarkMenu);
+    $("#option_back_to_main").on("click", backToMainChat);
+    $("#option_convert_to_group").on("click", convertSoloToGroupChat);
 });

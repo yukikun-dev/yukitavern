@@ -16,7 +16,7 @@ function createDefaultFiles() {
             if (!fs.existsSync(file)) {
                 const defaultFilePath = path.join(
                     "default",
-                    path.parse(file).base
+                    path.parse(file).base,
                 );
                 fs.copyFileSync(defaultFilePath, file);
                 console.log(`Created default file: ${file}`);
@@ -24,7 +24,7 @@ function createDefaultFiles() {
         } catch (error) {
             console.error(
                 `FATAL: Could not write default file: ${file}`,
-                error
+                error,
             );
         }
     }
@@ -197,7 +197,7 @@ async function loadSentencepieceTokenizer(modelPath) {
     } catch (error) {
         console.error(
             "Sentencepiece tokenizer failed to load: " + modelPath,
-            error
+            error,
         );
         return null;
     }
@@ -374,7 +374,7 @@ if (cliArguments.disableCsrf === false) {
     app.use(doubleCsrfProtection);
 } else {
     console.warn(
-        "\nCSRF protection is disabled. This will make your server vulnerable to CSRF attacks.\n"
+        "\nCSRF protection is disabled. This will make your server vulnerable to CSRF attacks.\n",
     );
     app.get("/csrf-token", (req, res) => {
         res.json({
@@ -411,20 +411,20 @@ app.use(function (req, res, next) {
     if (
         whitelistMode === true &&
         !whitelist.some((x) =>
-            ipMatching.matches(clientIp, ipMatching.getMatch(x))
+            ipMatching.matches(clientIp, ipMatching.getMatch(x)),
         )
     ) {
         console.log(
             "Forbidden: Connection attempt from " +
                 clientIp +
-                ". If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of SillyTavern folder.\n"
+                ". If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of SillyTavern folder.\n",
         );
         return res
             .status(403)
             .send(
                 "<b>Forbidden</b>: Connection attempt from <b>" +
                     clientIp +
-                    "</b>. If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of SillyTavern folder."
+                    "</b>. If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of SillyTavern folder.",
             );
     }
     next();
@@ -438,7 +438,7 @@ app.use((req, res, next) => {
     ) {
         const filePath = path.join(
             charactersPath,
-            decodeURIComponent(req.url.substr("/characters".length))
+            decodeURIComponent(req.url.substr("/characters".length)),
         );
         console.log("req.url: " + req.url);
         console.log(filePath);
@@ -462,8 +462,8 @@ app.use("/backgrounds", (req, res) => {
         path.join(
             process.cwd(),
             "public/backgrounds",
-            req.url.replace(/%20/g, " ")
-        )
+            req.url.replace(/%20/g, " "),
+        ),
     );
     fs.readFile(filePath, (err, data) => {
         if (err) {
@@ -477,7 +477,7 @@ app.use("/backgrounds", (req, res) => {
 
 app.use("/characters", (req, res) => {
     const filePath = decodeURIComponent(
-        path.join(process.cwd(), charactersPath, req.url.replace(/%20/g, " "))
+        path.join(process.cwd(), charactersPath, req.url.replace(/%20/g, " ")),
     );
     fs.readFile(filePath, (err, data) => {
         if (err) {
@@ -489,8 +489,8 @@ app.use("/characters", (req, res) => {
 });
 app.use(
     multer({ dest: "uploads", limits: { fieldSize: 10 * 1024 * 1024 } }).single(
-        "avatar"
-    )
+        "avatar",
+    ),
 );
 app.get("/", function (request, response) {
     response.sendFile(process.cwd() + "/public/index.html");
@@ -528,13 +528,13 @@ app.post(
                         `${api_server}/extra/abort`,
                         {
                             method: "POST",
-                        }
+                        },
                     );
 
                     if (!abortResponse.ok) {
                         console.log(
                             "Error sending abort request to Kobold:",
-                            abortResponse.status
+                            abortResponse.status,
                         );
                     }
                 } catch (error) {
@@ -628,7 +628,7 @@ app.post(
                     if (!response.ok) {
                         const errorText = await response.text();
                         console.log(
-                            `Kobold returned error: ${response.status} ${response.statusText} ${errorText}`
+                            `Kobold returned error: ${response.status} ${response.statusText} ${errorText}`,
                         );
 
                         try {
@@ -655,7 +655,7 @@ app.post(
                         console.debug(
                             `KoboldAI is busy. Retry attempt ${
                                 i + 1
-                            } of ${MAX_RETRIES}...`
+                            } of ${MAX_RETRIES}...`,
                         );
                         await delay(delayAmount);
                         break;
@@ -663,7 +663,7 @@ app.post(
                         if ("status" in error) {
                             console.log(
                                 "Status Code from Kobold:",
-                                error.status
+                                error.status,
                             );
                         }
                         return response_generate.send({ error: true });
@@ -673,7 +673,7 @@ app.post(
 
         console.log("Max retries exceeded. Giving up.");
         return response_generate.send({ error: true });
-    }
+    },
 );
 
 //************** Text generation web UI
@@ -722,14 +722,14 @@ app.post(
                 while (true) {
                     if (isGenerationStopped) {
                         console.error(
-                            "Streaming stopped by user. Closing websocket..."
+                            "Streaming stopped by user. Closing websocket...",
                         );
                         websocket.close();
                         return;
                     }
 
                     const rawMessage = await new Promise((resolve) =>
-                        websocket.once("message", resolve)
+                        websocket.once("message", resolve),
                     );
                     const message = json5.parse(rawMessage);
 
@@ -776,7 +776,7 @@ app.post(
             if (request.body.use_mancer) {
                 args.headers = Object.assign(
                     args.headers,
-                    get_mancer_headers()
+                    get_mancer_headers(),
                 );
             }
 
@@ -798,7 +798,7 @@ app.post(
                 return response_generate.send(retval);
             }
         }
-    }
+    },
 );
 
 app.post("/savechat", jsonParser, function (request, response) {
@@ -808,10 +808,10 @@ app.post("/savechat", jsonParser, function (request, response) {
         let jsonlData = chat_data.map(JSON.stringify).join("\n");
         fs.writeFileSync(
             `${chatsPath + sanitize(dir_name)}/${sanitize(
-                String(request.body.file_name)
+                String(request.body.file_name),
             )}.jsonl`,
             jsonlData,
-            "utf8"
+            "utf8",
         );
         return response.send({ result: "ok" });
     } catch (error) {
@@ -836,7 +836,7 @@ app.post("/getchat", jsonParser, function (request, response) {
         }
 
         const fileName = `${chatsPath + dirName}/${sanitize(
-            String(request.body.file_name)
+            String(request.body.file_name),
         )}.jsonl`;
         const chatFileExists = fs.existsSync(fileName);
 
@@ -913,7 +913,7 @@ app.post(
             .on("error", function () {
                 response_getstatus.send({ result: "no_connection" });
             });
-    }
+    },
 );
 
 const formatApiUrl = (url) =>
@@ -1028,7 +1028,7 @@ function readFromV2(char) {
                 char[charField] = defaultValue;
             } else {
                 console.debug(
-                    `Spec v2 data missing for unknown field: ${charField}`
+                    `Spec v2 data missing for unknown field: ${charField}`,
                 );
                 return;
             }
@@ -1041,7 +1041,7 @@ function readFromV2(char) {
             console.debug(
                 `Spec v2 data mismatch with Spec v1 for field: ${charField}`,
                 char[charField],
-                v2Value
+                v2Value,
             );
         }
         char[charField] = v2Value;
@@ -1105,7 +1105,7 @@ function charaFormatData(data) {
     _.set(
         char,
         "data.post_history_instructions",
-        data.post_history_instructions || ""
+        data.post_history_instructions || "",
     );
     _.set(
         char,
@@ -1115,7 +1115,7 @@ function charaFormatData(data) {
                   .split(",")
                   .map((x) => x.trim())
                   .filter((x) => x)
-            : data.tags || []
+            : data.tags || [],
     );
     _.set(char, "data.creator", data.creator || "");
     _.set(char, "data.character_version", data.character_version || "");
@@ -1143,12 +1143,12 @@ function charaFormatData(data) {
                 _.set(
                     char,
                     "data.character_book",
-                    convertWorldInfoToCharacterBook(data.world, file.entries)
+                    convertWorldInfoToCharacterBook(data.world, file.entries),
                 );
             }
         } catch {
             console.debug(
-                `Failed to read world info file: ${data.world}. Character book will not be available.`
+                `Failed to read world info file: ${data.world}. Character book will not be available.`,
             );
         }
     }
@@ -1191,15 +1191,15 @@ app.post("/renamechat", jsonParser, async function (request, response) {
         ? directories.groupChats
         : path.join(
               directories.chats,
-              String(request.body.avatar_url).replace(".png", "")
+              String(request.body.avatar_url).replace(".png", ""),
           );
     const pathToOriginalFile = path.join(
         pathToFolder,
-        request.body.original_file
+        request.body.original_file,
     );
     const pathToRenamedFile = path.join(
         pathToFolder,
-        request.body.renamed_file
+        request.body.renamed_file,
     );
     console.log("Old chat name", pathToOriginalFile);
     console.log("New chat name", pathToRenamedFile);
@@ -1291,20 +1291,20 @@ app.post(
             if (!request.file) {
                 const avatarPath = path.join(
                     charactersPath,
-                    request.body.avatar_url
+                    request.body.avatar_url,
                 );
                 await charaWrite(
                     avatarPath,
                     char,
                     target_img,
                     response,
-                    "Character saved"
+                    "Character saved",
                 );
             } else {
                 const crop = tryParse(request.query.crop);
                 const newAvatarPath = path.join(
                     "./uploads/",
-                    request.file.filename
+                    request.file.filename,
                 );
                 invalidateThumbnail("avatar", request.body.avatar_url);
                 await charaWrite(
@@ -1313,13 +1313,13 @@ app.post(
                     target_img,
                     response,
                     "Character saved",
-                    crop
+                    crop,
                 );
             }
         } catch {
             console.error("An error occured, character edit invalidated.");
         }
-    }
+    },
 );
 
 /**
@@ -1356,7 +1356,7 @@ app.post(
         try {
             const avatarPath = path.join(
                 charactersPath,
-                request.body.avatar_url
+                request.body.avatar_url,
             );
             charaRead(avatarPath)
                 .then((char) => {
@@ -1381,19 +1381,19 @@ app.post(
                         char,
                         request.body.avatar_url.replace(".png", ""),
                         response,
-                        "Character saved"
+                        "Character saved",
                     );
                 })
                 .catch((err) => {
                     console.error(
                         "An error occured, character edit invalidated.",
-                        err
+                        err,
                     );
                 });
         } catch {
             console.error("An error occured, character edit invalidated.");
         }
-    }
+    },
 );
 
 app.post("/deletecharacter", jsonParser, async function (request, response) {
@@ -1441,7 +1441,7 @@ async function charaWrite(
     target_img,
     response = undefined,
     mes = "ok",
-    crop = undefined
+    crop = undefined,
 ) {
     try {
         // Read the image, resize, and save it as a PNG into the buffer
@@ -1450,7 +1450,7 @@ async function charaWrite(
         // Get the chunks
         const chunks = extract(image);
         const tEXtChunks = chunks.filter(
-            (chunk) => chunk.create_date === "tEXt" || chunk.name === "tEXt"
+            (chunk) => chunk.create_date === "tEXt" || chunk.name === "tEXt",
         );
 
         // Remove all existing tEXt chunks
@@ -1464,7 +1464,7 @@ async function charaWrite(
 
         fs.writeFileSync(
             charactersPath + target_img + ".png",
-            new Buffer.from(encode(chunks))
+            new Buffer.from(encode(chunks)),
         );
         if (response !== undefined) response.send(mes);
         return true;
@@ -1485,7 +1485,7 @@ async function tryReadImage(img_url, crop) {
         if (
             typeof crop == "object" &&
             [crop.x, crop.y, crop.width, crop.height].every(
-                (x) => typeof x === "number"
+                (x) => typeof x === "number",
             )
         ) {
             rawImg = rawImg.crop(crop.x, crop.y, crop.width, crop.height);
@@ -1539,7 +1539,7 @@ const calculateDataSize = (data) => {
     return typeof data === "object"
         ? Object.values(data).reduce(
               (acc, val) => acc + new String(val).length,
-              0
+              0,
           )
         : 0;
 };
@@ -1608,7 +1608,7 @@ app.post("/getcharacters", jsonParser, function (request, response) {
         characters = {};
 
         let processingPromises = pngFiles.map((file, index) =>
-            processCharacter(file, index)
+            processCharacter(file, index),
         );
         await Promise.all(processingPromises);
         performance.mark("B");
@@ -1673,7 +1673,7 @@ app.post("/deleteuseravatar", jsonParser, function (request, response) {
 
     const fileName = path.join(
         directories.avatars,
-        sanitize(request.body.avatar)
+        sanitize(request.body.avatar),
     );
 
     if (fs.existsSync(fileName)) {
@@ -1709,7 +1709,7 @@ app.post("/delbackground", jsonParser, function (request, response) {
 
     const fileName = path.join(
         "public/backgrounds/",
-        sanitize(request.body.bg)
+        sanitize(request.body.bg),
     );
 
     if (!fs.existsSync(fileName)) {
@@ -1736,7 +1736,7 @@ app.post("/delchat", jsonParser, function (request, response) {
 
     const dirName = String(request.body.avatar_url).replace(".png", "");
     const fileName = `${chatsPath + dirName}/${sanitize(
-        String(request.body.chatfile)
+        String(request.body.chatfile),
     )}`;
     const chatFileExists = fs.existsSync(fileName);
 
@@ -1758,11 +1758,11 @@ app.post("/renamebackground", jsonParser, function (request, response) {
 
     const oldFileName = path.join(
         "public/backgrounds/",
-        sanitize(request.body.old_bg)
+        sanitize(request.body.old_bg),
     );
     const newFileName = path.join(
         "public/backgrounds/",
-        sanitize(request.body.new_bg)
+        sanitize(request.body.new_bg),
     );
 
     if (!fs.existsSync(oldFileName)) {
@@ -1809,7 +1809,7 @@ app.post("/savesettings", jsonParser, function (request, response) {
             } else {
                 response.send({ result: "ok" });
             }
-        }
+        },
     );
 
     /*fs.writeFile('public/settings.json', JSON.stringify(request.body), 'utf8', function (err) {
@@ -1845,10 +1845,10 @@ function readAndParseFromDirectory(directoryPath, fileExtension = ".json") {
         try {
             const file = fs.readFileSync(
                 path.join(directoryPath, item),
-                "utf-8"
+                "utf-8",
             );
             parsedFiles.push(
-                fileExtension == ".json" ? json5.parse(file) : file
+                fileExtension == ".json" ? json5.parse(file) : file,
             );
         } catch {
             // skip
@@ -1879,12 +1879,12 @@ function readPresetsFromDirectory(directoryPath, options = {}) {
         try {
             const file = fs.readFileSync(
                 path.join(directoryPath, item),
-                "utf8"
+                "utf8",
             );
             json5.parse(file);
             fileContents.push(file);
             fileNames.push(
-                removeFileExtension ? item.replace(/\.[^/.]+$/, "") : item
+                removeFileExtension ? item.replace(/\.[^/.]+$/, "") : item,
             );
         } catch {
             // skip
@@ -1904,7 +1904,7 @@ app.post("/getsettings", jsonParser, (request, response) => {
             if (err) return response.sendStatus(500);
 
             return data;
-        }
+        },
     );
 
     // NovelAI Settings
@@ -1948,7 +1948,7 @@ app.post("/getsettings", jsonParser, (request, response) => {
     const themes = readAndParseFromDirectory(directories.themes);
     const movingUIPresets = readAndParseFromDirectory(directories.movingUI);
     const quickReplyPresets = readAndParseFromDirectory(
-        directories.quickreplies
+        directories.quickreplies,
     );
 
     const instruct = readAndParseFromDirectory(directories.instruct);
@@ -2009,7 +2009,7 @@ app.post("/savetheme", jsonParser, (request, response) => {
 
     const filename = path.join(
         directories.themes,
-        sanitize(request.body.name) + ".json"
+        sanitize(request.body.name) + ".json",
     );
     fs.writeFileSync(filename, JSON.stringify(request.body, null, 4), "utf8");
 
@@ -2023,7 +2023,7 @@ app.post("/savemovingui", jsonParser, (request, response) => {
 
     const filename = path.join(
         directories.movingUI,
-        sanitize(request.body.name) + ".json"
+        sanitize(request.body.name) + ".json",
     );
     fs.writeFileSync(filename, JSON.stringify(request.body, null, 4), "utf8");
 
@@ -2037,7 +2037,7 @@ app.post("/savequickreply", jsonParser, (request, response) => {
 
     const filename = path.join(
         directories.quickreplies,
-        sanitize(request.body.name) + ".json"
+        sanitize(request.body.name) + ".json",
     );
     fs.writeFileSync(filename, JSON.stringify(request.body, null, 4), "utf8");
 
@@ -2140,12 +2140,12 @@ app.post(
                         console.log(data);
                         response_getstatus_novel.send({ error: true });
                     }
-                }
+                },
             )
             .on("error", function () {
                 response_getstatus_novel.send({ error: true });
             });
-    }
+    },
 );
 
 app.post(
@@ -2257,7 +2257,7 @@ app.post(
                     const text = await response.text();
                     let message = text;
                     console.log(
-                        `Novel API returned error: ${response.status} ${response.statusText} ${text}`
+                        `Novel API returned error: ${response.status} ${response.statusText} ${text}`,
                     );
 
                     try {
@@ -2278,7 +2278,7 @@ app.post(
         } catch (error) {
             return response_generate_novel.send({ error: true });
         }
-    }
+    },
 );
 
 app.post("/getallchatsofcharacter", jsonParser, function (request, response) {
@@ -2295,7 +2295,7 @@ app.post("/getallchatsofcharacter", jsonParser, function (request, response) {
 
         // filter for JSON files
         const jsonFiles = files.filter(
-            (file) => path.extname(file) === ".jsonl"
+            (file) => path.extname(file) === ".jsonl",
         );
 
         // sort the files by name
@@ -2308,7 +2308,7 @@ app.post("/getallchatsofcharacter", jsonParser, function (request, response) {
             for (let i = jsonFiles.length - 1; i >= 0; i--) {
                 const file = jsonFiles[i];
                 const fileStream = fs.createReadStream(
-                    chatsPath + char_dir + "/" + file
+                    chatsPath + char_dir + "/" + file,
                 );
 
                 const fullPathAndFile = chatsPath + char_dir + "/" + file;
@@ -2348,7 +2348,7 @@ app.post("/getallchatsofcharacter", jsonParser, function (request, response) {
                         } else {
                             console.log(
                                 "Found an invalid or corrupted chat file: " +
-                                    fullPathAndFile
+                                    fullPathAndFile,
                             );
                         }
                     }
@@ -2405,7 +2405,7 @@ app.post(
                         unsetFavFlag(jsonData);
                         jsonData = readFromV2(jsonData);
                         png_name = getPngName(
-                            jsonData.data?.name || jsonData.name
+                            jsonData.data?.name || jsonData.name,
                         );
                         let char = JSON.stringify(jsonData);
                         charaWrite(
@@ -2413,7 +2413,7 @@ app.post(
                             char,
                             png_name,
                             response,
-                            { file_name: png_name }
+                            { file_name: png_name },
                         );
                     } else if (jsonData.name !== undefined) {
                         console.log("importing from v1 json");
@@ -2422,7 +2422,7 @@ app.post(
                             jsonData.creator_notes =
                                 jsonData.creator_notes.replace(
                                     "Creator's notes go here.",
-                                    ""
+                                    "",
                                 );
                         }
                         png_name = getPngName(jsonData.name);
@@ -2454,7 +2454,7 @@ app.post(
                             char,
                             png_name,
                             response,
-                            { file_name: png_name }
+                            { file_name: png_name },
                         );
                     } else if (jsonData.char_name !== undefined) {
                         //json Pygmalion notepad
@@ -2464,7 +2464,7 @@ app.post(
                             jsonData.creator_notes =
                                 jsonData.creator_notes.replace(
                                     "Creator's notes go here.",
-                                    ""
+                                    "",
                                 );
                         }
                         png_name = getPngName(jsonData.char_name);
@@ -2496,7 +2496,7 @@ app.post(
                             char,
                             png_name,
                             response,
-                            { file_name: png_name }
+                            { file_name: png_name },
                         );
                     } else {
                         console.log("Incorrect character format .json");
@@ -2509,7 +2509,7 @@ app.post(
                     let jsonData = json5.parse(img_data);
 
                     jsonData.name = sanitize(
-                        jsonData.data?.name || jsonData.name
+                        jsonData.data?.name || jsonData.name,
                     );
                     png_name = getPngName(jsonData.name);
 
@@ -2517,13 +2517,13 @@ app.post(
                         try {
                             let convertedPath = path.join(
                                 "./uploads",
-                                path.basename(uploadPath, ".webp") + ".png"
+                                path.basename(uploadPath, ".webp") + ".png",
                             );
                             await webp.dwebp(uploadPath, convertedPath, "-o");
                             uploadPath = convertedPath;
                         } catch {
                             console.error(
-                                "WEBP image conversion failed. Using the default character image."
+                                "WEBP image conversion failed. Using the default character image.",
                             );
                             uploadPath = defaultAvatarPath;
                         }
@@ -2545,7 +2545,7 @@ app.post(
                             jsonData.creator_notes =
                                 jsonData.creator_notes.replace(
                                     "Creator's notes go here.",
-                                    ""
+                                    "",
                                 );
                         }
 
@@ -2585,7 +2585,7 @@ app.post(
                 }
             }
         }
-    }
+    },
 );
 
 app.post("/dupecharacter", jsonParser, async function (request, response) {
@@ -2597,7 +2597,7 @@ app.post("/dupecharacter", jsonParser, async function (request, response) {
         }
         let filename = path.join(
             directories.characters,
-            sanitize(request.body.avatar_url)
+            sanitize(request.body.avatar_url),
         );
         if (!fs.existsSync(filename)) {
             console.log("file for dupe not found");
@@ -2634,7 +2634,7 @@ app.post("/exportchat", jsonParser, async function (request, response) {
         ? directories.groupChats
         : path.join(
               directories.chats,
-              String(request.body.avatar_url).replace(".png", "")
+              String(request.body.avatar_url).replace(".png", ""),
           );
     let filename = path.join(pathToFolder, request.body.file);
     let exportfilename = request.body.exportfilename;
@@ -2707,7 +2707,7 @@ app.post("/exportcharacter", jsonParser, async function (request, response) {
 
     let filename = path.join(
         directories.characters,
-        sanitize(request.body.avatar_url)
+        sanitize(request.body.avatar_url),
     );
 
     if (!fs.existsSync(filename)) {
@@ -2746,7 +2746,7 @@ app.post("/exportcharacter", jsonParser, async function (request, response) {
                     inputWebpPath,
                     outputWebpPath,
                     metadataPath,
-                    "exif"
+                    "exif",
                 );
 
                 response.sendFile(
@@ -2756,7 +2756,7 @@ app.post("/exportcharacter", jsonParser, async function (request, response) {
                         fs.rmSync(inputWebpPath);
                         fs.rmSync(metadataPath);
                         fs.rmSync(outputWebpPath);
-                    }
+                    },
                 );
 
                 return;
@@ -2776,7 +2776,7 @@ app.post("/importgroupchat", urlencodedParser, function (request, response) {
         const chatname = humanizedISO8601DateTime();
         fs.copyFileSync(
             `./uploads/${filedata.filename}`,
-            `${directories.groupChats}/${chatname}.jsonl`
+            `${directories.groupChats}/${chatname}.jsonl`,
         );
         return response.send({ res: chatname });
     } catch (error) {
@@ -2833,7 +2833,7 @@ app.post("/importchat", urlencodedParser, function (request, response) {
                         (jsonData.histories.histories ?? []).forEach(
                             (history) => {
                                 newChats.push(chat.from(history));
-                            }
+                            },
                         );
 
                         const errors = [];
@@ -2844,14 +2844,14 @@ app.post("/importchat", urlencodedParser, function (request, response) {
                                 }/${ch_name} - ${humanizedISO8601DateTime()} imported.jsonl`,
                                 chat.map(JSON.stringify).join("\n"),
                                 "utf8",
-                                (err) => err ?? errors.push(err)
-                            )
+                                (err) => err ?? errors.push(err),
+                            ),
                         );
 
                         if (0 < errors.length) {
                             response.send(
                                 "Errors occurred while writing character files. Errors: " +
-                                    JSON.stringify(errors)
+                                    JSON.stringify(errors),
                             );
                         }
 
@@ -2894,20 +2894,20 @@ app.post("/importchat", urlencodedParser, function (request, response) {
                                 chatsPath + avatar_url
                             }/${ch_name} - ${humanizedISO8601DateTime()} imported.jsonl`,
                             chat.map(JSON.stringify).join("\n"),
-                            "utf8"
+                            "utf8",
                         );
 
                         response.send({ res: true });
                     } else {
                         response.send({ error: true });
                     }
-                }
+                },
             );
         }
         if (format === "jsonl") {
             //console.log(humanizedISO8601DateTime()+':imported chat format is JSONL');
             const fileStream = fs.createReadStream(
-                "./uploads/" + filedata.filename
+                "./uploads/" + filedata.filename,
             );
             const rl = readline.createInterface({
                 input: fileStream,
@@ -2934,7 +2934,7 @@ app.post("/importchat", urlencodedParser, function (request, response) {
                                 response.send({ res: true });
                                 return;
                             }
-                        }
+                        },
                     );
                 } else {
                     response.send({ error: true });
@@ -3018,7 +3018,7 @@ app.post("/uploaduseravatar", urlencodedParser, async (request, response) => {
         if (
             typeof crop == "object" &&
             [crop.x, crop.y, crop.width, crop.height].every(
-                (x) => typeof x === "number"
+                (x) => typeof x === "number",
             )
         ) {
             rawImg = rawImg.crop(crop.x, crop.y, crop.width, crop.height);
@@ -3067,12 +3067,12 @@ app.post("/getgroups", jsonParser, (_, response) => {
                 for (const chat of chats) {
                     if (group.chats.includes(path.parse(chat).name)) {
                         const chatStat = fs.statSync(
-                            path.join(directories.groupChats, chat)
+                            path.join(directories.groupChats, chat),
                         );
                         chat_size += chatStat.size;
                         date_last_chat = Math.max(
                             date_last_chat,
-                            chatStat.mtimeMs
+                            chatStat.mtimeMs,
                         );
                     }
                 }
@@ -3202,7 +3202,7 @@ app.post("/deletegroup", jsonParser, async (request, response) => {
                 console.log("Deleting group chat", chat);
                 const pathToFile = path.join(
                     directories.groupChats,
-                    `${id}.jsonl`
+                    `${id}.jsonl`,
                 );
 
                 if (fs.existsSync(pathToFile)) {
@@ -3213,7 +3213,7 @@ app.post("/deletegroup", jsonParser, async (request, response) => {
     } catch (error) {
         console.error(
             "Could not delete group chats. Clean them up manually.",
-            error
+            error,
         );
     }
 
@@ -3233,7 +3233,7 @@ app.get("/discover_extensions", jsonParser, function (_, response) {
     const extensions = fs
         .readdirSync(directories.extensions)
         .filter((f) =>
-            fs.statSync(path.join(directories.extensions, f)).isDirectory()
+            fs.statSync(path.join(directories.extensions, f)).isDirectory(),
         )
         .filter((f) => f !== "third-party");
 
@@ -3248,7 +3248,7 @@ app.get("/discover_extensions", jsonParser, function (_, response) {
         .filter((f) =>
             fs
                 .statSync(path.join(directories.extensions, "third-party", f))
-                .isDirectory()
+                .isDirectory(),
         );
 
     // add the third-party extensions to the extensions array
@@ -3391,7 +3391,7 @@ async function generateThumbnail(type, file) {
                 .getBufferAsync(mime.lookup("jpg"));
         } catch (inner) {
             console.warn(
-                `Thumbnailer can not process the image: ${pathToOriginalFile}. Using original size`
+                `Thumbnailer can not process the image: ${pathToOriginalFile}. Using original size`,
             );
             buffer = fs.readFileSync(pathToOriginalFile);
         }
@@ -3448,7 +3448,7 @@ app.post(
 
         if (request.body.use_openrouter == false) {
             api_url = new URL(
-                request.body.reverse_proxy || api_openai
+                request.body.reverse_proxy || api_openai,
             ).toString();
             api_key_openai = request.body.reverse_proxy
                 ? request.body.proxy_password
@@ -3480,7 +3480,7 @@ app.post(
                         data.data.forEach((model) => {
                             const context_length = model.context_length;
                             const tokens_dollar = parseFloat(
-                                1 / (1000 * model.pricing.prompt)
+                                1 / (1000 * model.pricing.prompt),
                             );
                             const tokens_rounded = (
                                 Math.round(tokens_dollar * 1000) / 1000
@@ -3518,7 +3518,7 @@ app.post(
             .on("error", function () {
                 response_getstatus_openai.send({ error: true });
             });
-    }
+    },
 );
 
 app.post("/openai_bias", jsonParser, async function (request, response) {
@@ -3565,7 +3565,7 @@ app.post("/deletepreset_openai", jsonParser, function (request, response) {
     const name = request.body.name;
     const pathToFile = path.join(
         directories.openAI_Settings,
-        `${name}.settings`
+        `${name}.settings`,
     );
 
     if (fs.existsSync(pathToFile)) {
@@ -3670,7 +3670,7 @@ async function sendScaleRequest(request, response) {
             console.log(
                 `Scale API returned error: ${generateResponse.status} ${
                     generateResponse.statusText
-                } ${await generateResponse.text()}`
+                } ${await generateResponse.text()}`,
             );
             return response
                 .status(generateResponse.status)
@@ -3696,7 +3696,7 @@ async function sendClaudeRequest(request, response) {
     const fetch = require("node-fetch").default;
 
     const api_url = new URL(
-        request.body.reverse_proxy || api_claude
+        request.body.reverse_proxy || api_claude,
     ).toString();
     const api_key_claude = request.body.reverse_proxy
         ? request.body.proxy_password
@@ -3716,7 +3716,7 @@ async function sendClaudeRequest(request, response) {
         let requestPrompt = convertClaudePrompt(
             request.body.messages,
             true,
-            true
+            true,
         );
 
         if (request.body.assistant_prefill) {
@@ -3764,7 +3764,7 @@ async function sendClaudeRequest(request, response) {
                 console.log(
                     `Claude API returned error: ${generateResponse.status} ${
                         generateResponse.statusText
-                    } ${await generateResponse.text()}`
+                    } ${await generateResponse.text()}`,
                 );
                 return response
                     .status(generateResponse.status)
@@ -3809,7 +3809,7 @@ app.post(
 
         if (!request.body.use_openrouter) {
             api_url = new URL(
-                request.body.reverse_proxy || api_openai
+                request.body.reverse_proxy || api_openai,
             ).toString();
             api_key_openai = request.body.reverse_proxy
                 ? request.body.proxy_password
@@ -3831,7 +3831,7 @@ app.post(
         const isTextCompletion = Boolean(
             request.body.model &&
                 (request.body.model.startsWith("text-") ||
-                    request.body.model.startsWith("code-"))
+                    request.body.model.startsWith("code-")),
         );
         const textPrompt = isTextCompletion
             ? convertChatMLPrompt(request.body.messages)
@@ -3886,7 +3886,7 @@ app.post(
             response_generate_openai,
             request,
             retries = 5,
-            timeout = 1000
+            timeout = 1000,
         ) {
             try {
                 const response = await axios(config);
@@ -3908,7 +3908,7 @@ app.post(
                     handleErrorResponse(
                         response,
                         response_generate_openai,
-                        request
+                        request,
                     );
                 }
             } catch (error) {
@@ -3923,7 +3923,7 @@ app.post(
                             config,
                             response_generate_openai,
                             request,
-                            retries - 1
+                            retries - 1,
                         );
                     }, timeout);
                 } else {
@@ -3955,7 +3955,7 @@ app.post(
         function handleErrorResponse(
             response,
             response_generate_openai,
-            request
+            request,
         ) {
             if (response.status >= 400 && response.status <= 504) {
                 console.log("Error occurred:", response.status, response.data);
@@ -3996,7 +3996,7 @@ app.post(
         }
 
         makeRequest(config, response_generate_openai, request);
-    }
+    },
 );
 
 app.post(
@@ -4038,7 +4038,7 @@ app.post(
         //tokenizer.free();
 
         response_tokenize_openai.send({ token_count: num_tokens });
-    }
+    },
 );
 
 app.post("/save_preset", jsonParser, function (request, response) {
@@ -4058,7 +4058,7 @@ app.post("/save_preset", jsonParser, function (request, response) {
     fs.writeFileSync(
         fullpath,
         JSON.stringify(request.body.preset, null, 4),
-        "utf-8"
+        "utf-8",
     );
     return response.send({ name });
 });
@@ -4128,17 +4128,17 @@ function createTokenizationHandler(getTokenizerFn) {
 app.post(
     "/tokenize_llama",
     jsonParser,
-    createTokenizationHandler(() => spp_llama)
+    createTokenizationHandler(() => spp_llama),
 );
 app.post(
     "/tokenize_nerdstash",
     jsonParser,
-    createTokenizationHandler(() => spp_nerd)
+    createTokenizationHandler(() => spp_nerd),
 );
 app.post(
     "/tokenize_nerdstash_v2",
     jsonParser,
-    createTokenizationHandler(() => spp_nerd_v2)
+    createTokenizationHandler(() => spp_nerd_v2),
 );
 app.post("/tokenize_via_api", jsonParser, async function (request, response) {
     if (!request.body) {
@@ -4196,13 +4196,13 @@ function getAsync(url, args) {
 const tavernUrl = new URL(
     (cliArguments.ssl ? "https://" : "http://") +
         (listen ? "0.0.0.0" : "127.0.0.1") +
-        (":" + server_port)
+        (":" + server_port),
 );
 
 const autorunUrl = new URL(
     (cliArguments.ssl ? "https://" : "http://") +
         "127.0.0.1" +
-        (":" + server_port)
+        (":" + server_port),
 );
 
 const setupTasks = async function () {
@@ -4212,7 +4212,7 @@ const setupTasks = async function () {
         `SillyTavern ${version.pkgVersion}` +
             (version.gitBranch
                 ? ` '${version.gitBranch}' (${version.gitRevision})`
-                : "")
+                : ""),
     );
 
     backupSettings();
@@ -4250,7 +4250,7 @@ const setupTasks = async function () {
 
     if (listen) {
         console.log(
-            "\n0.0.0.0 means SillyTavern is listening on all network interfaces (Wi-Fi, LAN, localhost). If you want to limit it only to internal localhost (127.0.0.1), change the setting in config.conf to “listen=false”\n"
+            "\n0.0.0.0 means SillyTavern is listening on all network interfaces (Wi-Fi, LAN, localhost). If you want to limit it only to internal localhost (127.0.0.1), change the setting in config.conf to “listen=false”\n",
         );
     }
 };
@@ -4258,11 +4258,11 @@ const setupTasks = async function () {
 if (listen && !config.whitelistMode && !config.basicAuthMode) {
     if (config.securityOverride)
         console.warn(
-            "Security has been overriden. If it's not a trusted network, change the settings."
+            "Security has been overriden. If it's not a trusted network, change the settings.",
         );
     else {
         console.error(
-            "Your SillyTavern is currently unsecurely open to the public. Enable whitelisting or basic authentication."
+            "Your SillyTavern is currently unsecurely open to the public. Enable whitelisting or basic authentication.",
         );
         process.exit(1);
     }
@@ -4274,14 +4274,14 @@ if (true === cliArguments.ssl)
                 cert: fs.readFileSync(cliArguments.certPath),
                 key: fs.readFileSync(cliArguments.keyPath),
             },
-            app
+            app,
         )
         .listen(tavernUrl.port || 443, tavernUrl.hostname, setupTasks);
 else
     http.createServer(app).listen(
         tavernUrl.port || 80,
         tavernUrl.hostname,
-        setupTasks
+        setupTasks,
     );
 
 async function convertWebp() {
@@ -4300,12 +4300,12 @@ async function convertWebp() {
             const source = path.join(directories.characters, file);
             const dest = path.join(
                 directories.characters,
-                path.basename(file, ".webp") + ".png"
+                path.basename(file, ".webp") + ".png",
             );
 
             if (fs.existsSync(dest)) {
                 console.log(
-                    `${dest} already exists. Delete ${source} manually`
+                    `${dest} already exists. Delete ${source} manually`,
                 );
                 continue;
             }
@@ -4354,7 +4354,7 @@ function backupSettings() {
 
         const backupFile = path.join(
             directories.backups,
-            `settings_${generateTimestamp()}.json`
+            `settings_${generateTimestamp()}.json`,
         );
         fs.copyFileSync(SETTINGS_FILE, backupFile);
 
@@ -4362,7 +4362,7 @@ function backupSettings() {
         if (files.length > MAX_BACKUPS) {
             files = files.map((f) => path.join(directories.backups, f));
             files.sort(
-                (a, b) => fs.statSync(a).mtimeMs - fs.statSync(b).mtimeMs
+                (a, b) => fs.statSync(a).mtimeMs - fs.statSync(b).mtimeMs,
             );
 
             fs.rmSync(files[0]);
@@ -4495,7 +4495,7 @@ app.post("/generate_horde", jsonParser, async (request, response) => {
 app.post("/viewsecrets", jsonParser, async (_, response) => {
     if (!allowKeysExposure) {
         console.error(
-            "secrets.json could not be viewed unless the value of allowKeysExposure in config.conf is set to true"
+            "secrets.json could not be viewed unless the value of allowKeysExposure in config.conf is set to true",
         );
         return response.sendStatus(403);
     }
@@ -4519,7 +4519,7 @@ app.post("/horde_samplers", jsonParser, async (_, response) => {
     try {
         const ai_horde = getHordeClient();
         const samplers = Object.values(
-            ai_horde.ModelGenerationInputStableSamplers
+            ai_horde.ModelGenerationInputStableSamplers,
         );
         response.send(samplers);
     } catch (error) {
@@ -4582,13 +4582,13 @@ app.post("/horde_generateimage", jsonParser, async (request, response) => {
                 nsfw: request.body.nfsw,
                 models: [request.body.model],
             },
-            { token: api_key_horde }
+            { token: api_key_horde },
         );
 
         if (!generation.id) {
             console.error(
                 "Image generation request is not satisfyable:",
-                generation.message || "unknown error"
+                generation.message || "unknown error",
             );
             return response.sendStatus(400);
         }
@@ -4600,7 +4600,7 @@ app.post("/horde_generateimage", jsonParser, async (request, response) => {
 
             if (check.done) {
                 const result = await ai_horde.getImageGenerationStatus(
-                    generation.id
+                    generation.id,
                 );
                 return response.send(result.generations[0].img);
             }
@@ -4724,7 +4724,7 @@ app.post("/novel_tts", jsonParser, async (request, response) => {
     try {
         const fetch = require("node-fetch").default;
         const url = `${api_novelai}/ai/generate-voice?text=${encodeURIComponent(
-            text
+            text,
         )}&voice=-1&seed=${encodeURIComponent(voice)}&opus=false&version=v2`;
         const result = await fetch(url, {
             method: "GET",
@@ -4812,7 +4812,7 @@ app.post("/upload_sprite_pack", urlencodedParser, async (request, response) => {
         for (const [filename, buffer] of sprites) {
             // Remove existing sprite with the same label
             const existingFile = files.find(
-                (file) => path.parse(file).name === path.parse(filename).name
+                (file) => path.parse(file).name === path.parse(filename).name,
             );
 
             if (existingFile) {
@@ -4902,7 +4902,7 @@ app.post("/import_custom", jsonParser, async (request, response) => {
         response.set("Content-Type", result.fileType);
         response.set(
             "Content-Disposition",
-            `attachment; filename="${result.fileName}"`
+            `attachment; filename="${result.fileName}"`,
         );
         response.set("X-Custom-Content-Type", chubParsed?.type);
         return response.send(result.buffer);
@@ -5040,7 +5040,7 @@ function importRisuSprites(data) {
         }
 
         console.log(
-            `RisuAI: Found ${images.length} sprites for ${name}. Writing to disk.`
+            `RisuAI: Found ${images.length} sprites for ${name}. Writing to disk.`,
         );
         const files = fs.readdirSync(spritesPath);
 
@@ -5049,7 +5049,7 @@ function importRisuSprites(data) {
             for (const file of files) {
                 if (path.parse(file).name === label) {
                     console.log(
-                        `RisuAI: The sprite ${label} for ${name} already exists. Skipping.`
+                        `RisuAI: The sprite ${label} for ${name} already exists. Skipping.`,
                     );
                     continue outer;
                 }
@@ -5231,7 +5231,7 @@ app.post("/get_extension", jsonParser, async (request, response) => {
         const extensionPath = path.join(
             directories.extensions,
             "third-party",
-            path.basename(url, ".git")
+            path.basename(url, ".git"),
         );
 
         if (fs.existsSync(extensionPath)) {
@@ -5243,9 +5243,8 @@ app.post("/get_extension", jsonParser, async (request, response) => {
         await git.clone(url, extensionPath);
         console.log(`Extension has been cloned at ${extensionPath}`);
 
-        const { version, author, display_name } = await getManifest(
-            extensionPath
-        );
+        const { version, author, display_name } =
+            await getManifest(extensionPath);
 
         return response.send({ version, author, display_name, extensionPath });
     } catch (error) {
@@ -5271,7 +5270,7 @@ app.post("/update_extension", jsonParser, async (request, response) => {
         return response
             .status(400)
             .send(
-                "Bad Request: extensionName is required in the request body."
+                "Bad Request: extensionName is required in the request body.",
             );
     }
 
@@ -5280,7 +5279,7 @@ app.post("/update_extension", jsonParser, async (request, response) => {
         const extensionPath = path.join(
             directories.extensions,
             "third-party",
-            extensionName
+            extensionName,
         );
 
         if (!fs.existsSync(extensionPath)) {
@@ -5289,9 +5288,8 @@ app.post("/update_extension", jsonParser, async (request, response) => {
                 .send(`Directory does not exist at ${extensionPath}`);
         }
 
-        const { isUpToDate, remoteUrl } = await checkIfRepoIsUpToDate(
-            extensionPath
-        );
+        const { isUpToDate, remoteUrl } =
+            await checkIfRepoIsUpToDate(extensionPath);
         const currentBranch = await git.cwd(extensionPath).branch();
         if (!isUpToDate) {
             await git.cwd(extensionPath).pull("origin", currentBranch.current);
@@ -5331,7 +5329,7 @@ app.post("/get_extension_version", jsonParser, async (request, response) => {
         return response
             .status(400)
             .send(
-                "Bad Request: extensionName is required in the request body."
+                "Bad Request: extensionName is required in the request body.",
             );
     }
 
@@ -5340,7 +5338,7 @@ app.post("/get_extension_version", jsonParser, async (request, response) => {
         const extensionPath = path.join(
             directories.extensions,
             "third-party",
-            extensionName
+            extensionName,
         );
 
         if (!fs.existsSync(extensionPath)) {
@@ -5357,9 +5355,8 @@ app.post("/get_extension_version", jsonParser, async (request, response) => {
             .cwd(extensionPath)
             .revparse(["HEAD"]);
         console.log(currentBranch, currentCommitHash);
-        const { isUpToDate, remoteUrl } = await checkIfRepoIsUpToDate(
-            extensionPath
-        );
+        const { isUpToDate, remoteUrl } =
+            await checkIfRepoIsUpToDate(extensionPath);
 
         return response.send({
             currentBranchName,
@@ -5386,7 +5383,7 @@ app.post("/delete_extension", jsonParser, async (request, response) => {
         return response
             .status(400)
             .send(
-                "Bad Request: extensionName is required in the request body."
+                "Bad Request: extensionName is required in the request body.",
             );
     }
 
@@ -5397,7 +5394,7 @@ app.post("/delete_extension", jsonParser, async (request, response) => {
         const extensionPath = path.join(
             directories.extensions,
             "third-party",
-            extensionName
+            extensionName,
         );
 
         if (!fs.existsSync(extensionPath)) {

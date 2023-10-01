@@ -35,14 +35,13 @@
     opacity: 0.7;
     align-items: center;
     justify-content: center;
-
 }
 
 .objective-task-button:hover {
     opacity: 1;
 }
 
-[id^=objective-task-delete-] {
+[id^="objective-task-delete-"] {
     color: #da3f3f;
 }
 

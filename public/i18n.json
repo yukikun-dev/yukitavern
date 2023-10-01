@@ -1,9 +1,5 @@
 {
-    "lang": [
-        "zh-cn",
-        "ja-jp",
-        "ko-kr"
-    ],
+    "lang": ["zh-cn", "ja-jp", "ko-kr"],
     "zh-cn": {
         "clickslidertips": "点击滑块右侧数字可手动输入",
         "kobldpresets": "Kobold 预设",

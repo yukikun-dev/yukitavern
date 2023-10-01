@@ -34,9 +34,11 @@ export function download(content, fileName, contentType) {
 export async function urlContentToDataUri(url, params) {
     const response = await fetch(url, params);
     const blob = await response.blob();
-    return await new Promise(callback => {
+    return await new Promise((callback) => {
         let reader = new FileReader();
-        reader.onload = function () { callback(this.result); };
+        reader.onload = function () {
+            callback(this.result);
+        };
         reader.readAsDataURL(blob);
     });
 }
@@ -83,14 +85,14 @@ export function getBase64Async(file) {
 export async function parseJsonFile(file) {
     return new Promise((resolve, reject) => {
         const fileReader = new FileReader();
-        fileReader.onload = event => resolve(JSON.parse(event.target.result));
-        fileReader.onerror = error => reject(error);
+        fileReader.onload = (event) => resolve(JSON.parse(event.target.result));
+        fileReader.onerror = (error) => reject(error);
         fileReader.readAsText(file);
     });
 }
 
 export function getStringHash(str, seed = 0) {
-    if (typeof str !== 'string') {
+    if (typeof str !== "string") {
         return 0;
     }
 
@@ -102,17 +104,23 @@ export function getStringHash(str, seed = 0) {
         h2 = Math.imul(h2 ^ ch, 1597334677);
     }
 
-    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    h1 =
+        Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
+        Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 =
+        Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
+        Math.imul(h1 ^ (h1 >>> 13), 3266489909);
 
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-};
+}
 
 export function debounce(func, timeout = 300) {
     let timer;
     return (...args) => {
         clearTimeout(timer);
-        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, timeout);
     };
 }
 
@@ -120,7 +128,7 @@ export function throttle(func, limit = 300) {
     let lastCall;
     return (...args) => {
         const now = Date.now();
-        if (!lastCall || (now - lastCall) >= limit) {
+        if (!lastCall || now - lastCall >= limit) {
             lastCall = now;
             func.apply(this, args);
         }
@@ -135,8 +143,13 @@ export function isElementInViewport(el) {
     return (
         rect.top >= 0 &&
         rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /* or $(window).height() */
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth) /* or $(window).width() */
+        rect.bottom <=
+            (window.innerHeight ||
+                document.documentElement
+                    .clientHeight) /* or $(window).height() */ &&
+        rect.right <=
+            (window.innerWidth ||
+                document.documentElement.clientWidth) /* or $(window).width() */
     );
 }
 
@@ -151,7 +164,10 @@ export function getUniqueName(name, exists) {
 }
 
 export const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-export const isSubsetOf = (a, b) => (Array.isArray(a) && Array.isArray(b)) ? b.every(val => a.includes(val)) : false;
+export const isSubsetOf = (a, b) =>
+    Array.isArray(a) && Array.isArray(b)
+        ? b.every((val) => a.includes(val))
+        : false;
 
 export function incrementString(str) {
     // Find the trailing number or it will match the empty string
@@ -159,18 +175,15 @@ export function incrementString(str) {
 
     // Take the substring up until where the integer was matched
     // Concatenate it to the matched count incremented by 1
-    return str.substr(0, count.index) + (++count[0]);
-};
+    return str.substr(0, count.index) + ++count[0];
+}
 
 export function stringFormat(format) {
     const args = Array.prototype.slice.call(arguments, 1);
     return format.replace(/{(\d+)}/g, function (match, number) {
-        return typeof args[number] != 'undefined'
-            ? args[number]
-            : match
-            ;
+        return typeof args[number] != "undefined" ? args[number] : match;
     });
-};
+}
 
 // Save the caret position in a contenteditable element
 export function saveCaretPosition(element) {
@@ -193,10 +206,10 @@ export function saveCaretPosition(element) {
     // Return an object with the start and end offsets of the range
     const position = {
         start: range.startOffset,
-        end: range.endOffset
+        end: range.endOffset,
     };
 
-    console.debug('Caret saved', position);
+    console.debug("Caret saved", position);
 
     return position;
 }
@@ -208,7 +221,7 @@ export function restoreCaretPosition(element, position) {
         return;
     }
 
-    console.debug('Caret restored', position);
+    console.debug("Caret restored", position);
 
     // Create a new range object
     const range = new Range();
@@ -224,18 +237,20 @@ export function restoreCaretPosition(element, position) {
 }
 
 export async function resetScrollHeight(element) {
-    $(element).css('height', '0px');
-    $(element).css('height', $(element).prop('scrollHeight') + 3 + 'px');
+    $(element).css("height", "0px");
+    $(element).css("height", $(element).prop("scrollHeight") + 3 + "px");
 }
 
 export async function initScrollHeight(element) {
     await delay(1);
 
-    const curHeight = Number($(element).css("height").replace('px', ''));
+    const curHeight = Number($(element).css("height").replace("px", ""));
     const curScrollHeight = Number($(element).prop("scrollHeight"));
     const diff = curScrollHeight - curHeight;
 
-    if (diff < 3) { return } //happens when the div isn't loaded yet
+    if (diff < 3) {
+        return;
+    } //happens when the div isn't loaded yet
 
     const newHeight = curHeight + diff + 3; //the +3 here is to account for padding/line-height on text inputs
     //console.log(`init height to ${newHeight}`);
@@ -245,15 +260,36 @@ export async function initScrollHeight(element) {
 }
 
 export function sortByCssOrder(a, b) {
-    const _a = Number($(a).css('order'));
-    const _b = Number($(b).css('order'));
+    const _a = Number($(a).css("order"));
+    const _b = Number($(b).css("order"));
     return _a - _b;
 }
 
 export function end_trim_to_sentence(input, include_newline = false) {
     // inspired from https://github.com/kaihordewebui/kaihordewebui.github.io/blob/06b95e6b7720eb85177fbaf1a7f52955d7cdbc02/index.html#L4853-L4867
 
-    const punctuation = new Set(['.', '!', '?', '*', '"', ')', '}', '`', ']', '$', '。', '！', '？', '”', '）', '】', '】', '’', '」', '】']); // extend this as you see fit
+    const punctuation = new Set([
+        ".",
+        "!",
+        "?",
+        "*",
+        '"',
+        ")",
+        "}",
+        "`",
+        "]",
+        "$",
+        "。",
+        "！",
+        "？",
+        "”",
+        "）",
+        "】",
+        "】",
+        "’",
+        "」",
+        "】",
+    ]); // extend this as you see fit
     let last = -1;
 
     for (let i = input.length - 1; i >= 0; i--) {
@@ -264,7 +300,7 @@ export function end_trim_to_sentence(input, include_newline = false) {
             break;
         }
 
-        if (include_newline && char === '\n') {
+        if (include_newline && char === "\n") {
             last = i;
             break;
         }
@@ -299,14 +335,30 @@ export function timestampToMoment(timestamp) {
     }
 
     // Unix time (legacy TAI)
-    if (typeof timestamp === 'number') {
+    if (typeof timestamp === "number") {
         return moment(timestamp);
     }
 
     // ST "humanized" format pattern
-    const pattern1 = /(\d{4})-(\d{1,2})-(\d{1,2}) @(\d{1,2})h (\d{1,2})m (\d{1,2})s (\d{1,3})ms/;
-    const replacement1 = (match, year, month, day, hour, minute, second, millisecond) => {
-        return `${year.padStart(4, "0")}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:${second.padStart(2, "0")}.${millisecond.padStart(3, "0")}Z`;
+    const pattern1 =
+        /(\d{4})-(\d{1,2})-(\d{1,2}) @(\d{1,2})h (\d{1,2})m (\d{1,2})s (\d{1,3})ms/;
+    const replacement1 = (
+        match,
+        year,
+        month,
+        day,
+        hour,
+        minute,
+        second,
+        millisecond,
+    ) => {
+        return `${year.padStart(4, "0")}-${month.padStart(
+            2,
+            "0",
+        )}-${day.padStart(2, "0")}T${hour.padStart(2, "0")}:${minute.padStart(
+            2,
+            "0",
+        )}:${second.padStart(2, "0")}.${millisecond.padStart(3, "0")}Z`;
     };
     const isoTimestamp1 = timestamp.replace(pattern1, replacement1);
     if (moment(isoTimestamp1).isValid()) {
@@ -317,8 +369,13 @@ export function timestampToMoment(timestamp) {
     const pattern2 = /(\w+)\s(\d{1,2}),\s(\d{4})\s(\d{1,2}):(\d{1,2})(am|pm)/i;
     const replacement2 = (match, month, day, year, hour, minute, meridiem) => {
         const monthNum = moment().month(month).format("MM");
-        const hour24 = meridiem.toLowerCase() === 'pm' ? (parseInt(hour, 10) % 12) + 12 : parseInt(hour, 10) % 12;
-        return `${year}-${monthNum}-${day.padStart(2, "0")}T${hour24.toString().padStart(2, "0")}:${minute.padStart(2, "0")}:00`;
+        const hour24 =
+            meridiem.toLowerCase() === "pm"
+                ? (parseInt(hour, 10) % 12) + 12
+                : parseInt(hour, 10) % 12;
+        return `${year}-${monthNum}-${day.padStart(2, "0")}T${hour24
+            .toString()
+            .padStart(2, "0")}:${minute.padStart(2, "0")}:00`;
     };
     const isoTimestamp2 = timestamp.replace(pattern2, replacement2);
     if (moment(isoTimestamp2).isValid()) {
@@ -340,24 +397,31 @@ export function sortMoments(a, b) {
 }
 
 /** Split string to parts no more than length in size */
-export function splitRecursive(input, length, delimitiers = ['\n\n', '\n', ' ', '']) {
-    const delim = delimitiers[0] ?? '';
+export function splitRecursive(
+    input,
+    length,
+    delimitiers = ["\n\n", "\n", " ", ""],
+) {
+    const delim = delimitiers[0] ?? "";
     const parts = input.split(delim);
 
-    const flatParts = parts.flatMap(p => {
+    const flatParts = parts.flatMap((p) => {
         if (p.length < length) return p;
         return splitRecursive(input, length, delimitiers.slice(1));
     });
 
     // Merge short chunks
     const result = [];
-    let currentChunk = '';
-    for (let i = 0; i < flatParts.length;) {
+    let currentChunk = "";
+    for (let i = 0; i < flatParts.length; ) {
         currentChunk = flatParts[i];
         let j = i + 1;
         while (j < flatParts.length) {
             const nextChunk = flatParts[j];
-            if (currentChunk.length + nextChunk.length + delim.length <= length) {
+            if (
+                currentChunk.length + nextChunk.length + delim.length <=
+                length
+            ) {
                 currentChunk += delim + nextChunk;
             } else {
                 break;
@@ -383,7 +447,10 @@ export class IndexedDBStore {
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
-                db.createObjectStore(this.storeName, { keyPath: null, autoIncrement: false });
+                db.createObjectStore(this.storeName, {
+                    keyPath: null,
+                    autoIncrement: false,
+                });
             };
 
             request.onsuccess = (event) => {
@@ -423,7 +490,10 @@ export class IndexedDBStore {
         if (!this.db) await this.open();
 
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(this.storeName, "readwrite");
+            const transaction = this.db.transaction(
+                this.storeName,
+                "readwrite",
+            );
             const objectStore = transaction.objectStore(this.storeName);
             const request = objectStore.put(object, key);
 
@@ -443,7 +513,10 @@ export class IndexedDBStore {
         if (!this.db) await this.open();
 
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(this.storeName, "readwrite");
+            const transaction = this.db.transaction(
+                this.storeName,
+                "readwrite",
+            );
             const objectStore = transaction.objectStore(this.storeName);
             const request = objectStore.delete(key);
 
@@ -461,7 +534,8 @@ export class IndexedDBStore {
 }
 
 export function isDataURL(str) {
-    const regex = /^data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)*;?)?(base64)?,([a-z0-9!$&',()*+;=\-_%.~:@\/?#]+)?$/i;
+    const regex =
+        /^data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)*;?)?(base64)?,([a-z0-9!$&',()*+;=\-_%.~:@\/?#]+)?$/i;
     return regex.test(str);
 }
 
@@ -470,7 +544,7 @@ export function getCharaFilename(chid) {
     const fileName = context.characters[chid ?? context.characterId].avatar;
 
     if (fileName) {
-        return fileName.replace(/\.[^/.]+$/, "")
+        return fileName.replace(/\.[^/.]+$/, "");
     }
 }
 
@@ -489,7 +563,7 @@ export function extractAllWords(value) {
 }
 
 export function escapeRegex(string) {
-    return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+    return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
 }
 
 export class RateLimiter {
@@ -510,9 +584,9 @@ export class RateLimiter {
             }, remainingTime);
 
             if (abortSignal) {
-                abortSignal.addEventListener('abort', () => {
+                abortSignal.addEventListener("abort", () => {
                     clearTimeout(timeoutId);
-                    reject(new Error('Aborted'));
+                    reject(new Error("Aborted"));
                 });
             }
         });
@@ -531,14 +605,24 @@ export class RateLimiter {
 // Taken from https://github.com/LostRuins/lite.koboldai.net/blob/main/index.html
 //import tavern png data. adapted from png-chunks-extract under MIT license
 //accepts png input data, and returns the extracted JSON
-export function extractDataFromPng(data, identifier = 'chara') {
+export function extractDataFromPng(data, identifier = "chara") {
     console.log("Attempting PNG import...");
     let uint8 = new Uint8Array(4);
     let uint32 = new Uint32Array(uint8.buffer);
 
     //check if png header is valid
-    if (!data || data[0] !== 0x89 || data[1] !== 0x50 || data[2] !== 0x4E || data[3] !== 0x47 || data[4] !== 0x0D || data[5] !== 0x0A || data[6] !== 0x1A || data[7] !== 0x0A) {
-        console.log("PNG header invalid")
+    if (
+        !data ||
+        data[0] !== 0x89 ||
+        data[1] !== 0x50 ||
+        data[2] !== 0x4e ||
+        data[3] !== 0x47 ||
+        data[4] !== 0x0d ||
+        data[5] !== 0x0a ||
+        data[6] !== 0x1a ||
+        data[7] !== 0x0a
+    ) {
+        console.log("PNG header invalid");
         return null;
     }
 
@@ -563,25 +647,24 @@ export function extractDataFromPng(data, identifier = 'chara') {
         chunk[3] = data[idx++];
 
         // Get the name in ASCII for identification.
-        let name = (
+        let name =
             String.fromCharCode(chunk[0]) +
             String.fromCharCode(chunk[1]) +
             String.fromCharCode(chunk[2]) +
-            String.fromCharCode(chunk[3])
-        );
+            String.fromCharCode(chunk[3]);
 
         // The IHDR header MUST come first.
-        if (!chunks.length && name !== 'IHDR') {
-            console.log('Warning: IHDR header missing');
+        if (!chunks.length && name !== "IHDR") {
+            console.log("Warning: IHDR header missing");
         }
 
         // The IEND header marks the end of the file,
         // so on discovering it break out of the loop.
-        if (name === 'IEND') {
+        if (name === "IEND") {
             ended = true;
             chunks.push({
                 name: name,
-                data: new Uint8Array(0)
+                data: new Uint8Array(0),
             });
             break;
         }
@@ -598,29 +681,32 @@ export function extractDataFromPng(data, identifier = 'chara') {
         uint8[1] = data[idx++];
         uint8[0] = data[idx++];
 
-
         // The chunk data is now copied to remove the 4 preceding
         // bytes used for the chunk name/type.
         let chunkData = new Uint8Array(chunk.buffer.slice(4));
 
         chunks.push({
             name: name,
-            data: chunkData
+            data: chunkData,
         });
     }
 
     if (!ended) {
-        console.log('.png file ended prematurely: no IEND header was found');
+        console.log(".png file ended prematurely: no IEND header was found");
     }
 
     //find the chunk with the chara name, just check first and last letter
-    let found = chunks.filter(x => (
-        x.name == "tEXt"
-        && x.data.length > identifier.length
-        && x.data.slice(0, identifier.length).every((v, i) => String.fromCharCode(v) == identifier[i])));
+    let found = chunks.filter(
+        (x) =>
+            x.name == "tEXt" &&
+            x.data.length > identifier.length &&
+            x.data
+                .slice(0, identifier.length)
+                .every((v, i) => String.fromCharCode(v) == identifier[i]),
+    );
 
     if (found.length == 0) {
-        console.log('PNG Image contains no data');
+        console.log("PNG Image contains no data");
         return null;
     } else {
         try {
@@ -644,8 +730,8 @@ export function createThumbnail(dataUrl, maxWidth, maxHeight) {
         const img = new Image();
         img.src = dataUrl;
         img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
 
             // Calculate the thumbnail dimensions while maintaining the aspect ratio
             const aspectRatio = img.width / img.height;
@@ -664,21 +750,25 @@ export function createThumbnail(dataUrl, maxWidth, maxHeight) {
             ctx.drawImage(img, 0, 0, thumbnailWidth, thumbnailHeight);
 
             // Convert the canvas to a data URL and resolve the promise
-            const thumbnailDataUrl = canvas.toDataURL('image/jpeg');
+            const thumbnailDataUrl = canvas.toDataURL("image/jpeg");
             resolve(thumbnailDataUrl);
         };
 
         img.onerror = () => {
-            reject(new Error('Failed to load the image.'));
+            reject(new Error("Failed to load the image."));
         };
     });
 }
 
-export async function waitUntilCondition(condition, timeout = 1000, interval = 100) {
+export async function waitUntilCondition(
+    condition,
+    timeout = 1000,
+    interval = 100,
+) {
     return new Promise((resolve, reject) => {
         const timeoutId = setTimeout(() => {
             clearInterval(intervalId);
-            reject(new Error('Timed out waiting for condition to be true'));
+            reject(new Error("Timed out waiting for condition to be true"));
         }, timeout);
 
         const intervalId = setInterval(() => {
@@ -692,11 +782,14 @@ export async function waitUntilCondition(condition, timeout = 1000, interval = 1
 }
 
 export function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        function (c) {
+            const r = (Math.random() * 16) | 0;
+            const v = c === "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        },
+    );
 }
 
 export function deepClone(obj) {

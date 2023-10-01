@@ -3,9 +3,9 @@
 // First version by Cohee#1207
 // Adapted by Tony-sama
 
-export { BrowserSttProvider }
+export { BrowserSttProvider };
 
-const DEBUG_PREFIX = "<Speech Recognition module (Browser)> "
+const DEBUG_PREFIX = "<Speech Recognition module (Browser)> ";
 
 class BrowserSttProvider {
     //########//
@@ -13,17 +13,18 @@ class BrowserSttProvider {
     //########//
 
     settings = {
-        language: ""
-    }
+        language: "",
+    };
 
     defaultSettings = {
         language: "en-US",
-    }
+    };
 
     processTranscriptFunction = null;
 
     get settingsHtml() {
-        let html = ' \
+        let html =
+            ' \
         <span>Language</span> </br> \
         <select id="speech_recognition_browser_provider_language"> \
             <option value="ar-SA">ar-SA: Arabic (Saudi Arabia)</option> \
@@ -80,75 +81,104 @@ class BrowserSttProvider {
             <option value="zh-HK">zh-HK: Chinese (Hond Kong)</option> \
             <option value="zh-TW">zh-TW: Chinese (Taiwan)</option> \
         </select> \
-        '
-        return html
+        ';
+        return html;
     }
 
     onSettingsChange() {
         // Used when provider settings are updated from UI
-        this.settings.language = $("#speech_recognition_browser_provider_language").val();
-        console.debug(DEBUG_PREFIX+"Change language to",this.settings.language);
+        this.settings.language = $(
+            "#speech_recognition_browser_provider_language",
+        ).val();
+        console.debug(
+            DEBUG_PREFIX + "Change language to",
+            this.settings.language,
+        );
         this.loadSettings(this.settings);
     }
 
     static capitalizeInterim(interimTranscript) {
         let capitalizeIndex = -1;
-        if (interimTranscript.length > 2 && interimTranscript[0] === ' ') capitalizeIndex = 1;
+        if (interimTranscript.length > 2 && interimTranscript[0] === " ")
+            capitalizeIndex = 1;
         else if (interimTranscript.length > 1) capitalizeIndex = 0;
         if (capitalizeIndex > -1) {
-            const spacing = capitalizeIndex > 0 ? ' '.repeat(capitalizeIndex - 1) : '';
-            const capitalized = interimTranscript[capitalizeIndex].toLocaleUpperCase();
+            const spacing =
+                capitalizeIndex > 0 ? " ".repeat(capitalizeIndex - 1) : "";
+            const capitalized =
+                interimTranscript[capitalizeIndex].toLocaleUpperCase();
             const rest = interimTranscript.substring(capitalizeIndex + 1);
             interimTranscript = spacing + capitalized + rest;
         }
         return interimTranscript;
     }
-    
+
     static composeValues(previous, interim) {
-        let spacing = '';
-        if (previous.endsWith('.')) spacing = ' ';
+        let spacing = "";
+        if (previous.endsWith(".")) spacing = " ";
         return previous + spacing + interim;
     }
 
     loadSettings(settings) {
         const processTranscript = this.processTranscriptFunction;
-        
+
         // Populate Provider UI given input settings
         if (Object.keys(settings).length == 0) {
-            console.debug(DEBUG_PREFIX+"Using default browser STT settings")
+            console.debug(DEBUG_PREFIX + "Using default browser STT settings");
         }
 
         // Initialise as defaultSettings
         this.settings = this.defaultSettings;
 
-        for (const key in settings){
-            if (key in this.settings){
-                this.settings[key] = settings[key]
+        for (const key in settings) {
+            if (key in this.settings) {
+                this.settings[key] = settings[key];
             } else {
-                throw `Invalid setting passed to Speech recogniton extension (browser): ${key}`
+                throw `Invalid setting passed to Speech recogniton extension (browser): ${key}`;
             }
         }
 
-        $("#speech_recognition_browser_provider_language").val(this.settings.language);
+        $("#speech_recognition_browser_provider_language").val(
+            this.settings.language,
+        );
 
-        const speechRecognitionSettings = $.extend({
-            grammar: '' // Custom grammar
-        }, options);
+        const speechRecognitionSettings = $.extend(
+            {
+                grammar: "", // Custom grammar
+            },
+            options,
+        );
 
-        const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const speechRecognitionList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+        const speechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+        const speechRecognitionList =
+            window.SpeechGrammarList || window.webkitSpeechGrammarList;
 
         if (!speechRecognition) {
-            console.warn(DEBUG_PREFIX+'Speech recognition is not supported in this browser.');
+            console.warn(
+                DEBUG_PREFIX +
+                    "Speech recognition is not supported in this browser.",
+            );
             $("#microphone_button").hide();
-            toastr.error("Speech recognition is not supported in this browser, use another browser or another provider of SillyTavern-extras Speech recognition extension.", "Speech recognition activation Failed (Browser)", { timeOut: 10000, extendedTimeOut: 20000, preventDuplicates: true });
+            toastr.error(
+                "Speech recognition is not supported in this browser, use another browser or another provider of SillyTavern-extras Speech recognition extension.",
+                "Speech recognition activation Failed (Browser)",
+                {
+                    timeOut: 10000,
+                    extendedTimeOut: 20000,
+                    preventDuplicates: true,
+                },
+            );
             return;
         }
 
         const recognition = new speechRecognition();
 
         if (speechRecognitionSettings.grammar && speechRecognitionList) {
-            speechRecognitionList.addFromString(speechRecognitionSettings.grammar, 1);
+            speechRecognitionList.addFromString(
+                speechRecognitionSettings.grammar,
+                1,
+            );
             recognition.grammars = speechRecognitionList;
         }
 
@@ -156,11 +186,11 @@ class BrowserSttProvider {
         recognition.interimResults = true;
         recognition.lang = this.settings.language;
 
-        const textarea = $('#send_textarea');
-        const button = $('#microphone_button');
+        const textarea = $("#send_textarea");
+        const button = $("#microphone_button");
 
         let listening = false;
-        button.off('click').on("click", function () {
+        button.off("click").on("click", function () {
             if (listening) {
                 recognition.stop();
             } else {
@@ -169,65 +199,72 @@ class BrowserSttProvider {
             listening = !listening;
         });
 
-        let initialText = '';
+        let initialText = "";
 
         recognition.onresult = function (speechEvent) {
-            let finalTranscript = '';
-            let interimTranscript = ''
+            let finalTranscript = "";
+            let interimTranscript = "";
 
-            for (let i = speechEvent.resultIndex; i < speechEvent.results.length; ++i) {
-            const transcript = speechEvent.results[i][0].transcript;
+            for (
+                let i = speechEvent.resultIndex;
+                i < speechEvent.results.length;
+                ++i
+            ) {
+                const transcript = speechEvent.results[i][0].transcript;
 
-            if (speechEvent.results[i].isFinal) {
-                let interim = BrowserSttProvider.capitalizeInterim(transcript);
-                if (interim != '') {
-                let final = finalTranscript;
-                final = BrowserSttProvider.composeValues(final, interim);
-                if (final.slice(-1) != '.' & final.slice(-1) != '?') final += '.';
-                finalTranscript = final;
-                recognition.abort();
-                listening = false;
+                if (speechEvent.results[i].isFinal) {
+                    let interim =
+                        BrowserSttProvider.capitalizeInterim(transcript);
+                    if (interim != "") {
+                        let final = finalTranscript;
+                        final = BrowserSttProvider.composeValues(
+                            final,
+                            interim,
+                        );
+                        if ((final.slice(-1) != ".") & (final.slice(-1) != "?"))
+                            final += ".";
+                        finalTranscript = final;
+                        recognition.abort();
+                        listening = false;
+                    }
+                    interimTranscript = " ";
+                } else {
+                    interimTranscript += transcript;
                 }
-                interimTranscript = ' ';
-            } else {
-                interimTranscript += transcript;
-            }
             }
 
-            interimTranscript = BrowserSttProvider.capitalizeInterim(interimTranscript);
-                
+            interimTranscript =
+                BrowserSttProvider.capitalizeInterim(interimTranscript);
+
             textarea.val(initialText + finalTranscript + interimTranscript);
         };
 
         recognition.onerror = function (event) {
-            console.error('Error occurred in recognition:', event.error);
+            console.error("Error occurred in recognition:", event.error);
             //if ($('#speech_recognition_debug').is(':checked'))
             //    toastr.error('Error occurred in recognition:'+ event.error, 'STT Generation error (Browser)', { timeOut: 10000, extendedTimeOut: 20000, preventDuplicates: true });
         };
 
         recognition.onend = function () {
             listening = false;
-            button.toggleClass('fa-microphone fa-microphone-slash');
+            button.toggleClass("fa-microphone fa-microphone-slash");
             const newText = textarea.val().substring(initialText.length);
-            textarea.val(textarea.val().substring(0,initialText.length));
+            textarea.val(textarea.val().substring(0, initialText.length));
             processTranscript(newText);
-
         };
 
         recognition.onstart = function () {
             initialText = textarea.val();
-            button.toggleClass('fa-microphone fa-microphone-slash');
-            
+            button.toggleClass("fa-microphone fa-microphone-slash");
+
             if ($("#speech_recognition_message_mode").val() == "replace") {
                 textarea.val("");
-                initialText = ""
+                initialText = "";
             }
         };
-        
+
         $("#microphone_button").show();
-        
-        console.debug(DEBUG_PREFIX+"Browser STT settings loaded")
+
+        console.debug(DEBUG_PREFIX + "Browser STT settings loaded");
     }
-
-
 }

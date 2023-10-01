@@ -1,8 +1,8 @@
 import { isMobile } from "../../RossAscends-mods.js";
 import { getPreviewString } from "./index.js";
-import { talkingAnimation } from './index.js';
+import { talkingAnimation } from "./index.js";
 
-export { SystemTtsProvider }
+export { SystemTtsProvider };
 
 /**
  * Chunkify
@@ -17,11 +17,15 @@ export { SystemTtsProvider }
 var speechUtteranceChunker = function (utt, settings, callback) {
     settings = settings || {};
     var newUtt;
-    var txt = (settings && settings.offset !== undefined ? utt.text.substring(settings.offset) : utt.text);
-    if (utt.voice && utt.voice.voiceURI === 'native') { // Not part of the spec
+    var txt =
+        settings && settings.offset !== undefined
+            ? utt.text.substring(settings.offset)
+            : utt.text;
+    if (utt.voice && utt.voice.voiceURI === "native") {
+        // Not part of the spec
         newUtt = utt;
         newUtt.text = txt;
-        newUtt.addEventListener('end', function () {
+        newUtt.addEventListener("end", function () {
             if (speechUtteranceChunker.cancel) {
                 speechUtteranceChunker.cancel = false;
             }
@@ -29,13 +33,26 @@ var speechUtteranceChunker = function (utt, settings, callback) {
                 callback();
             }
         });
-    }
-    else {
+    } else {
         var chunkLength = (settings && settings.chunkLength) || 160;
-        var pattRegex = new RegExp('^[\\s\\S]{' + Math.floor(chunkLength / 2) + ',' + chunkLength + '}[.!?,]{1}|^[\\s\\S]{1,' + chunkLength + '}$|^[\\s\\S]{1,' + chunkLength + '} ');
+        var pattRegex = new RegExp(
+            "^[\\s\\S]{" +
+                Math.floor(chunkLength / 2) +
+                "," +
+                chunkLength +
+                "}[.!?,]{1}|^[\\s\\S]{1," +
+                chunkLength +
+                "}$|^[\\s\\S]{1," +
+                chunkLength +
+                "} ",
+        );
         var chunkArr = txt.match(pattRegex);
 
-        if (chunkArr == null || chunkArr[0] === undefined || chunkArr[0].length <= 2) {
+        if (
+            chunkArr == null ||
+            chunkArr[0] === undefined ||
+            chunkArr[0].length <= 2
+        ) {
             //call once all text has been spoken...
             if (callback !== undefined) {
                 callback();
@@ -46,13 +63,13 @@ var speechUtteranceChunker = function (utt, settings, callback) {
         newUtt = new SpeechSynthesisUtterance(chunk);
         var x;
         for (x in utt) {
-            if (utt.hasOwnProperty(x) && x !== 'text') {
+            if (utt.hasOwnProperty(x) && x !== "text") {
                 newUtt[x] = utt[x];
             }
         }
         newUtt.lang = utt.lang;
         newUtt.voice = utt.voice;
-        newUtt.addEventListener('end', function () {
+        newUtt.addEventListener("end", function () {
             if (speechUtteranceChunker.cancel) {
                 speechUtteranceChunker.cancel = false;
                 return;
@@ -79,18 +96,18 @@ class SystemTtsProvider {
     // Config //
     //########//
 
-    settings
-    voices = []
-    separator = ' ... '
+    settings;
+    voices = [];
+    separator = " ... ";
 
     defaultSettings = {
         voiceMap: {},
         rate: 1,
         pitch: 1,
-    }
+    };
 
     get settingsHtml() {
-        if (!('speechSynthesis' in window)) {
+        if (!("speechSynthesis" in window)) {
             return "Your browser or operating system doesn't support speech synthesis";
         }
 
@@ -102,11 +119,11 @@ class SystemTtsProvider {
     }
 
     onSettingsChange() {
-        this.settings.rate = Number($('#system_tts_rate').val());
-        this.settings.pitch = Number($('#system_tts_pitch').val());
-        $('#system_tts_pitch_output').text(this.settings.pitch);
-        $('#system_tts_rate_output').text(this.settings.rate);
-        console.log('Save changes');
+        this.settings.rate = Number($("#system_tts_rate").val());
+        this.settings.pitch = Number($("#system_tts_pitch").val());
+        $("#system_tts_pitch_output").text(this.settings.pitch);
+        $("#system_tts_rate_output").text(this.settings.rate);
+        console.log("Save changes");
     }
 
     loadSettings(settings) {
@@ -119,11 +136,11 @@ class SystemTtsProvider {
         if (isMobile()) {
             let hasEnabledVoice = false;
 
-            document.addEventListener('click', () => {
+            document.addEventListener("click", () => {
                 if (hasEnabledVoice) {
                     return;
                 }
-                const utterance = new SpeechSynthesisUtterance('hi');
+                const utterance = new SpeechSynthesisUtterance("hi");
                 utterance.volume = 0;
                 speechSynthesis.speak(utterance);
                 hasEnabledVoice = true;
@@ -141,40 +158,55 @@ class SystemTtsProvider {
             }
         }
 
-        $('#system_tts_rate').val(this.settings.rate || this.defaultSettings.rate);
-        $('#system_tts_pitch').val(this.settings.pitch || this.defaultSettings.pitch);
-        $('#system_tts_pitch_output').text(this.settings.pitch);
-        $('#system_tts_rate_output').text(this.settings.rate);
+        $("#system_tts_rate").val(
+            this.settings.rate || this.defaultSettings.rate,
+        );
+        $("#system_tts_pitch").val(
+            this.settings.pitch || this.defaultSettings.pitch,
+        );
+        $("#system_tts_pitch_output").text(this.settings.pitch);
+        $("#system_tts_rate_output").text(this.settings.rate);
         console.info("Settings loaded");
     }
 
     async onApplyClick() {
-        return
+        return;
     }
 
     //#################//
     //  TTS Interfaces //
     //#################//
     fetchTtsVoiceIds() {
-        if (!('speechSynthesis' in window)) {
+        if (!("speechSynthesis" in window)) {
             return [];
         }
 
         return speechSynthesis
             .getVoices()
-            .sort((a, b) => a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name))
-            .map(x => ({ name: x.name, voice_id: x.voiceURI, preview_url: false, lang: x.lang }));
+            .sort(
+                (a, b) =>
+                    a.lang.localeCompare(b.lang) ||
+                    a.name.localeCompare(b.name),
+            )
+            .map((x) => ({
+                name: x.name,
+                voice_id: x.voiceURI,
+                preview_url: false,
+                lang: x.lang,
+            }));
     }
 
     previewTtsVoice(voiceId) {
-        if (!('speechSynthesis' in window)) {
-            throw 'Speech synthesis API is not supported';
+        if (!("speechSynthesis" in window)) {
+            throw "Speech synthesis API is not supported";
         }
 
-        const voice = speechSynthesis.getVoices().find(x => x.voiceURI === voiceId);
+        const voice = speechSynthesis
+            .getVoices()
+            .find((x) => x.voiceURI === voiceId);
 
         if (!voice) {
-            throw `TTS Voice name ${voiceName} not found`
+            throw `TTS Voice name ${voiceName} not found`;
         }
 
         speechSynthesis.cancel();
@@ -187,44 +219,48 @@ class SystemTtsProvider {
     }
 
     async getVoice(voiceName) {
-        if (!('speechSynthesis' in window)) {
-            return { voice_id: null }
+        if (!("speechSynthesis" in window)) {
+            return { voice_id: null };
         }
 
         const voices = speechSynthesis.getVoices();
-        const match = voices.find(x => x.name == voiceName);
+        const match = voices.find((x) => x.name == voiceName);
 
         if (!match) {
-            throw `TTS Voice name ${voiceName} not found`
+            throw `TTS Voice name ${voiceName} not found`;
         }
 
         return { voice_id: match.voiceURI, name: match.name };
     }
 
     async generateTts(text, voiceId) {
-        if (!('speechSynthesis' in window)) {
-            throw 'Speech synthesis API is not supported';
+        if (!("speechSynthesis" in window)) {
+            throw "Speech synthesis API is not supported";
         }
 
-        const silence = await fetch('/sounds/silence.mp3');
+        const silence = await fetch("/sounds/silence.mp3");
 
         return new Promise((resolve, reject) => {
             const voices = speechSynthesis.getVoices();
-            const voice = voices.find(x => x.voiceURI === voiceId);
+            const voice = voices.find((x) => x.voiceURI === voiceId);
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.voice = voice;
             utterance.rate = this.settings.rate || 1;
             utterance.pitch = this.settings.pitch || 1;
             utterance.onend = () => resolve(silence);
             utterance.onerror = () => reject();
-            speechUtteranceChunker(utterance, {
-                chunkLength: 200,
-            }, function () {
-                //some code to execute when done
-                resolve(silence);
-                console.log('System TTS done');
-                talkingAnimation(false);
-            });
+            speechUtteranceChunker(
+                utterance,
+                {
+                    chunkLength: 200,
+                },
+                function () {
+                    //some code to execute when done
+                    resolve(silence);
+                    console.log("System TTS done");
+                    talkingAnimation(false);
+                },
+            );
         });
     }
 }

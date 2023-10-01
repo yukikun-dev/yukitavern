@@ -14,17 +14,17 @@ declare enum ModelGenerationInputStableSamplers {
     "k_dpm_adaptive" = "k_dpm_adaptive",
     "k_dpmpp_2s_a" = "k_dpmpp_2s_a",
     "k_dpmpp_2m" = "k_dpmpp_2m",
-    "dpmsolver" = "dpmsolver"
+    "dpmsolver" = "dpmsolver",
 }
 declare enum SourceImageProcessingTypes {
     "img2img" = "img2img",
     "inpainting" = "inpainting",
-    "outpainting" = "outpainting"
+    "outpainting" = "outpainting",
 }
 declare enum ModelGenerationInputPostProcessingTypes {
     "GFPGAN" = "GFPGAN",
     "RealESRGAN_x4plus" = "RealESRGAN_x4plus",
-    "CodeFormers" = "CodeFormers"
+    "CodeFormers" = "CodeFormers",
 }
 declare enum ModelInterrogationFormTypes {
     "caption" = "caption",
@@ -36,7 +36,7 @@ declare enum ModelInterrogationFormTypes {
     "NMKD_Siax" = "NMKD_Siax",
     "4x_AnimeSharp" = "4x_AnimeSharp",
     "CodeFormers" = "CodeFormers",
-    "strip_background" = "strip_background"
+    "strip_background" = "strip_background",
 }
 declare enum HordeAsyncRequestStates {
     "waiting" = "waiting",
@@ -44,7 +44,7 @@ declare enum HordeAsyncRequestStates {
     "done" = "done",
     "faulted" = "faulted",
     "partial" = "partial",
-    "cancelled" = "cancelled"
+    "cancelled" = "cancelled",
 }
 declare enum ModelGenerationInputControlTypes {
     "canny" = "canny",
@@ -55,7 +55,7 @@ declare enum ModelGenerationInputControlTypes {
     "seg" = "seg",
     "scribble" = "scribble",
     "fakescribbles" = "fakescribbles",
-    "hough" = "hough"
+    "hough" = "hough",
 }
 declare class APIError extends Error {
     rawError: RequestError;
@@ -63,7 +63,11 @@ declare class APIError extends Error {
     method: string;
     url: string;
     requestBody: any;
-    constructor(rawError: RequestError, core_res: IncomingMessage, requestBody?: any);
+    constructor(
+        rawError: RequestError,
+        core_res: IncomingMessage,
+        requestBody?: any,
+    );
     get name(): string;
 }
 declare class AIHorde {
@@ -112,11 +116,14 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns UserDetails - The user data of the requested user
      */
-    getUserDetails<T extends keyof UserDetails>(id: number, options?: {
-        token?: string;
-        force?: boolean;
-        fields?: T[];
-    }): Promise<Pick<UserDetails, T>>;
+    getUserDetails<T extends keyof UserDetails>(
+        id: number,
+        options?: {
+            token?: string;
+            force?: boolean;
+            fields?: T[];
+        },
+    ): Promise<Pick<UserDetails, T>>;
     /**
      * Details of a worker Team
      * @param id - The teams id to get
@@ -125,11 +132,14 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns TeamDetailsStable - The team data
      */
-    getTeam<T extends keyof TeamDetailsStable>(id: string, options?: {
-        token?: string;
-        force?: boolean;
-        fields?: T[];
-    }): Promise<Pick<TeamDetailsStable, T>>;
+    getTeam<T extends keyof TeamDetailsStable>(
+        id: string,
+        options?: {
+            token?: string;
+            force?: boolean;
+            fields?: T[];
+        },
+    ): Promise<Pick<TeamDetailsStable, T>>;
     /**
      * Details of a registered worker.
      * This can be used to verify a user exists
@@ -139,11 +149,14 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns worker details for the requested worker
      */
-    getWorkerDetails<T extends keyof WorkerDetailsStable>(id: string, options?: {
-        token?: string;
-        force?: boolean;
-        fields?: T[];
-    }): Promise<Pick<WorkerDetailsStable, T>>;
+    getWorkerDetails<T extends keyof WorkerDetailsStable>(
+        id: string,
+        options?: {
+            token?: string;
+            force?: boolean;
+            fields?: T[];
+        },
+    ): Promise<Pick<WorkerDetailsStable, T>>;
     /**
      * Retrieve the status of an Asynchronous generation request without images
      * Use this method to check the status of a currently running asynchronous request without consuming bandwidth.
@@ -152,10 +165,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns RequestStatusCheck - The Check data of the Generation
      */
-    getImageGenerationCheck<T extends keyof RequestStatusCheck>(id: string, options?: {
-        force?: boolean;
-        fields?: T[];
-    }): Promise<Pick<RequestStatusCheck, T>>;
+    getImageGenerationCheck<T extends keyof RequestStatusCheck>(
+        id: string,
+        options?: {
+            force?: boolean;
+            fields?: T[];
+        },
+    ): Promise<Pick<RequestStatusCheck, T>>;
     /**
      * Retrieve the full status of an Asynchronous generation request
      * This method will include all already generated images in base64 encoded .webp files.
@@ -166,10 +182,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns RequestStatusStable - The Status of the Generation
      */
-    getImageGenerationStatus<T extends keyof RequestStatusStable>(id: string, options?: {
-        force?: boolean;
-        fields?: T[];
-    }): Promise<Pick<RequestStatusStable, T>>;
+    getImageGenerationStatus<T extends keyof RequestStatusStable>(
+        id: string,
+        options?: {
+            force?: boolean;
+            fields?: T[];
+        },
+    ): Promise<Pick<RequestStatusStable, T>>;
     /**
      * This request will include all already generated texts.
      * @param id - The id of the generation
@@ -177,10 +196,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns RequestStatusStable - The Status of the Generation
      */
-    getTextGenerationStatus<T extends keyof RequestStatusKobold>(id: string, options?: {
-        force?: boolean;
-        fields?: T[];
-    }): Promise<Pick<RequestStatusKobold, T>>;
+    getTextGenerationStatus<T extends keyof RequestStatusKobold>(
+        id: string,
+        options?: {
+            force?: boolean;
+            fields?: T[];
+        },
+    ): Promise<Pick<RequestStatusKobold, T>>;
     /**
      * This request will include all already generated images.
      * As such, you are requested to not retrieve this endpoint often. Instead use the /check/ endpoint first
@@ -188,10 +210,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns InterrogationStatus - The Status data of the Interrogation
      */
-    getInterrogationStatus<T extends keyof InterrogationStatus>(id: string, options?: {
-        force?: boolean;
-        fields?: T[];
-    }): Promise<Pick<InterrogationStatus, T>>;
+    getInterrogationStatus<T extends keyof InterrogationStatus>(
+        id: string,
+        options?: {
+            force?: boolean;
+            fields?: T[];
+        },
+    ): Promise<Pick<InterrogationStatus, T>>;
     /**
      * If this loads, this node is available
      * @returns true - If request was successful, if not throws error
@@ -303,10 +328,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns FilterDetails[] - Array of Filter Details
      */
-    getFilters<T extends keyof FilterDetails>(filter_type?: string, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<FilterDetails, T>[]>;
+    getFilters<T extends keyof FilterDetails>(
+        filter_type?: string,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<FilterDetails, T>[]>;
     /**
      * Gets Details for a specific filter
      * @param filter_id - The filter to show
@@ -314,10 +342,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns FilterDetails - Filter Details
      */
-    getFilter<T extends keyof FilterDetails>(filter_id?: string, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<FilterDetails, T>>;
+    getFilter<T extends keyof FilterDetails>(
+        filter_id?: string,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<FilterDetails, T>>;
     /**
      * Transfer Kudos to a registered user
      * @param check_data - The prompt to check
@@ -325,10 +356,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns FilterPromptSuspicion
      */
-    postFilters<T extends keyof FilterPromptSuspicion>(check_data: FilterCheckPayload, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<FilterPromptSuspicion, T>>;
+    postFilters<T extends keyof FilterPromptSuspicion>(
+        check_data: FilterCheckPayload,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<FilterPromptSuspicion, T>>;
     /**
      * Initiate an Asynchronous request to generate images
      * This method will immediately return with the UUID of the request for generation.
@@ -340,10 +374,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns RequestAsync - The id and message for the async generation request
      */
-    postAsyncImageGenerate<T extends keyof RequestAsync>(generation_data: GenerationInput, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<RequestAsync, T>>;
+    postAsyncImageGenerate<T extends keyof RequestAsync>(
+        generation_data: GenerationInput,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<RequestAsync, T>>;
     /**
      * Initiate an Asynchronous request to generate text
      * This endpoint will immediately return with the UUID of the request for generation.
@@ -355,10 +392,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns RequestAsync - The id and message for the async generation request
      */
-    postAsyncTextGenerate<T extends keyof RequestAsync>(generation_data: GenerationInputKobold, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<RequestAsync, T>>;
+    postAsyncTextGenerate<T extends keyof RequestAsync>(
+        generation_data: GenerationInputKobold,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<RequestAsync, T>>;
     /**
      * Submit aesthetic ratings for generated images to be used by LAION
      * The request has to have been sent as shared: true.
@@ -371,10 +411,14 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns GenerationSubmitted - The kudos awarded for the rating
      */
-    postRating<T extends keyof GenerationSubmitted>(generation_id: string, rating: AestheticsPayload, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<GenerationSubmitted, T>>;
+    postRating<T extends keyof GenerationSubmitted>(
+        generation_id: string,
+        rating: AestheticsPayload,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<GenerationSubmitted, T>>;
     /**
      * Check if there are generation requests queued for fulfillment
      * This endpoint is used by registered workers only
@@ -383,10 +427,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns GenerationPayloadStable
      */
-    postImageGenerationPop<T extends keyof GenerationPayloadStable>(pop_input: PopInputStable, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<GenerationPayloadStable, T>>;
+    postImageGenerationPop<T extends keyof GenerationPayloadStable>(
+        pop_input: PopInputStable,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<GenerationPayloadStable, T>>;
     /**
      * Check if there are generation requests queued for fulfillment
      * This endpoint is used by registered workers only
@@ -395,10 +442,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns GenerationPayloadKobold
      */
-    postTextGenerationPop<T extends keyof GenerationPayloadKobold>(pop_input: PopInputKobold, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<GenerationPayloadKobold, T>>;
+    postTextGenerationPop<T extends keyof GenerationPayloadKobold>(
+        pop_input: PopInputKobold,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<GenerationPayloadKobold, T>>;
     /**
      * Submit a generated image
      * This endpoint is used by registered workers only
@@ -407,14 +457,17 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns GenerationSubmitted
      */
-    postImageGenerationSubmit<T extends keyof GenerationSubmitted>(generation_submit: {
-        id: string;
-        generation: string;
-        seed: string;
-    }, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<GenerationSubmitted, T>>;
+    postImageGenerationSubmit<T extends keyof GenerationSubmitted>(
+        generation_submit: {
+            id: string;
+            generation: string;
+            seed: string;
+        },
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<GenerationSubmitted, T>>;
     /**
      * Submit generated text
      * This endpoint is used by registered workers only
@@ -423,14 +476,17 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns GenerationSubmitted
      */
-    postTextGenerationSubmit<T extends keyof GenerationSubmitted>(generation_submit: {
-        id: string;
-        generation: string;
-        state: "ok" | "censored" | "faulted";
-    }, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<GenerationSubmitted, T>>;
+    postTextGenerationSubmit<T extends keyof GenerationSubmitted>(
+        generation_submit: {
+            id: string;
+            generation: string;
+            state: "ok" | "censored" | "faulted";
+        },
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<GenerationSubmitted, T>>;
     /**
      * Initiate an Asynchronous request to interrogate an image.
      * This endpoint will immediately return with the UUID of the request for interrogation.
@@ -442,10 +498,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns RequestInterrogationResponse
      */
-    postAsyncInterrogate<T extends keyof RequestInterrogationResponse>(interrogate_payload: ModelInterrogationInputStable, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<RequestInterrogationResponse, T>>;
+    postAsyncInterrogate<T extends keyof RequestInterrogationResponse>(
+        interrogate_payload: ModelInterrogationInputStable,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<RequestInterrogationResponse, T>>;
     /**
      * Check if there are interrogation requests queued for fulfillment
      * This endpoint is used by registered workers only
@@ -454,10 +513,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns InterrogationPopPayload
      */
-    postInterrogationPop<T extends keyof InterrogationPopPayload>(pop_input: InterrogationPopInput, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<InterrogationPopPayload, T>>;
+    postInterrogationPop<T extends keyof InterrogationPopPayload>(
+        pop_input: InterrogationPopInput,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<InterrogationPopPayload, T>>;
     /**
      * Submit the results of an interrogated image
      * This endpoint is used by registered workers only
@@ -466,13 +528,16 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns GenerationSubmitted
      */
-    postInterrogationSubmit<T extends keyof GenerationSubmitted>(interrogation_submit: {
-        id: string;
-        result: string;
-    }, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<GenerationSubmitted, T>>;
+    postInterrogationSubmit<T extends keyof GenerationSubmitted>(
+        interrogation_submit: {
+            id: string;
+            result: string;
+        },
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<GenerationSubmitted, T>>;
     /**
      * Transfer Kudos to a registered user
      * @param transfer_data - The data specifiying who to send how many kudos
@@ -480,13 +545,16 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns KudosTransferred
      */
-    postKudosTransfer<T extends keyof KudosTransferred>(transfer_data: {
-        username: string;
-        amount: number;
-    }, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<KudosTransferred, T>>;
+    postKudosTransfer<T extends keyof KudosTransferred>(
+        transfer_data: {
+            username: string;
+            amount: number;
+        },
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<KudosTransferred, T>>;
     /**
      * Receive kudos from the KoboldAI Horde
      * @param user_id - The stable horde user id of the receiving user
@@ -495,13 +563,17 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns null
      */
-    postKoboldTransfer(user_id: string, transfer_data: {
-        kai_id: string;
-        kudos_amount: number;
-        trusted: boolean;
-    }, options?: {
-        token?: string;
-    }): Promise<null>;
+    postKoboldTransfer(
+        user_id: string,
+        transfer_data: {
+            kai_id: string;
+            kudos_amount: number;
+            trusted: boolean;
+        },
+        options?: {
+            token?: string;
+        },
+    ): Promise<null>;
     /**
      * Create a new team
      * Only trusted users can create new teams.
@@ -510,10 +582,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns ModifyTeam
      */
-    createTeam<T extends keyof ModifyTeam>(create_payload: CreateTeamInput, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<ModifyTeam, T>>;
+    createTeam<T extends keyof ModifyTeam>(
+        create_payload: CreateTeamInput,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<ModifyTeam, T>>;
     /** PUT */
     /**
      * Change Horde Modes
@@ -522,15 +597,18 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns HordeModes
      */
-    putStatusModes<T extends keyof HordeModes>(modes: {
-        maintenance: boolean;
-        shutdown: number;
-        invite_only: boolean;
-        raid: boolean;
-    }, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<HordeModes, T>>;
+    putStatusModes<T extends keyof HordeModes>(
+        modes: {
+            maintenance: boolean;
+            shutdown: number;
+            invite_only: boolean;
+            raid: boolean;
+        },
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<HordeModes, T>>;
     /**
      * Method for horde admins to perform operations on users
      * @param update_payload - The data to change on the target user
@@ -539,10 +617,14 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns ModifyUser
      */
-    updateUser<T extends keyof ModifyUser>(update_payload: ModifyUserInput, id: number, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<ModifyUser, T>>;
+    updateUser<T extends keyof ModifyUser>(
+        update_payload: ModifyUserInput,
+        id: number,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<ModifyUser, T>>;
     /**
      * Put the worker into maintenance or pause mode
      * Maintenance can be set by the owner of the serve or an admin.
@@ -555,10 +637,14 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns ModifyWorker
      */
-    updateWorker<T extends keyof ModifyWorker>(update_payload: ModifyWorkerInput, id: string, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<ModifyWorker>;
+    updateWorker<T extends keyof ModifyWorker>(
+        update_payload: ModifyWorkerInput,
+        id: string,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<ModifyWorker>;
     /** PATCH */
     /**
      * Updates a Team's information
@@ -567,10 +653,14 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns ModifyTeam
      */
-    updateTeam<T extends keyof ModifyTeam>(update_payload: ModifyTeamInput, id: string, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<ModifyTeam, T>>;
+    updateTeam<T extends keyof ModifyTeam>(
+        update_payload: ModifyTeamInput,
+        id: string,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<ModifyTeam, T>>;
     /**
      * Adds a new regex filer
      * @param create_payload - The data to create the filter with
@@ -578,10 +668,14 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns FilterDetails
      */
-    addFilter<T extends keyof FilterDetails>(create_payload: PutNewFilter, id: string, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<FilterDetails, T>>;
+    addFilter<T extends keyof FilterDetails>(
+        create_payload: PutNewFilter,
+        id: string,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<FilterDetails, T>>;
     /** PATCH */
     /**
      * Updates an existing regex filer
@@ -590,10 +684,14 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns FilterDetails
      */
-    updateFilter<T extends keyof FilterDetails>(update_payload: PatchExistingFilter, id: string, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<FilterDetails, T>>;
+    updateFilter<T extends keyof FilterDetails>(
+        update_payload: PatchExistingFilter,
+        id: string,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<FilterDetails, T>>;
     /** DELETE */
     /**
      * Cancel an unfinished request
@@ -602,9 +700,12 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns RequestStatusStable
      */
-    deleteImageGenerationRequest<T extends keyof RequestStatusStable>(id: string, options?: {
-        fields?: T[];
-    }): Promise<Pick<RequestStatusStable, T>>;
+    deleteImageGenerationRequest<T extends keyof RequestStatusStable>(
+        id: string,
+        options?: {
+            fields?: T[];
+        },
+    ): Promise<Pick<RequestStatusStable, T>>;
     /**
      * Cancel an unfinished request
      * This request will include all already generated images in base64 encoded .webp files.
@@ -612,9 +713,12 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns RequestStatusKobold
      */
-    deleteTextGenerationRequest<T extends keyof RequestStatusKobold>(id: string, options?: {
-        fields?: T[];
-    }): Promise<Pick<RequestStatusKobold, T>>;
+    deleteTextGenerationRequest<T extends keyof RequestStatusKobold>(
+        id: string,
+        options?: {
+            fields?: T[];
+        },
+    ): Promise<Pick<RequestStatusKobold, T>>;
     /**
      * Cancel an unfinished interrogation request
      * This request will return all already interrogated image results.
@@ -622,9 +726,12 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns InterrogationStatus
      */
-    deleteInterrogationRequest<T extends keyof InterrogationStatus>(id: string, options?: {
-        fields?: T[];
-    }): Promise<Pick<InterrogationStatus, T>>;
+    deleteInterrogationRequest<T extends keyof InterrogationStatus>(
+        id: string,
+        options?: {
+            fields?: T[];
+        },
+    ): Promise<Pick<InterrogationStatus, T>>;
     /**
      * Delete the worker entry
      * This will delete the worker and their statistics. Will not affect the kudos generated by that worker for their owner.
@@ -635,10 +742,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns DeletedWorker
      */
-    deleteWorker<T extends keyof DeletedWorker>(id: string, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<DeletedWorker>;
+    deleteWorker<T extends keyof DeletedWorker>(
+        id: string,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<DeletedWorker>;
     /**
      * Delete the team entry
      * Only the team's creator or a horde moderator can use this endpoint.
@@ -648,10 +758,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns DeletedTeam
      */
-    deleteTeam<T extends keyof DeletedTeam>(id: string, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<DeletedTeam, T>>;
+    deleteTeam<T extends keyof DeletedTeam>(
+        id: string,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<DeletedTeam, T>>;
     /**
      * Remove an IP from timeout
      * Only usable by horde moderators
@@ -660,10 +773,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns SimpleResponse
      */
-    deleteIPTimeout<T extends keyof SimpleResponse>(delete_payload: DeleteTimeoutIPInput, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<SimpleResponse, T>>;
+    deleteIPTimeout<T extends keyof SimpleResponse>(
+        delete_payload: DeleteTimeoutIPInput,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<SimpleResponse, T>>;
     /**
      * Delete a regex filter
      * @param filter_id - The ID of the filter to delete
@@ -671,10 +787,13 @@ declare class AIHorde {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns SimpleResponse
      */
-    deleteFilter<T extends keyof SimpleResponse>(filter_id: string, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<SimpleResponse, T>>;
+    deleteFilter<T extends keyof SimpleResponse>(
+        filter_id: string,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<SimpleResponse, T>>;
 }
 export = AIHorde;
 export interface AIHordeInitOptions {
@@ -683,7 +802,7 @@ export interface AIHordeInitOptions {
     /**
      * The interval to check expired data in the cache
      * @default 1000
-    */
+     */
     cache_interval?: number;
     /** The default token to use for requests */
     default_token?: string;
@@ -735,41 +854,41 @@ export interface ModifyUserInput {
      * The amount of concurrent request this user can have
      * @minimum 0
      * @maximum 100
-    */
+     */
     concurrency?: number;
     /**
      * The amount by which to multiply the users kudos consumption
      * @minimum 0.1
      * @maximum 10
-    */
+     */
     usage_multiplier?: number;
     /** Set to the amount of workers this user is allowed to join to the horde when in worker invite-only mode. */
     worker_invited?: number;
     /**
      * Set to true to Make this user a horde moderator
      * @example false
-    */
+     */
     moderator?: boolean;
     /**
      * Set to true to Make this user a display their worker IDs
      * @example false
-    */
+     */
     public_workers?: boolean;
     /**
      * When specified, will start assigning the user monthly kudos, starting now!
      * @minimum 0
-    */
+     */
     monthly_kudos?: number;
     /**
      * When specified, will change the username. No profanity allowed!
      * @minLength 3
      * @maxLength 100
-    */
+     */
     username?: string;
     /**
      * When set to true,the user and their servers will not be affected by suspicion
      * @example false
-    */
+     */
     trusted?: boolean;
     /** Set the user's suspicion back to 0 */
     reset_suspicion?: boolean;
@@ -778,7 +897,7 @@ export interface ModifyUserInput {
      * @example email@example.com
      * @minLength 5
      * @maxLength 500
-    */
+     */
     contact?: string;
 }
 export interface ModifyWorkerInput {
@@ -790,25 +909,25 @@ export interface ModifyWorkerInput {
      * You can optionally provide a server note which will be seen in the server details. No profanity allowed!
      * @minLength 5
      * @maxLength 1000
-    */
+     */
     info?: string;
     /**
      * When this is set, it will change the worker's name. No profanity allowed!
      * @minLength 5
      * @maxLength 100
-    */
+     */
     name?: string;
     /**
      * The team towards which this worker contributes kudos. No profanity allowed!
      * @example 0bed257b-e57c-4327-ac64-40cdfb1ac5e6
      * @minLength 3
      * @maxLength 100
-    */
+     */
     team?: string;
 }
 /**
  * @link https://aihorde.net/api/
-*/
+ */
 export interface GenerationInputKobold {
     /** The prompt which will be sent to KoboldAI to generate text */
     prompt?: string;
@@ -913,22 +1032,22 @@ export interface GenerationInput {
     /**
      * Set to true if this request is NSFW. This will skip workers which censor images.
      * @default false
-    */
+     */
     nsfw?: boolean;
     /**
      * When true, only trusted workers will serve this request. When False, Evaluating workers will also be used which can increase speed but adds more risk!
      * @default true
-    */
+     */
     trusted_workers?: boolean;
     /**
      * When True, allows slower workers to pick up this request. Disabling this incurs an extra kudos cost.
      * @default true
-    */
+     */
     slow_workers?: boolean;
     /**
      * If the request is SFW, and the worker accidentaly generates NSFW, it will send back a censored image.
      * @default false
-    */
+     */
     censor_nsfw?: boolean;
     /** Specify which workers are allowed to service this request */
     workers?: string[];
@@ -937,7 +1056,7 @@ export interface GenerationInput {
     /** The Base64-encoded webp to use for img2img, max siue 3072 * 3072 */
     source_image?: string;
     /** If source_image is provided, specifies how to process it. */
-    source_processing?: typeof AIHorde.SourceImageProcessingTypes[keyof typeof AIHorde.SourceImageProcessingTypes];
+    source_processing?: (typeof AIHorde.SourceImageProcessingTypes)[keyof typeof AIHorde.SourceImageProcessingTypes];
     /** If source_processing is set to 'inpainting' or 'outpainting', this parameter can be optionally provided as the Base64-encoded webp mask of the areas to inpaint. If this arg is not passed, the inpainting/outpainting mask has to be embedded as alpha channel */
     source_mask?: string;
     /** If True, the image will be sent via cloudflare r2 download link */
@@ -947,17 +1066,17 @@ export interface GenerationInput {
     /**
      * If enabled, suspicious prompts are sanitized through a string replacement filter instead.
      * @default true
-    */
+     */
     replacement_filter?: boolean;
 }
 export interface ModelGenerationInputStable {
     /**
      * @default k_euler
-    */
-    sampler_name?: typeof AIHorde.ModelGenerationInputStableSamplers[keyof typeof AIHorde.ModelGenerationInputStableSamplers];
+     */
+    sampler_name?: (typeof AIHorde.ModelGenerationInputStableSamplers)[keyof typeof AIHorde.ModelGenerationInputStableSamplers];
     /**
      * Special Toggles used in the SD Webui. To be documented.
-    */
+     */
     toggles?: number[];
     /**
      * its how much the AI listens to your prompt, essentially.
@@ -966,7 +1085,7 @@ export interface ModelGenerationInputStable {
      * @maximum 30
      *
      * Multiple of 0.5
-    */
+     */
     cfg_scale?: number;
     /**
      * The strength of denoising
@@ -974,7 +1093,7 @@ export interface ModelGenerationInputStable {
      * @maximum 1
      *
      * Multiple of 0.01
-    */
+     */
     denoising_strength?: number;
     /** The seed to use to generete this request. */
     seed?: string;
@@ -985,7 +1104,7 @@ export interface ModelGenerationInputStable {
      * @maximum 3072
      *
      * Multiple of 64
-    */
+     */
     height?: number;
     /**
      * The width of the image to generate
@@ -994,35 +1113,35 @@ export interface ModelGenerationInputStable {
      * @maximum 3072
      *
      * Multiple of 64
-    */
+     */
     width?: number;
     /**
      * If passed with multiple n, the provided seed will be incremented every time by this value
      * @minimum 1
      * @maximum 1000
-    */
+     */
     seed_variation?: number;
     /** Set to True to enable karras noise scheduling tweaks */
     karras?: boolean;
     /** The list of post-processors to apply to the image, in the order to be applied */
-    post_processing?: (typeof AIHorde.ModelGenerationInputPostProcessingTypes[keyof typeof AIHorde.ModelGenerationInputPostProcessingTypes])[];
+    post_processing?: (typeof AIHorde.ModelGenerationInputPostProcessingTypes)[keyof typeof AIHorde.ModelGenerationInputPostProcessingTypes][];
     /**
      * Set to True to create images that stitch together seamlessly
      * @default false
-    */
+     */
     tiling?: boolean;
     /**
      * Set to True to process the image at base resolution before upscaling and re-processing
      * @default false
-    */
+     */
     hires_fix?: boolean;
     /**
      * The number of CLIP language processor layers to skip
      * @minimum 1
      * @maximum 12
-    */
+     */
     clip_skip?: number;
-    control_type?: (typeof AIHorde.ModelGenerationInputControlTypes[keyof typeof AIHorde.ModelGenerationInputControlTypes]);
+    control_type?: (typeof AIHorde.ModelGenerationInputControlTypes)[keyof typeof AIHorde.ModelGenerationInputControlTypes];
     /**
      * Set to True if the image submitted is a pre-generated control map for ControlNet use
      * @default false
@@ -1043,23 +1162,23 @@ export interface ModelGenerationInputStable {
      * @default 30
      * @minimum 1
      * @maximum 500
-    */
+     */
     steps?: number;
     /**
      * The amount of images to generate
      * @minimum 1
      * @maximum 20
-    */
+     */
     n?: number;
 }
 export interface ModelPayloadRootStable {
     /**
      * @default k_euler
-    */
-    sampler_name?: typeof AIHorde.ModelGenerationInputStableSamplers[keyof typeof AIHorde.ModelGenerationInputStableSamplers];
+     */
+    sampler_name?: (typeof AIHorde.ModelGenerationInputStableSamplers)[keyof typeof AIHorde.ModelGenerationInputStableSamplers];
     /**
      * Special Toggles used in the SD Webui. To be documented.
-    */
+     */
     toggles?: number[];
     /**
      * its how much the AI listens to your prompt, essentially.
@@ -1068,7 +1187,7 @@ export interface ModelPayloadRootStable {
      * @maximum 30
      *
      * Multiple of 0.5
-    */
+     */
     cfg_scale?: number;
     /**
      * The strength of denoising
@@ -1076,7 +1195,7 @@ export interface ModelPayloadRootStable {
      * @maximum 1
      *
      * Multiple of 0.01
-    */
+     */
     denoising_strength?: number;
     /** The seed to use to generete this request. */
     seed?: string;
@@ -1087,7 +1206,7 @@ export interface ModelPayloadRootStable {
      * @maximum 1024
      *
      * Multiple of 64
-    */
+     */
     height?: number;
     /**
      * The width of the image to generate
@@ -1096,13 +1215,13 @@ export interface ModelPayloadRootStable {
      * @maximum 1024
      *
      * Multiple of 64
-    */
+     */
     width?: number;
     /**
      * If passed with multiple n, the provided seed will be incremented every time by this value
      * @minimum 1
      * @maximum 1000
-    */
+     */
     seed_variation?: number;
     /** Set to True to enable karras noise scheduling tweaks */
     karras?: boolean;
@@ -1185,7 +1304,7 @@ export interface PopInputStable extends PopInput {
     /**
      * The maximum amount of pixels this worker can generate
      * @default 262144
-    */
+     */
     max_pixels?: number;
     /** Words which, when detected will refuse to pick up any jobs */
     blacklist?: string[];
@@ -1194,7 +1313,7 @@ export interface PopInputKobold extends PopInput {
     /**
      * The maximum amount of pixels this worker can generate
      * @default 262144
-    */
+     */
     max_pixels?: number;
     /** Words which, when detected will refuse to pick up any jobs */
     blacklist?: string[];
@@ -1207,14 +1326,14 @@ export interface PopInput {
     /**
      * Whether this worker can generate NSFW requests or not.
      * @default false
-    */
+     */
     nsfw?: boolean;
     /** Which models this worker is serving */
     models?: string[];
     /**
      * The version of the bridge used by this worker
      * @default 1
-    */
+     */
     bridge_version: number;
     /**
      * The worker name, version and website
@@ -1260,11 +1379,11 @@ export interface GenerationPayloadKobold {
 export interface ModelPayloadStable {
     /**
      * @default k_euler
-    */
-    sampler_name?: typeof AIHorde.ModelGenerationInputStableSamplers[keyof typeof AIHorde.ModelGenerationInputStableSamplers];
+     */
+    sampler_name?: (typeof AIHorde.ModelGenerationInputStableSamplers)[keyof typeof AIHorde.ModelGenerationInputStableSamplers];
     /**
      * Special Toggles used in the SD Webui. To be documented.
-    */
+     */
     toggles?: number[];
     /**
      * its how much the AI listens to your prompt, essentially.
@@ -1273,7 +1392,7 @@ export interface ModelPayloadStable {
      * @maximum 30
      *
      * Multiple of 0.5
-    */
+     */
     cfg_scale?: number;
     /**
      * The strength of denoising
@@ -1281,7 +1400,7 @@ export interface ModelPayloadStable {
      * @maximum 1
      *
      * Multiple of 0.01
-    */
+     */
     denoising_strength?: number;
     /** The seed to use to generete this request. */
     seed?: string;
@@ -1292,7 +1411,7 @@ export interface ModelPayloadStable {
      * @maximum 3072
      *
      * Multiple of 64
-    */
+     */
     height?: number;
     /**
      * The width of the image to generate
@@ -1301,45 +1420,45 @@ export interface ModelPayloadStable {
      * @maximum 3072
      *
      * Multiple of 64
-    */
+     */
     width?: number;
     /**
      * If passed with multiple n, the provided seed will be incremented every time by this value
      * @minimum 1
      * @maximum 1000
-    */
+     */
     seed_variation?: number;
     /** Set to True to enable karras noise scheduling tweaks */
     karras?: boolean;
     /** The list of post-processors to apply to the image, in the order to be applied */
-    post_processing?: (typeof AIHorde.ModelGenerationInputPostProcessingTypes[keyof typeof AIHorde.ModelGenerationInputPostProcessingTypes])[];
+    post_processing?: (typeof AIHorde.ModelGenerationInputPostProcessingTypes)[keyof typeof AIHorde.ModelGenerationInputPostProcessingTypes][];
     /**
      * Set to True to create images that stitch together seamlessly
      * @default false
-    */
+     */
     tiling?: boolean;
     /**
      * Set to True to process the image at base resolution before upscaling and re-processing
      * @default false
-    */
+     */
     hires_fix?: boolean;
     /**
      * The number of CLIP language processor layers to skip
      * @minimum 1
      * @maximum 12
-    */
+     */
     clip_skip?: number;
-    control_type?: (typeof AIHorde.ModelGenerationInputControlTypes[keyof typeof AIHorde.ModelGenerationInputControlTypes]);
+    control_type?: (typeof AIHorde.ModelGenerationInputControlTypes)[keyof typeof AIHorde.ModelGenerationInputControlTypes];
     /** The prompt which will be sent to Stable Diffusion to generate an image */
     prompt?: string;
     /**
      * @default 30
-    */
+     */
     ddim_steps?: number;
     /**
      * The amount of images to generate
      * @default 1
-    */
+     */
     n_iter?: number;
     /** When true will apply NSFW censoring model on the generation */
     use_nsfw_censor?: boolean;
@@ -1442,7 +1561,7 @@ export interface UserDetails {
     /**
      * (Privileged) Contact details for the horde admins to reach the user in case of emergency.
      * @example email@example.com
-    */
+     */
     contact?: string;
     /**
      * How many seconds since this account was created
@@ -1479,7 +1598,7 @@ export interface MonthlyKudos {
     /**
      * Last date this user received monthly Kudos.
      * @type string($date-time)
-    */
+     */
     last_received?: string;
 }
 export interface UsageDetailsStable extends UsageDetails {
@@ -1583,7 +1702,7 @@ export interface WorkerDetails extends WorkerDetailsLite {
     /**
      * How many jobs this worker has left uncompleted after it started them.
      * @example 0
-    */
+     */
     uncompleted_jobs?: number;
     /** Which models this worker if offerring */
     models?: string[];
@@ -1593,14 +1712,14 @@ export interface WorkerDetails extends WorkerDetailsLite {
      * @example email@example.com
      * @minLength 5
      * @maxLength 500
-    */
+     */
     contact?: string;
     /**
      * The bridge agent name, version and website
      * @default: unknown:0:unknown
      * @example: AI Horde Worker:11:https://github.com/db0/AI-Horde-Worker
      * @maxLength: 1000
-    */
+     */
     bridge_agent?: string;
 }
 export interface WorkerDetailsLite {
@@ -1692,14 +1811,14 @@ export interface CreateTeamInput {
      * The name of the team. No profanity allowed!
      * @minLength 3
      * @maxLength 100
-    */
+     */
     name: string;
     /**
      * Extra information or comments about this team.
      * @example Anarchy is emergent order.
      * @minLength 3
      * @maxLength 1000
-    */
+     */
     info?: string;
 }
 export interface ModifyTeam {
@@ -1722,7 +1841,7 @@ export interface TeamDetails extends TeamDetailsLite {
     /**
      * Extra information or comments about this team provided by its owner
      * @example Anarchy is emergent order.
-    */
+     */
     info?: string;
     /** How many images this team's workers have generated */
     requests_fulfilled?: number;
@@ -1733,7 +1852,7 @@ export interface TeamDetails extends TeamDetailsLite {
     /**
      * How many workers have been dedicated to this team
      * @example 10
-    */
+     */
     worker_count?: number;
     workers?: WorkerDetailsLite[];
     models?: ActiveModelLite[];
@@ -1749,14 +1868,14 @@ export interface ModifyTeamInput {
      * The name of the team. No profanity allowed!
      * @minLength 3
      * @maxLength 100
-    */
+     */
     name?: string;
     /**
      * Extra information or comments about this team.
      * @example Anarchy is emergent order.
      * @minLength 3
      * @maxLength 1000
-    */
+     */
     info?: string;
 }
 export interface DeletedTeam {
@@ -1781,13 +1900,23 @@ export interface SimpleResponse {
      */
     message: string;
 }
-export declare type InterrogationPopFormPayloadStable = Partial<Record<typeof AIHorde.ModelInterrogationFormTypes[keyof typeof AIHorde.ModelInterrogationFormTypes], string>>;
-export declare type InterrogationFormResult = Partial<Record<typeof AIHorde.ModelInterrogationFormTypes[keyof typeof AIHorde.ModelInterrogationFormTypes], Record<string, any>>>;
+export declare type InterrogationPopFormPayloadStable = Partial<
+    Record<
+        (typeof AIHorde.ModelInterrogationFormTypes)[keyof typeof AIHorde.ModelInterrogationFormTypes],
+        string
+    >
+>;
+export declare type InterrogationFormResult = Partial<
+    Record<
+        (typeof AIHorde.ModelInterrogationFormTypes)[keyof typeof AIHorde.ModelInterrogationFormTypes],
+        Record<string, any>
+    >
+>;
 export interface ModelInterrogationFormStable {
     /**
      * The type of interrogation this is
      */
-    name: typeof AIHorde.ModelInterrogationFormTypes[keyof typeof AIHorde.ModelInterrogationFormTypes];
+    name: (typeof AIHorde.ModelInterrogationFormTypes)[keyof typeof AIHorde.ModelInterrogationFormTypes];
     payload?: InterrogationPopFormPayload;
 }
 export interface ModelInterrogationInputStable {
@@ -1807,7 +1936,7 @@ export interface InterrogationPopInput {
     /** Users with priority to use this worker */
     priority_usernames?: string[];
     /** The type of interrogation this worker can fulfull */
-    forms?: (typeof AIHorde.ModelInterrogationFormTypes[keyof typeof AIHorde.ModelInterrogationFormTypes])[];
+    forms?: (typeof AIHorde.ModelInterrogationFormTypes)[keyof typeof AIHorde.ModelInterrogationFormTypes][];
     /**
      * The amount of forms to pop at the same time
      * @default 1
@@ -1833,7 +1962,7 @@ export interface InterrogationPopFormPayload {
      * The name of this interrogation form
      * @example caption
      */
-    name?: typeof AIHorde.ModelInterrogationFormTypes[keyof typeof AIHorde.ModelInterrogationFormTypes];
+    name?: (typeof AIHorde.ModelInterrogationFormTypes)[keyof typeof AIHorde.ModelInterrogationFormTypes];
     payload?: InterrogationPopFormPayloadStable;
     /** The URL From which the source image can be downloaded */
     source_image?: string;
@@ -1864,12 +1993,12 @@ export interface InterrogationFormStatus {
     /** The name of this interrogation form */
     form?: string;
     /** title: Interrogation State */
-    state?: typeof AIHorde.HordeAsyncRequestStates[keyof typeof AIHorde.HordeAsyncRequestStates];
+    state?: (typeof AIHorde.HordeAsyncRequestStates)[keyof typeof AIHorde.HordeAsyncRequestStates];
     result?: InterrogationFormResult;
 }
 export interface InterrogationStatus {
     /** title: Interrogation State */
-    state?: typeof AIHorde.HordeAsyncRequestStates[keyof typeof AIHorde.HordeAsyncRequestStates];
+    state?: (typeof AIHorde.HordeAsyncRequestStates)[keyof typeof AIHorde.HordeAsyncRequestStates];
     forms?: InterrogationFormStatus[];
 }
 export interface AestheticsPayload {
@@ -2024,7 +2153,7 @@ declare enum RatingArtifactsRatings {
     "SOME_FLAWS" = 2,
     "OBVIOUS_FLAWS" = 3,
     "HARMFUL_FLAWS" = 4,
-    "GARBAGE" = 5
+    "GARBAGE" = 5,
 }
 declare class AIHordeRatings {
     #private;
@@ -2057,13 +2186,16 @@ declare class AIHordeRatings {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns DatasetImagePopResponse - An images data to rate
      */
-    getNewRating<T extends keyof DatasetImagePopResponse>(image_options?: {
-        dataset_id: string;
-        model_name?: string;
-    }, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<DatasetImagePopResponse, T>>;
+    getNewRating<T extends keyof DatasetImagePopResponse>(
+        image_options?: {
+            dataset_id: string;
+            model_name?: string;
+        },
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<DatasetImagePopResponse, T>>;
     /** POST ENDPOINTS */
     /**
      * Check if there are interrogation requests queued for fulfillment
@@ -2074,10 +2206,14 @@ declare class AIHordeRatings {
      * @param options.fields - Array of fields that will be included in the returned data
      * @returns InterrogationPopPayload
      */
-    postRating<T extends keyof RatePostResponse>(image_id: string, rating: RatePostInput, options?: {
-        token?: string;
-        fields?: T[];
-    }): Promise<Pick<RatePostResponse, T>>;
+    postRating<T extends keyof RatePostResponse>(
+        image_id: string,
+        rating: RatePostInput,
+        options?: {
+            token?: string;
+            fields?: T[];
+        },
+    ): Promise<Pick<RatePostResponse, T>>;
 }
 /**
  * Internal Interfaces
@@ -2173,7 +2309,7 @@ export interface RatePostInput {
      * @minimum 0
      * @maximum 5
      */
-    artifacts?: typeof AIHordeRatings.RatingArtifactsRatings[keyof typeof AIHordeRatings.RatingArtifactsRatings];
+    artifacts?: (typeof AIHordeRatings.RatingArtifactsRatings)[keyof typeof AIHordeRatings.RatingArtifactsRatings];
 }
 export interface RatePostResponse {
     /**

@@ -2,9 +2,7 @@
     "display_name": "Memory",
     "loading_order": 9,
     "requires": [],
-    "optional": [
-        "summarize"
-    ],
+    "optional": ["summarize"],
     "js": "index.js",
     "css": "style.css",
     "author": "Cohee#1207",

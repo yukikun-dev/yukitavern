@@ -1,7 +1,33 @@
-import { saveSettings, callPopup, substituteParams, getTokenCount, getRequestHeaders, chat_metadata, this_chid, characters, saveCharacterDebounced, menu_type } from "../script.js";
-import { download, debounce, initScrollHeight, resetScrollHeight, parseJsonFile, extractDataFromPng, getFileBuffer, delay, getCharaFilename, deepClone } from "./utils.js";
+import {
+    saveSettings,
+    callPopup,
+    substituteParams,
+    getTokenCount,
+    getRequestHeaders,
+    chat_metadata,
+    this_chid,
+    characters,
+    saveCharacterDebounced,
+    menu_type,
+} from "../script.js";
+import {
+    download,
+    debounce,
+    initScrollHeight,
+    resetScrollHeight,
+    parseJsonFile,
+    extractDataFromPng,
+    getFileBuffer,
+    delay,
+    getCharaFilename,
+    deepClone,
+} from "./utils.js";
 import { getContext } from "./extensions.js";
-import { NOTE_MODULE_NAME, metadata_keys, shouldWIAddPrompt } from "./authors-note.js";
+import {
+    NOTE_MODULE_NAME,
+    metadata_keys,
+    shouldWIAddPrompt,
+} from "./authors-note.js";
 import { registerSlashCommand } from "./slash-commands.js";
 import { deviceInfo } from "./RossAscends-mods.js";
 
@@ -20,7 +46,7 @@ export {
     deleteWorldInfo,
     setWorldInfoSettings,
     getWorldInfoPrompt,
-}
+};
 
 const world_info_insertion_strategy = {
     evenly: 0,
@@ -37,12 +63,16 @@ let world_info_recursive = false;
 let world_info_overflow_alert = false;
 let world_info_case_sensitive = false;
 let world_info_match_whole_words = false;
-let world_info_character_strategy = world_info_insertion_strategy.character_first;
+let world_info_character_strategy =
+    world_info_insertion_strategy.character_first;
 let world_info_budget_cap = 0;
-const saveWorldDebounced = debounce(async (name, data) => await _save(name, data), 1000);
+const saveWorldDebounced = debounce(
+    async (name, data) => await _save(name, data),
+    1000,
+);
 const saveSettingsDebounced = debounce(() => {
-    Object.assign(world_info, { globalSelect: selected_world_info })
-    saveSettings()
+    Object.assign(world_info, { globalSelect: selected_world_info });
+    saveSettings();
 }, 1000);
 const sortFn = (a, b) => b.order - a.order;
 
@@ -57,7 +87,7 @@ export function getWorldInfoSettings() {
         world_info_match_whole_words,
         world_info_character_strategy,
         world_info_budget_cap,
-    }
+    };
 }
 
 const world_info_position = {
@@ -65,13 +95,14 @@ const world_info_position = {
     after: 1,
     ANTop: 2,
     ANBottom: 3,
-
 };
 
 const worldInfoCache = {};
 
 async function getWorldInfoPrompt(chat2, maxContext) {
-    let worldInfoString = "", worldInfoBefore = "", worldInfoAfter = "";
+    let worldInfoString = "",
+        worldInfoBefore = "",
+        worldInfoAfter = "";
 
     const activatedWorldInfo = await checkWorldInfo(chat2, maxContext);
     worldInfoBefore = activatedWorldInfo.worldInfoBefore;
@@ -93,9 +124,13 @@ function setWorldInfoSettings(settings, data) {
     if (settings.world_info_case_sensitive !== undefined)
         world_info_case_sensitive = Boolean(settings.world_info_case_sensitive);
     if (settings.world_info_match_whole_words !== undefined)
-        world_info_match_whole_words = Boolean(settings.world_info_match_whole_words);
+        world_info_match_whole_words = Boolean(
+            settings.world_info_match_whole_words,
+        );
     if (settings.world_info_character_strategy !== undefined)
-        world_info_character_strategy = Number(settings.world_info_character_strategy);
+        world_info_character_strategy = Number(
+            settings.world_info_character_strategy,
+        );
     if (settings.world_info_budget_cap !== undefined)
         world_info_budget_cap = Number(settings.world_info_budget_cap);
 
@@ -115,7 +150,7 @@ function setWorldInfoSettings(settings, data) {
         selected_world_info = existingWorldInfo;
     }
 
-    world_info = settings.world_info ?? {}
+    world_info = settings.world_info ?? {};
 
     $("#world_info_depth_counter").text(world_info_depth);
     $("#world_info_depth").val(world_info_depth);
@@ -123,12 +158,17 @@ function setWorldInfoSettings(settings, data) {
     $("#world_info_budget_counter").text(world_info_budget);
     $("#world_info_budget").val(world_info_budget);
 
-    $("#world_info_recursive").prop('checked', world_info_recursive);
-    $("#world_info_overflow_alert").prop('checked', world_info_overflow_alert);
-    $("#world_info_case_sensitive").prop('checked', world_info_case_sensitive);
-    $("#world_info_match_whole_words").prop('checked', world_info_match_whole_words);
+    $("#world_info_recursive").prop("checked", world_info_recursive);
+    $("#world_info_overflow_alert").prop("checked", world_info_overflow_alert);
+    $("#world_info_case_sensitive").prop("checked", world_info_case_sensitive);
+    $("#world_info_match_whole_words").prop(
+        "checked",
+        world_info_match_whole_words,
+    );
 
-    $(`#world_info_character_strategy option[value='${world_info_character_strategy}']`).prop('selected', true);
+    $(
+        `#world_info_character_strategy option[value='${world_info_character_strategy}']`,
+    ).prop("selected", true);
     $("#world_info_character_strategy").val(world_info_character_strategy);
 
     $("#world_info_budget_cap").val(world_info_budget_cap);
@@ -137,15 +177,25 @@ function setWorldInfoSettings(settings, data) {
     world_names = data.world_names?.length ? data.world_names : [];
 
     // Add to existing selected WI if it exists
-    selected_world_info = selected_world_info.concat(settings.world_info?.globalSelect?.filter((e) => world_names.includes(e)) ?? []);
+    selected_world_info = selected_world_info.concat(
+        settings.world_info?.globalSelect?.filter((e) =>
+            world_names.includes(e),
+        ) ?? [],
+    );
 
     if (world_names.length > 0) {
         $("#world_info").empty();
     }
 
     world_names.forEach((item, i) => {
-        $("#world_info").append(`<option value='${i}'${selected_world_info.includes(item) ? ' selected' : ''}>${item}</option>`);
-        $("#world_editor_select").append(`<option value='${i}'>${item}</option>`);
+        $("#world_info").append(
+            `<option value='${i}'${
+                selected_world_info.includes(item) ? " selected" : ""
+            }>${item}</option>`,
+        );
+        $("#world_editor_select").append(
+            `<option value='${i}'>${item}</option>`,
+        );
     });
 
     $("#world_editor_select").trigger("change");
@@ -178,7 +228,7 @@ async function loadWorldInfoData(name) {
         method: "POST",
         headers: getRequestHeaders(),
         body: JSON.stringify({ name: name }),
-        cache: 'no-cache',
+        cache: "no-cache",
     });
 
     if (response.ok) {
@@ -204,8 +254,14 @@ async function updateWorldInfoList() {
         $("#world_editor_select").find('option[value!=""]').remove();
 
         world_names.forEach((item, i) => {
-            $("#world_info").append(`<option value='${i}'${selected_world_info.includes(item) ? ' selected' : ''}>${item}</option>`);
-            $("#world_editor_select").append(`<option value='${i}'>${item}</option>`);
+            $("#world_info").append(
+                `<option value='${i}'${
+                    selected_world_info.includes(item) ? " selected" : ""
+                }>${item}</option>`,
+            );
+            $("#world_editor_select").append(
+                `<option value='${i}'>${item}</option>`,
+            );
         });
     }
 }
@@ -215,97 +271,118 @@ function hideWorldEditor() {
 }
 
 function getWIElement(name) {
-    const wiElement = $("#world_info").children().filter(function () {
-        return $(this).text().toLowerCase() === name.toLowerCase()
-    });
+    const wiElement = $("#world_info")
+        .children()
+        .filter(function () {
+            return $(this).text().toLowerCase() === name.toLowerCase();
+        });
 
     return wiElement;
 }
 
 function nullWorldInfo() {
-    toastr.info("Create or import a new World Info file first.", "World Info is not set", { timeOut: 10000, preventDuplicates: true });
+    toastr.info(
+        "Create or import a new World Info file first.",
+        "World Info is not set",
+        { timeOut: 10000, preventDuplicates: true },
+    );
 }
 
 function displayWorldEntries(name, data) {
     $("#world_popup_entries_list").empty().show();
 
     if (!data || !("entries" in data)) {
-        $("#world_popup_new").off('click').on('click', nullWorldInfo);
-        $("#world_popup_name_button").off('click').on('click', nullWorldInfo);
-        $("#world_popup_export").off('click').on('click', nullWorldInfo);
-        $("#world_popup_delete").off('click').on('click', nullWorldInfo);
+        $("#world_popup_new").off("click").on("click", nullWorldInfo);
+        $("#world_popup_name_button").off("click").on("click", nullWorldInfo);
+        $("#world_popup_export").off("click").on("click", nullWorldInfo);
+        $("#world_popup_delete").off("click").on("click", nullWorldInfo);
         $("#world_popup_entries_list").hide();
         return;
     }
 
     // Convert the data.entries object into an array
-    const entriesArray = Object.keys(data.entries).map(uid => {
+    const entriesArray = Object.keys(data.entries).map((uid) => {
         const entry = data.entries[uid];
         entry.displayIndex = entry.displayIndex ?? entry.uid;
         return entry;
     });
 
     // Sort the entries array by displayIndex and uid
-    entriesArray.sort((a, b) => a.displayIndex - b.displayIndex || a.uid - b.uid);
+    entriesArray.sort(
+        (a, b) => a.displayIndex - b.displayIndex || a.uid - b.uid,
+    );
 
     // Loop through the sorted array and call appendWorldEntry
     for (const entry of entriesArray) {
         appendWorldEntry(name, data, entry);
     }
 
-    $("#world_popup_new").off('click').on('click', () => {
-        createWorldInfoEntry(name, data);
-    });
+    $("#world_popup_new")
+        .off("click")
+        .on("click", () => {
+            createWorldInfoEntry(name, data);
+        });
 
-    $("#world_popup_name_button").off('click').on('click', async () => {
-        await renameWorldInfo(name, data);
-    });
+    $("#world_popup_name_button")
+        .off("click")
+        .on("click", async () => {
+            await renameWorldInfo(name, data);
+        });
 
-    $("#world_popup_export").off('click').on('click', () => {
-        if (name && data) {
-            const jsonValue = JSON.stringify(data);
-            const fileName = `${name}.json`;
-            download(jsonValue, fileName, "application/json");
-        }
-    });
+    $("#world_popup_export")
+        .off("click")
+        .on("click", () => {
+            if (name && data) {
+                const jsonValue = JSON.stringify(data);
+                const fileName = `${name}.json`;
+                download(jsonValue, fileName, "application/json");
+            }
+        });
 
-    $("#world_popup_delete").off('click').on('click', async () => {
-        const confirmation = await callPopup(`<h3>Delete the World/Lorebook: "${name}"?</h3>This action is irreversible!`, "confirm");
+    $("#world_popup_delete")
+        .off("click")
+        .on("click", async () => {
+            const confirmation = await callPopup(
+                `<h3>Delete the World/Lorebook: "${name}"?</h3>This action is irreversible!`,
+                "confirm",
+            );
 
-        if (!confirmation) {
-            return;
-        }
+            if (!confirmation) {
+                return;
+            }
 
-        if (world_info.charLore) {
-            world_info.charLore.forEach((charLore, index) => {
-                if (charLore.extraBooks?.includes(name)) {
-                    const tempCharLore = charLore.extraBooks.filter((e) => e !== name);
-                    if (tempCharLore.length === 0) {
-                        world_info.charLore.splice(index, 1);
-                    } else {
-                        charLore.extraBooks = tempCharLore;
+            if (world_info.charLore) {
+                world_info.charLore.forEach((charLore, index) => {
+                    if (charLore.extraBooks?.includes(name)) {
+                        const tempCharLore = charLore.extraBooks.filter(
+                            (e) => e !== name,
+                        );
+                        if (tempCharLore.length === 0) {
+                            world_info.charLore.splice(index, 1);
+                        } else {
+                            charLore.extraBooks = tempCharLore;
+                        }
                     }
-                }
-            });
+                });
 
-            saveSettingsDebounced();
-        }
+                saveSettingsDebounced();
+            }
 
-        // Selected world_info automatically refreshes
-        await deleteWorldInfo(name);
-    });
+            // Selected world_info automatically refreshes
+            await deleteWorldInfo(name);
+        });
 
     // Check if a sortable instance exists
-    if ($('#world_popup_entries_list').sortable('instance') !== undefined) {
+    if ($("#world_popup_entries_list").sortable("instance") !== undefined) {
         // Destroy the instance
-        $('#world_popup_entries_list').sortable('destroy');
+        $("#world_popup_entries_list").sortable("destroy");
     }
 
     $("#world_popup_entries_list").sortable({
         handle: ".drag-handle",
         stop: async function (event, ui) {
-            $('#world_popup_entries_list .world_entry').each(function (index) {
-                const uid = $(this).data('uid');
+            $("#world_popup_entries_list .world_entry").each(function (index) {
+                const uid = $(this).data("uid");
 
                 // Update the display index in the data array
                 const item = data.entries[uid];
@@ -316,26 +393,41 @@ function displayWorldEntries(name, data) {
                 }
 
                 item.displayIndex = index;
-                setOriginalDataValue(data, uid, 'extensions.display_index', index);
+                setOriginalDataValue(
+                    data,
+                    uid,
+                    "extensions.display_index",
+                    index,
+                );
             });
 
-            console.table(Object.keys(data.entries).map(uid => data.entries[uid]).map(x => ({ uid: x.uid, key: x.key.join(','), displayIndex: x.displayIndex })));
+            console.table(
+                Object.keys(data.entries)
+                    .map((uid) => data.entries[uid])
+                    .map((x) => ({
+                        uid: x.uid,
+                        key: x.key.join(","),
+                        displayIndex: x.displayIndex,
+                    })),
+            );
 
             await saveWorldInfo(name, data, true);
-        }
+        },
     });
     //$("#world_popup_entries_list").disableSelection();
 }
 
 function setOriginalDataValue(data, uid, key, value) {
     if (data.originalData && Array.isArray(data.originalData.entries)) {
-        let originalEntry = data.originalData.entries.find(x => x.uid === uid);
+        let originalEntry = data.originalData.entries.find(
+            (x) => x.uid === uid,
+        );
 
         if (!originalEntry) {
             return;
         }
 
-        const keyParts = key.split('.');
+        const keyParts = key.split(".");
         let currentObject = originalEntry;
 
         for (let i = 0; i < keyParts.length - 1; i++) {
@@ -354,7 +446,9 @@ function setOriginalDataValue(data, uid, key, value) {
 
 function deleteOriginalDataValue(data, uid) {
     if (data.originalData && Array.isArray(data.originalData.entries)) {
-        const originalIndex = data.originalData.entries.findIndex(x => x.uid === uid);
+        const originalIndex = data.originalData.entries.findIndex(
+            (x) => x.uid === uid,
+        );
 
         if (originalIndex >= 0) {
             data.originalData.entries.splice(originalIndex, 1);
@@ -390,20 +484,28 @@ function appendWorldEntry(name, data, entry) {
     initScrollHeight(keyInput);
 
     // logic AND/NOT
-    const selectiveLogicDropdown = template.find('select[name="entryLogicType"]');
+    const selectiveLogicDropdown = template.find(
+        'select[name="entryLogicType"]',
+    );
     selectiveLogicDropdown.data("uid", entry.uid);
 
     selectiveLogicDropdown.on("input", function () {
         const uid = $(this).data("uid");
         const value = Number($(this).val());
-        console.debug(`logic for ${entry.uid} set to ${value}`)
+        console.debug(`logic for ${entry.uid} set to ${value}`);
         data.entries[uid].selectiveLogic = !isNaN(value) ? value : 0;
-        setOriginalDataValue(data, uid, "selectiveLogic", data.entries[uid].selectiveLogic);
+        setOriginalDataValue(
+            data,
+            uid,
+            "selectiveLogic",
+            data.entries[uid].selectiveLogic,
+        );
         saveWorldInfo(name, data);
-
     });
     template
-        .find(`select[name="entryLogicType"] option[value=${entry.selectiveLogic}]`)
+        .find(
+            `select[name="entryLogicType"] option[value=${entry.selectiveLogic}]`,
+        )
         .prop("selected", true)
         .trigger("input");
 
@@ -419,7 +521,12 @@ function appendWorldEntry(name, data, entry) {
             .map((x) => x.trim())
             .filter((x) => x);
 
-        setOriginalDataValue(data, uid, "secondary_keys", data.entries[uid].keysecondary);
+        setOriginalDataValue(
+            data,
+            uid,
+            "secondary_keys",
+            data.entries[uid].keysecondary,
+        );
         saveWorldInfo(name, data);
     });
 
@@ -453,7 +560,7 @@ function appendWorldEntry(name, data, entry) {
 
     commentInput.val(entry.comment).trigger("input");
     commentToggle.prop("checked", true /* entry.addMemo */).trigger("input");
-    commentToggle.parent().hide()
+    commentToggle.parent().hide();
 
     // content
     const countTokensDebounced = debounce(function (that, value) {
@@ -488,7 +595,12 @@ function appendWorldEntry(name, data, entry) {
         const value = $(this).prop("checked");
         data.entries[uid].selective = value;
 
-        setOriginalDataValue(data, uid, "selective", data.entries[uid].selective);
+        setOriginalDataValue(
+            data,
+            uid,
+            "selective",
+            data.entries[uid].selective,
+        );
         saveWorldInfo(name, data);
 
         const keysecondary = $(this)
@@ -504,15 +616,13 @@ function appendWorldEntry(name, data, entry) {
             .find(".keyprimarytextpole");
 
         const keyprimaryHeight = keyprimarytextpole.outerHeight();
-        keysecondarytextpole.css('height', keyprimaryHeight + 'px');
+        keysecondarytextpole.css("height", keyprimaryHeight + "px");
 
         value ? keysecondary.show() : keysecondary.hide();
-
     });
     //forced on, ignored if empty
     selectiveInput.prop("checked", true /* entry.selective */).trigger("input");
     selectiveInput.parent().hide();
-
 
     // constant
     const constantInput = template.find('input[name="constant"]');
@@ -534,7 +644,12 @@ function appendWorldEntry(name, data, entry) {
         const value = Number($(this).val());
 
         data.entries[uid].order = !isNaN(value) ? value : 0;
-        setOriginalDataValue(data, uid, "insertion_order", data.entries[uid].order);
+        setOriginalDataValue(
+            data,
+            uid,
+            "insertion_order",
+            data.entries[uid].order,
+        );
         saveWorldInfo(name, data);
     });
     orderInput.val(entry.order).trigger("input");
@@ -554,14 +669,22 @@ function appendWorldEntry(name, data, entry) {
 
         // Clamp probability to 0-100
         if (data.entries[uid].probability !== null) {
-            data.entries[uid].probability = Math.min(100, Math.max(0, data.entries[uid].probability));
+            data.entries[uid].probability = Math.min(
+                100,
+                Math.max(0, data.entries[uid].probability),
+            );
 
             if (data.entries[uid].probability !== value) {
                 $(this).val(data.entries[uid].probability);
             }
         }
 
-        setOriginalDataValue(data, uid, "extensions.probability", data.entries[uid].probability);
+        setOriginalDataValue(
+            data,
+            uid,
+            "extensions.probability",
+            data.entries[uid].probability,
+        );
         saveWorldInfo(name, data);
     });
     probabilityInput.val(entry.probability).trigger("input");
@@ -594,7 +717,9 @@ function appendWorldEntry(name, data, entry) {
         probabilityInput.val(data.entries[uid].probability).trigger("input");
     });
     //forced on, 100% by default
-    probabilityToggle.prop("checked", true /* entry.useProbability */).trigger("input");
+    probabilityToggle
+        .prop("checked", true /* entry.useProbability */)
+        .trigger("input");
     probabilityToggle.parent().hide();
 
     // position
@@ -609,9 +734,19 @@ function appendWorldEntry(name, data, entry) {
         const value = Number($(this).val());
         data.entries[uid].position = !isNaN(value) ? value : 0;
         // Spec v2 only supports before_char and after_char
-        setOriginalDataValue(data, uid, "position", data.entries[uid].position == 0 ? 'before_char' : 'after_char');
+        setOriginalDataValue(
+            data,
+            uid,
+            "position",
+            data.entries[uid].position == 0 ? "before_char" : "after_char",
+        );
         // Write the original value as extensions field
-        setOriginalDataValue(data, uid, "extensions.position", data.entries[uid].position);
+        setOriginalDataValue(
+            data,
+            uid,
+            "extensions.position",
+            data.entries[uid].position,
+        );
         saveWorldInfo(name, data);
     });
 
@@ -635,16 +770,25 @@ function appendWorldEntry(name, data, entry) {
     });
     disableInput.prop("checked", entry.disable).trigger("input");
 
-    const excludeRecursionInput = template.find('input[name="exclude_recursion"]');
+    const excludeRecursionInput = template.find(
+        'input[name="exclude_recursion"]',
+    );
     excludeRecursionInput.data("uid", entry.uid);
     excludeRecursionInput.on("input", function () {
         const uid = $(this).data("uid");
         const value = $(this).prop("checked");
         data.entries[uid].excludeRecursion = value;
-        setOriginalDataValue(data, uid, "extensions.exclude_recursion", data.entries[uid].excludeRecursion);
+        setOriginalDataValue(
+            data,
+            uid,
+            "extensions.exclude_recursion",
+            data.entries[uid].excludeRecursion,
+        );
         saveWorldInfo(name, data);
     });
-    excludeRecursionInput.prop("checked", entry.excludeRecursion).trigger("input");
+    excludeRecursionInput
+        .prop("checked", entry.excludeRecursion)
+        .trigger("input");
 
     // delete button
     const deleteButton = template.find("input.delete_entry_button");
@@ -658,7 +802,7 @@ function appendWorldEntry(name, data, entry) {
     });
 
     template.appendTo("#world_popup_entries_list");
-    template.find('.inline-drawer-content').css('display', 'none'); //entries start collapsed
+    template.find(".inline-drawer-content").css("display", "none"); //entries start collapsed
 
     return template;
 }
@@ -726,22 +870,32 @@ async function saveWorldInfo(name, data, immediately) {
 
 async function renameWorldInfo(name, data) {
     const oldName = name;
-    const newName = await callPopup("<h3>Rename World Info</h3>Enter a new name:", 'input', oldName);
+    const newName = await callPopup(
+        "<h3>Rename World Info</h3>Enter a new name:",
+        "input",
+        oldName,
+    );
 
     if (oldName === newName || !newName) {
         console.debug("World info rename cancelled");
         return;
     }
 
-    const entryPreviouslySelected = selected_world_info.findIndex((e) => e === oldName);
+    const entryPreviouslySelected = selected_world_info.findIndex(
+        (e) => e === oldName,
+    );
 
     await saveWorldInfo(newName, data, true);
     await deleteWorldInfo(oldName);
 
-    const existingCharLores = world_info.charLore?.filter((e) => e.extraBooks.includes(oldName));
+    const existingCharLores = world_info.charLore?.filter((e) =>
+        e.extraBooks.includes(oldName),
+    );
     if (existingCharLores && existingCharLores.length > 0) {
         existingCharLores.forEach((charLore) => {
-            const tempCharLore = charLore.extraBooks.filter((e) => e !== oldName);
+            const tempCharLore = charLore.extraBooks.filter(
+                (e) => e !== oldName,
+            );
             tempCharLore.push(newName);
             charLore.extraBooks = tempCharLore;
         });
@@ -751,12 +905,12 @@ async function renameWorldInfo(name, data) {
     if (entryPreviouslySelected !== -1) {
         const wiElement = getWIElement(newName);
         wiElement.prop("selected", true);
-        $("#world_info").trigger('change');
+        $("#world_info").trigger("change");
     }
 
     const selectedIndex = world_names.indexOf(newName);
     if (selectedIndex !== -1) {
-        $('#world_editor_select').val(selectedIndex).trigger('change');
+        $("#world_editor_select").val(selectedIndex).trigger("change");
     }
 }
 
@@ -772,19 +926,21 @@ async function deleteWorldInfo(worldInfoName) {
     });
 
     if (response.ok) {
-        const existingWorldIndex = selected_world_info.findIndex((e) => e === worldInfoName);
+        const existingWorldIndex = selected_world_info.findIndex(
+            (e) => e === worldInfoName,
+        );
         if (existingWorldIndex !== -1) {
             selected_world_info.splice(existingWorldIndex, 1);
             saveSettingsDebounced();
         }
 
         await updateWorldInfoList();
-        $('#world_editor_select').trigger('change');
+        $("#world_editor_select").trigger("change");
 
-        if ($('#character_world').val() === worldInfoName) {
-            $('#character_world').val('').trigger('change');
+        if ($("#character_world").val() === worldInfoName) {
+            $("#character_world").val("").trigger("change");
             setWorldInfoButtonClass(undefined, false);
-            if (menu_type != 'create') {
+            if (menu_type != "create") {
                 saveCharacterDebounced();
             }
         }
@@ -832,7 +988,7 @@ async function createNewWorldInfo(worldInfoName) {
 
     const selectedIndex = world_names.indexOf(worldInfoName);
     if (selectedIndex !== -1) {
-        $('#world_editor_select').val(selectedIndex).trigger('change');
+        $("#world_editor_select").val(selectedIndex).trigger("change");
     } else {
         hideWorldEditor();
     }
@@ -852,7 +1008,9 @@ async function getCharacterLore() {
     if (baseWorldName) {
         worldsToSearch.add(baseWorldName);
     } else {
-        console.debug(`Character ${name}'s base world could not be found or is empty! Skipping...`)
+        console.debug(
+            `Character ${name}'s base world could not be found or is empty! Skipping...`,
+        );
         return [];
     }
 
@@ -860,22 +1018,31 @@ async function getCharacterLore() {
     const fileName = getCharaFilename(this_chid);
     const extraCharLore = world_info.charLore?.find((e) => e.name === fileName);
     if (extraCharLore) {
-        worldsToSearch = new Set([...worldsToSearch, ...extraCharLore.extraBooks]);
+        worldsToSearch = new Set([
+            ...worldsToSearch,
+            ...extraCharLore.extraBooks,
+        ]);
     }
 
     let entries = [];
     for (const worldName of worldsToSearch) {
         if (selected_world_info.includes(worldName)) {
-            console.debug(`Character ${name}'s world ${worldName} is already activated in global world info! Skipping...`);
+            console.debug(
+                `Character ${name}'s world ${worldName} is already activated in global world info! Skipping...`,
+            );
             continue;
         }
 
         const data = await loadWorldInfoData(worldName);
-        const newEntries = data ? Object.keys(data.entries).map((x) => data.entries[x]) : [];
+        const newEntries = data
+            ? Object.keys(data.entries).map((x) => data.entries[x])
+            : [];
         entries = entries.concat(newEntries);
     }
 
-    console.debug(`Character ${characters[this_chid]?.name} lore (${baseWorldName}) has ${entries.length} world info entries`);
+    console.debug(
+        `Character ${characters[this_chid]?.name} lore (${baseWorldName}) has ${entries.length} world info entries`,
+    );
     return entries;
 }
 
@@ -887,7 +1054,9 @@ async function getGlobalLore() {
     let entries = [];
     for (const worldName of selected_world_info) {
         const data = await loadWorldInfoData(worldName);
-        const newEntries = data ? Object.keys(data.entries).map((x) => data.entries[x]) : [];
+        const newEntries = data
+            ? Object.keys(data.entries).map((x) => data.entries[x])
+            : [];
         entries = entries.concat(newEntries);
     }
 
@@ -905,29 +1074,40 @@ async function getSortedEntries() {
 
         switch (Number(world_info_character_strategy)) {
             case world_info_insertion_strategy.evenly:
-                console.debug('WI using evenly')
+                console.debug("WI using evenly");
                 entries = [...globalLore, ...characterLore].sort(sortFn);
                 break;
             case world_info_insertion_strategy.character_first:
-                console.debug('WI using char first')
-                entries = [...characterLore.sort(sortFn), ...globalLore.sort(sortFn)];
+                console.debug("WI using char first");
+                entries = [
+                    ...characterLore.sort(sortFn),
+                    ...globalLore.sort(sortFn),
+                ];
                 break;
             case world_info_insertion_strategy.global_first:
-                console.debug('WI using global first')
-                entries = [...globalLore.sort(sortFn), ...characterLore.sort(sortFn)];
+                console.debug("WI using global first");
+                entries = [
+                    ...globalLore.sort(sortFn),
+                    ...characterLore.sort(sortFn),
+                ];
                 break;
             default:
-                console.error("Unknown WI insertion strategy: ", world_info_character_strategy, "defaulting to evenly");
+                console.error(
+                    "Unknown WI insertion strategy: ",
+                    world_info_character_strategy,
+                    "defaulting to evenly",
+                );
                 entries = [...globalLore, ...characterLore].sort(sortFn);
                 break;
         }
 
-        console.debug(`Sorted ${entries.length} world lore entries using strategy ${world_info_character_strategy}`);
+        console.debug(
+            `Sorted ${entries.length} world lore entries using strategy ${world_info_character_strategy}`,
+        );
 
         // Need to deep clone the entries to avoid modifying the cached data
         return deepClone(entries);
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e);
         return [];
     }
@@ -936,25 +1116,31 @@ async function getSortedEntries() {
 async function checkWorldInfo(chat, maxContext) {
     const context = getContext();
     const messagesToLookBack = world_info_depth * 2 || 1;
-    let textToScan = transformString(chat.slice(0, messagesToLookBack).join(""));
+    let textToScan = transformString(
+        chat.slice(0, messagesToLookBack).join(""),
+    );
     let needsToScan = true;
     let count = 0;
     let allActivatedEntries = new Set();
     let failedProbabilityChecks = new Set();
-    let allActivatedText = '';
+    let allActivatedText = "";
 
-    let budget = Math.round(world_info_budget * maxContext / 100) || 1;
+    let budget = Math.round((world_info_budget * maxContext) / 100) || 1;
 
     if (world_info_budget_cap > 0 && budget > world_info_budget_cap) {
-        console.debug(`Budget ${budget} exceeds cap ${world_info_budget_cap}, using cap`);
+        console.debug(
+            `Budget ${budget} exceeds cap ${world_info_budget_cap}, using cap`,
+        );
         budget = world_info_budget_cap;
     }
 
-    console.debug(`Context size: ${maxContext}; WI budget: ${budget} (max% = ${world_info_budget}%, cap = ${world_info_budget_cap})`);
+    console.debug(
+        `Context size: ${maxContext}; WI budget: ${budget} (max% = ${world_info_budget}%, cap = ${world_info_budget_cap})`,
+    );
     const sortedEntries = await getSortedEntries();
 
     if (sortedEntries.length === 0) {
-        return { worldInfoBefore: '', worldInfoAfter: '' };
+        return { worldInfoBefore: "", worldInfoAfter: "" };
     }
 
     while (needsToScan) {
@@ -968,53 +1154,87 @@ async function checkWorldInfo(chat, maxContext) {
                 continue;
             }
 
-            if (allActivatedEntries.has(entry) || entry.disable == true || (count > 1 && world_info_recursive && entry.excludeRecursion)) {
+            if (
+                allActivatedEntries.has(entry) ||
+                entry.disable == true ||
+                (count > 1 && world_info_recursive && entry.excludeRecursion)
+            ) {
                 continue;
             }
 
             if (entry.constant) {
-                entry.content = substituteParams(entry.content)
+                entry.content = substituteParams(entry.content);
                 activatedNow.add(entry);
                 continue;
             }
 
-            if (Array.isArray(entry.key) && entry.key.length) { //check for keywords existing
+            if (Array.isArray(entry.key) && entry.key.length) {
+                //check for keywords existing
                 primary: for (let key of entry.key) {
                     const substituted = substituteParams(key);
-                    console.debug(`${entry.uid}: ${substituted}`)
-                    if (substituted && matchKeys(textToScan, substituted.trim())) {
-                        console.debug(`${entry.uid}: got primary match`)
+                    console.debug(`${entry.uid}: ${substituted}`);
+                    if (
+                        substituted &&
+                        matchKeys(textToScan, substituted.trim())
+                    ) {
+                        console.debug(`${entry.uid}: got primary match`);
                         //selective logic begins
                         if (
                             entry.selective && //all entries are selective now
                             Array.isArray(entry.keysecondary) && //always true
                             entry.keysecondary.length //ignore empties
                         ) {
-                            console.debug(`uid:${entry.uid}: checking logic: ${entry.selectiveLogic}`)
+                            console.debug(
+                                `uid:${entry.uid}: checking logic: ${entry.selectiveLogic}`,
+                            );
                             secondary: for (let keysecondary of entry.keysecondary) {
-                                const secondarySubstituted = substituteParams(keysecondary);
-                                console.debug(`uid:${entry.uid}: filtering ${secondarySubstituted}`);
+                                const secondarySubstituted =
+                                    substituteParams(keysecondary);
+                                console.debug(
+                                    `uid:${entry.uid}: filtering ${secondarySubstituted}`,
+                                );
 
                                 // If selectiveLogic isn't found, assume it's AND
-                                const selectiveLogic = entry.selectiveLogic ?? 0;
+                                const selectiveLogic =
+                                    entry.selectiveLogic ?? 0;
 
                                 //AND operator
                                 if (selectiveLogic === 0) {
-                                    console.debug('saw AND logic, checking..')
-                                    if (secondarySubstituted && matchKeys(textToScan, secondarySubstituted.trim())) {
-                                        console.debug(`activating entry ${entry.uid} with AND found`)
+                                    console.debug("saw AND logic, checking..");
+                                    if (
+                                        secondarySubstituted &&
+                                        matchKeys(
+                                            textToScan,
+                                            secondarySubstituted.trim(),
+                                        )
+                                    ) {
+                                        console.debug(
+                                            `activating entry ${entry.uid} with AND found`,
+                                        );
                                         activatedNow.add(entry);
                                         break secondary;
                                     }
                                 }
                                 //NOT operator
                                 if (selectiveLogic === 1) {
-                                    console.debug(`uid ${entry.uid}: checking NOT logic for ${secondarySubstituted}`)
-                                    if (secondarySubstituted && matchKeys(textToScan, secondarySubstituted.trim())) {
-                                        console.debug(`uid ${entry.uid}: canceled; filtered out by ${secondarySubstituted}`)
+                                    console.debug(
+                                        `uid ${entry.uid}: checking NOT logic for ${secondarySubstituted}`,
+                                    );
+                                    if (
+                                        secondarySubstituted &&
+                                        matchKeys(
+                                            textToScan,
+                                            secondarySubstituted.trim(),
+                                        )
+                                    ) {
+                                        console.debug(
+                                            `uid ${entry.uid}: canceled; filtered out by ${secondarySubstituted}`,
+                                        );
                                         break primary;
                                     } else {
-                                        console.debug(`${entry.uid}: activated; passed NOT filter`)
+                                        console.debug(
+                                            `${entry.uid}: activated; passed NOT filter`,
+                                        );
                                         activatedNow.add(entry);
                                         break secondary;
                                     }
@@ -1022,31 +1242,41 @@ async function checkWorldInfo(chat, maxContext) {
                             }
                             //handle cases where secondary is empty
                         } else {
-                            console.debug(`uid ${entry.uid}: activated without filter logic`)
+                            console.debug(
+                                `uid ${entry.uid}: activated without filter logic`,
+                            );
                             activatedNow.add(entry);
                             break primary;
                         }
-                    } else { console.debug('no active entries for logic checks yet') }
+                    } else {
+                        console.debug("no active entries for logic checks yet");
+                    }
                 }
             }
         }
 
         needsToScan = world_info_recursive && activatedNow.size > 0;
-        const newEntries = [...activatedNow]
-            .sort((a, b) => sortedEntries.indexOf(a) - sortedEntries.indexOf(b));
+        const newEntries = [...activatedNow].sort(
+            (a, b) => sortedEntries.indexOf(a) - sortedEntries.indexOf(b),
+        );
         let newContent = "";
         const textToScanTokens = getTokenCount(allActivatedText);
         const probabilityChecksBefore = failedProbabilityChecks.size;
-        console.debug(`-- PROBABILITY CHECKS BEGIN --`)
+        console.debug(`-- PROBABILITY CHECKS BEGIN --`);
         for (const entry of newEntries) {
             const rollValue = Math.random() * 100;
 
-
             if (entry.useProbability && rollValue > entry.probability) {
-                console.debug(`WI entry ${entry.uid} ${entry.key} failed probability check, skipping`);
+                console.debug(
+                    `WI entry ${entry.uid} ${entry.key} failed probability check, skipping`,
+                );
                 failedProbabilityChecks.add(entry);
                 continue;
-            } else { console.debug(`uid:${entry.uid} passed probability check, inserting to prompt`) }
+            } else {
+                console.debug(
+                    `uid:${entry.uid} passed probability check, inserting to prompt`,
+                );
+            }
 
             newContent += `${substituteParams(entry.content)}\n`;
 
@@ -1054,30 +1284,39 @@ async function checkWorldInfo(chat, maxContext) {
                 console.debug(`WI budget reached, stopping`);
                 if (world_info_overflow_alert) {
                     console.log("Alerting");
-                    toastr.warning(`World info budget reached after ${count} entries.`, 'World Info');
+                    toastr.warning(
+                        `World info budget reached after ${count} entries.`,
+                        "World Info",
+                    );
                 }
                 needsToScan = false;
                 break;
             }
 
             allActivatedEntries.add(entry);
-            console.debug('WI entry activated:', entry);
+            console.debug("WI entry activated:", entry);
         }
 
         const probabilityChecksAfter = failedProbabilityChecks.size;
 
-        if ((probabilityChecksAfter - probabilityChecksBefore) === activatedNow.size) {
-            console.debug(`WI probability checks failed for all activated entries, stopping`);
+        if (
+            probabilityChecksAfter - probabilityChecksBefore ===
+            activatedNow.size
+        ) {
+            console.debug(
+                `WI probability checks failed for all activated entries, stopping`,
+            );
             needsToScan = false;
         }
 
         if (needsToScan) {
             const text = newEntries
-                .filter(x => !failedProbabilityChecks.has(x))
-                .map(x => x.content).join('\n');
+                .filter((x) => !failedProbabilityChecks.has(x))
+                .map((x) => x.content)
+                .join("\n");
             const currentlyActivatedText = transformString(text);
-            textToScan = (currentlyActivatedText + '\n' + textToScan);
-            allActivatedText = (currentlyActivatedText + '\n' + allActivatedText);
+            textToScan = currentlyActivatedText + "\n" + textToScan;
+            allActivatedText = currentlyActivatedText + "\n" + allActivatedText;
         }
     }
 
@@ -1107,13 +1346,24 @@ async function checkWorldInfo(chat, maxContext) {
         }
     });
 
-    const worldInfoBefore = WIBeforeEntries.length ? `${WIBeforeEntries.join("\n")}\n` : '';
-    const worldInfoAfter = WIAfterEntries.length ? `${WIAfterEntries.join("\n")}\n` : '';
+    const worldInfoBefore = WIBeforeEntries.length
+        ? `${WIBeforeEntries.join("\n")}\n`
+        : "";
+    const worldInfoAfter = WIAfterEntries.length
+        ? `${WIAfterEntries.join("\n")}\n`
+        : "";
 
     if (shouldWIAddPrompt) {
         const originalAN = context.extensionPrompts[NOTE_MODULE_NAME].value;
-        const ANWithWI = `${ANTopEntries.join("\n")}\n${originalAN}\n${ANBottomEntries.join("\n")}`
-        context.setExtensionPrompt(NOTE_MODULE_NAME, ANWithWI, chat_metadata[metadata_keys.position], chat_metadata[metadata_keys.depth]);
+        const ANWithWI = `${ANTopEntries.join(
+            "\n",
+        )}\n${originalAN}\n${ANBottomEntries.join("\n")}`;
+        context.setExtensionPrompt(
+            NOTE_MODULE_NAME,
+            ANWithWI,
+            chat_metadata[metadata_keys.position],
+            chat_metadata[metadata_keys.depth],
+        );
     }
 
     return { worldInfoBefore, worldInfoAfter };
@@ -1127,14 +1377,12 @@ function matchKeys(haystack, needle) {
 
         if (keyWords.length > 1) {
             return haystack.includes(transformedString);
-        }
-        else {
+        } else {
             const regex = new RegExp(`\\b${transformedString}\\b`);
             if (regex.test(haystack)) {
                 return true;
             }
         }
-
     } else {
         return haystack.includes(transformedString);
     }
@@ -1174,8 +1422,10 @@ function convertRisuLorebook(inputObj) {
     inputObj.data.forEach((entry, index) => {
         outputObj.entries[index] = {
             uid: index,
-            key: entry.key.split(',').map(x => x.trim()),
-            keysecondary: entry.secondkey ? entry.secondkey.split(',').map(x => x.trim()) : [],
+            key: entry.key.split(",").map((x) => x.trim()),
+            keysecondary: entry.secondkey
+                ? entry.secondkey.split(",").map((x) => x.trim())
+                : [],
             comment: entry.comment,
             content: entry.content,
             constant: entry.alwaysActive,
@@ -1196,18 +1446,18 @@ function convertRisuLorebook(inputObj) {
 
 function convertNovelLorebook(inputObj) {
     const outputObj = {
-        entries: {}
+        entries: {},
     };
 
     inputObj.entries.forEach((entry, index) => {
         const displayName = entry.displayName;
-        const addMemo = displayName !== undefined && displayName.trim() !== '';
+        const addMemo = displayName !== undefined && displayName.trim() !== "";
 
         outputObj.entries[index] = {
             uid: index,
             key: entry.keys,
             keysecondary: [],
-            comment: displayName || '',
+            comment: displayName || "",
             content: entry.text,
             constant: false,
             selective: false,
@@ -1243,7 +1493,11 @@ function convertCharacterBook(characterBook) {
             constant: entry.constant || false,
             selective: entry.selective || false,
             order: entry.insertion_order,
-            position: entry.extensions?.position ?? (entry.position === "before_char" ? world_info_position.before : world_info_position.after),
+            position:
+                entry.extensions?.position ??
+                (entry.position === "before_char"
+                    ? world_info_position.before
+                    : world_info_position.after),
             excludeRecursion: entry.extensions?.exclude_recursion ?? false,
             disable: !entry.enabled,
             addMemo: entry.comment ? true : false,
@@ -1258,7 +1512,10 @@ function convertCharacterBook(characterBook) {
 
 export function setWorldInfoButtonClass(chid, forceValue = undefined) {
     if (forceValue !== undefined) {
-        $('#set_character_world, #world_button').toggleClass('world_set', forceValue);
+        $("#set_character_world, #world_button").toggleClass(
+            "world_set",
+            forceValue,
+        );
         return;
     }
 
@@ -1268,27 +1525,34 @@ export function setWorldInfoButtonClass(chid, forceValue = undefined) {
 
     const world = characters[chid]?.data?.extensions?.world;
     const worldSet = Boolean(world && world_names.includes(world));
-    $('#set_character_world, #world_button').toggleClass('world_set', worldSet);
+    $("#set_character_world, #world_button").toggleClass("world_set", worldSet);
 }
 
 export function checkEmbeddedWorld(chid) {
-    $('#import_character_info').hide();
+    $("#import_character_info").hide();
 
     if (chid === undefined) {
         return false;
     }
 
     if (characters[chid]?.data?.character_book) {
-        $('#import_character_info').data('chid', chid).show();
+        $("#import_character_info").data("chid", chid).show();
 
         // Only show the alert once per character
         const checkKey = `AlertWI_${characters[chid].avatar}`;
         const worldName = characters[chid]?.data?.extensions?.world;
-        if (!localStorage.getItem(checkKey) && (!worldName || !world_names.includes(worldName))) {
+        if (
+            !localStorage.getItem(checkKey) &&
+            (!worldName || !world_names.includes(worldName))
+        ) {
             toastr.info(
                 'To import and use it, select "Import Card Lore" in the "More..." dropdown menu on the character panel.',
                 `${characters[chid].name} has an embedded World/Lorebook`,
-                { timeOut: 10000, extendedTimeOut: 20000, positionClass: 'toast-top-center' },
+                {
+                    timeOut: 10000,
+                    extendedTimeOut: 20000,
+                    positionClass: "toast-top-center",
+                },
             );
             localStorage.setItem(checkKey, 1);
         }
@@ -1299,32 +1563,43 @@ export function checkEmbeddedWorld(chid) {
 }
 
 export async function importEmbeddedWorldInfo() {
-    const chid = $('#import_character_info').data('chid');
+    const chid = $("#import_character_info").data("chid");
 
     if (chid === undefined) {
         return;
     }
 
-    const bookName = characters[chid]?.data?.character_book?.name || `${characters[chid]?.name}'s Lorebook`;
-    const confirmationText = (`<h3>Are you sure you want to import "${bookName}"?</h3>`) + (world_names.includes(bookName) ? 'It will overwrite the World/Lorebook with the same name.' : '');
+    const bookName =
+        characters[chid]?.data?.character_book?.name ||
+        `${characters[chid]?.name}'s Lorebook`;
+    const confirmationText =
+        `<h3>Are you sure you want to import "${bookName}"?</h3>` +
+        (world_names.includes(bookName)
+            ? "It will overwrite the World/Lorebook with the same name."
+            : "");
 
-    const confirmation = await callPopup(confirmationText, 'confirm');
+    const confirmation = await callPopup(confirmationText, "confirm");
 
     if (!confirmation) {
         return;
     }
 
-    const convertedBook = convertCharacterBook(characters[chid].data.character_book);
+    const convertedBook = convertCharacterBook(
+        characters[chid].data.character_book,
+    );
 
     await saveWorldInfo(bookName, convertedBook, true);
     await updateWorldInfoList();
-    $('#character_world').val(bookName).trigger('change');
+    $("#character_world").val(bookName).trigger("change");
 
-    toastr.success(`The world "${bookName}" has been imported and linked to the character successfully.`, 'World/Lorebook imported');
+    toastr.success(
+        `The world "${bookName}" has been imported and linked to the character successfully.`,
+        "World/Lorebook imported",
+    );
 
     const newIndex = world_names.indexOf(bookName);
     if (newIndex >= 0) {
-        $("#world_editor_select").val(newIndex).trigger('change');
+        $("#world_editor_select").val(newIndex).trigger("change");
     }
 
     setWorldInfoButtonClass(chid, true);
@@ -1332,8 +1607,10 @@ export async function importEmbeddedWorldInfo() {
 
 function onWorldInfoChange(_, text) {
     let selectedWorlds;
-    if (_ !== '__notSlashCommand__') { // if it's a slash command
-        if (text !== undefined) { // and args are provided
+    if (_ !== "__notSlashCommand__") {
+        // if it's a slash command
+        if (text !== undefined) {
+            // and args are provided
             const slashInputSplitText = text.trim().toLowerCase().split(",");
 
             slashInputSplitText.forEach((worldName) => {
@@ -1344,15 +1621,20 @@ function onWorldInfoChange(_, text) {
                 } else {
                     toastr.error(`No world found named: ${worldName}`);
                 }
-            })
-        } else { // if no args, unset all worlds
-            toastr.success('Deactivated all worlds');
+            });
+        } else {
+            // if no args, unset all worlds
+            toastr.success("Deactivated all worlds");
             selected_world_info = [];
             $("#world_info").val("");
         }
-    } else { //if it's a pointer selection
+    } else {
+        //if it's a pointer selection
         let tempWorldInfo = [];
-        let selectedWorlds = $("#world_info").val().map((e) => Number(e)).filter((e) => !isNaN(e));
+        let selectedWorlds = $("#world_info")
+            .val()
+            .map((e) => Number(e))
+            .filter((e) => !isNaN(e));
         if (selectedWorlds.length > 0) {
             selectedWorlds.forEach((worldIndex) => {
                 const existingWorldName = world_names[worldIndex];
@@ -1361,7 +1643,9 @@ function onWorldInfoChange(_, text) {
                 } else {
                     const wiElement = getWIElement(existingWorldName);
                     wiElement.prop("selected", false);
-                    toastr.error(`The world with ${existingWorldName} is invalid or corrupted.`);
+                    toastr.error(
+                        `The world with ${existingWorldName} is invalid or corrupted.`,
+                    );
                 }
             });
         }
@@ -1377,14 +1661,14 @@ export async function importWorldInfo(file) {
     }
 
     const formData = new FormData();
-    formData.append('avatar', file);
+    formData.append("avatar", file);
 
     try {
         let jsonData;
 
-        if (file.name.endsWith('.png')) {
+        if (file.name.endsWith(".png")) {
             const buffer = new Uint8Array(await getFileBuffer(file));
-            jsonData = extractDataFromPng(buffer, 'naidata');
+            jsonData = extractDataFromPng(buffer, "naidata");
         } else {
             // File should be a JSON file
             jsonData = await parseJsonFile(file);
@@ -1397,20 +1681,29 @@ export async function importWorldInfo(file) {
 
         // Convert Novel Lorebook
         if (jsonData.lorebookVersion !== undefined) {
-            console.log('Converting Novel Lorebook');
-            formData.append('convertedData', JSON.stringify(convertNovelLorebook(jsonData)));
+            console.log("Converting Novel Lorebook");
+            formData.append(
+                "convertedData",
+                JSON.stringify(convertNovelLorebook(jsonData)),
+            );
         }
 
         // Convert Agnai Memory Book
-        if (jsonData.kind === 'memory') {
-            console.log('Converting Agnai Memory Book');
-            formData.append('convertedData', JSON.stringify(convertAgnaiMemoryBook(jsonData)));
+        if (jsonData.kind === "memory") {
+            console.log("Converting Agnai Memory Book");
+            formData.append(
+                "convertedData",
+                JSON.stringify(convertAgnaiMemoryBook(jsonData)),
+            );
         }
 
         // Convert Risu Lorebook
-        if (jsonData.type === 'risu') {
-            console.log('Converting Risu Lorebook');
-            formData.append('convertedData', JSON.stringify(convertRisuLorebook(jsonData)));
+        if (jsonData.type === "risu") {
+            console.log("Converting Risu Lorebook");
+            formData.append(
+                "convertedData",
+                JSON.stringify(convertRisuLorebook(jsonData)),
+            );
         }
     } catch (error) {
         toastr.error(`Error parsing file: ${error}`);
@@ -1421,7 +1714,7 @@ export async function importWorldInfo(file) {
         type: "POST",
         url: "/importworldinfo",
         data: formData,
-        beforeSend: () => { },
+        beforeSend: () => {},
         cache: false,
         contentType: false,
         processData: false,
@@ -1431,24 +1724,29 @@ export async function importWorldInfo(file) {
 
                 const newIndex = world_names.indexOf(data.name);
                 if (newIndex >= 0) {
-                    $("#world_editor_select").val(newIndex).trigger('change');
+                    $("#world_editor_select").val(newIndex).trigger("change");
                 }
 
                 toastr.info(`World Info "${data.name}" imported successfully!`);
             }
         },
-        error: (jqXHR, exception) => { },
+        error: (jqXHR, exception) => {},
     });
 }
 
 jQuery(() => {
-
     $(document).ready(function () {
-        registerSlashCommand('world', onWorldInfoChange, [], "– sets active World, or unsets if no args provided", true, true);
-    })
+        registerSlashCommand(
+            "world",
+            onWorldInfoChange,
+            [],
+            "– sets active World, or unsets if no args provided",
+            true,
+            true,
+        );
+    });
 
-
-    $("#world_info").on('mousedown change', async function (e) {
+    $("#world_info").on("mousedown change", async function (e) {
         // If there's no world names, don't do anything
         if (world_names.length === 0) {
             e.preventDefault();
@@ -1468,12 +1766,12 @@ jQuery(() => {
         }
         */
 
-        onWorldInfoChange('__notSlashCommand__');
+        onWorldInfoChange("__notSlashCommand__");
     });
 
     //**************************WORLD INFO IMPORT EXPORT*************************//
-    $("#world_import_button").on('click', function () {
-        $("#world_import_file").trigger('click');
+    $("#world_import_button").on("click", function () {
+        $("#world_import_file").trigger("click");
     });
 
     $("#world_import_file").on("change", async function (e) {
@@ -1485,16 +1783,20 @@ jQuery(() => {
         $("#form_world_import").trigger("reset");
     });
 
-    $("#world_create_button").on('click', async () => {
+    $("#world_create_button").on("click", async () => {
         const tempName = getFreeWorldName();
-        const finalName = await callPopup("<h3>Create a new World Info?</h3>Enter a name for the new file:", "input", tempName);
+        const finalName = await callPopup(
+            "<h3>Create a new World Info?</h3>Enter a name for the new file:",
+            "input",
+            tempName,
+        );
 
         if (finalName) {
             await createNewWorldInfo(finalName);
         }
     });
 
-    $("#world_editor_select").on('change', async () => {
+    $("#world_editor_select").on("change", async () => {
         const selectedIndex = $("#world_editor_select").find(":selected").val();
 
         if (selectedIndex === "") {
@@ -1518,54 +1820,55 @@ jQuery(() => {
     });
 
     $(document).on("input", "#world_info_recursive", function () {
-        world_info_recursive = !!$(this).prop('checked');
-        saveSettingsDebounced();
-    })
-
-    $('#world_info_case_sensitive').on('input', function () {
-        world_info_case_sensitive = !!$(this).prop('checked');
-        saveSettingsDebounced();
-    })
-
-    $('#world_info_match_whole_words').on('input', function () {
-        world_info_match_whole_words = !!$(this).prop('checked');
+        world_info_recursive = !!$(this).prop("checked");
         saveSettingsDebounced();
     });
 
-    $('#world_info_character_strategy').on('change', function () {
+    $("#world_info_case_sensitive").on("input", function () {
+        world_info_case_sensitive = !!$(this).prop("checked");
+        saveSettingsDebounced();
+    });
+
+    $("#world_info_match_whole_words").on("input", function () {
+        world_info_match_whole_words = !!$(this).prop("checked");
+        saveSettingsDebounced();
+    });
+
+    $("#world_info_character_strategy").on("change", function () {
         world_info_character_strategy = $(this).val();
         saveSettingsDebounced();
     });
 
-    $('#world_info_overflow_alert').on('change', function () {
-        world_info_overflow_alert = !!$(this).prop('checked');
+    $("#world_info_overflow_alert").on("change", function () {
+        world_info_overflow_alert = !!$(this).prop("checked");
         saveSettingsDebounced();
     });
 
-    $('#world_info_budget_cap').on('input', function () {
+    $("#world_info_budget_cap").on("input", function () {
         world_info_budget_cap = Number($(this).val());
         $("#world_info_budget_cap_counter").text(world_info_budget_cap);
         saveSettingsDebounced();
     });
 
-    $('#world_button').on('click', async function () {
-        const chid = $('#set_character_world').data('chid');
+    $("#world_button").on("click", async function () {
+        const chid = $("#set_character_world").data("chid");
 
         if (chid) {
             const worldName = characters[chid]?.data?.extensions?.world;
             const hasEmbed = checkEmbeddedWorld(chid);
             if (worldName && world_names.includes(worldName)) {
-                if (!$('#WorldInfo').is(':visible')) {
-                    $('#WIDrawerIcon').trigger('click');
+                if (!$("#WorldInfo").is(":visible")) {
+                    $("#WIDrawerIcon").trigger("click");
                 }
                 const index = world_names.indexOf(worldName);
-                $("#world_editor_select").val(index).trigger('change');
+                $("#world_editor_select").val(index).trigger("change");
             } else if (hasEmbed) {
                 await importEmbeddedWorldInfo();
                 saveCharacterDebounced();
-            }
-            else {
-                $('#char-management-dropdown').val($('#set_character_world').val()).trigger('change');
+            } else {
+                $("#char-management-dropdown")
+                    .val($("#set_character_world").val())
+                    .trigger("change");
             }
         }
     });
@@ -1589,12 +1892,12 @@ jQuery(() => {
     */
 
     // Not needed on mobile
-    if (deviceInfo.device.type === 'desktop') {
-        $('#world_info').select2({
-            width: '100%',
-            placeholder: 'No Worlds active. Click here to select.',
+    if (deviceInfo.device.type === "desktop") {
+        $("#world_info").select2({
+            width: "100%",
+            placeholder: "No Worlds active. Click here to select.",
             allowClear: true,
             closeOnSelect: false,
         });
     }
-})
+});

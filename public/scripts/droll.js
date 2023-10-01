@@ -26,27 +26,37 @@ function DrollResult() {
  */
 DrollResult.prototype.toString = function () {
     if (this.rolls.length === 1 && this.modifier === 0) {
-        return this.rolls[0] + '';
+        return this.rolls[0] + "";
     }
 
     if (this.rolls.length > 1 && this.modifier === 0) {
-        return this.rolls.join(' + ') + ' = ' + this.total;
+        return this.rolls.join(" + ") + " = " + this.total;
     }
 
     if (this.rolls.length === 1 && this.modifier > 0) {
-        return this.rolls[0] + ' + ' + this.modifier + ' = ' + this.total;
+        return this.rolls[0] + " + " + this.modifier + " = " + this.total;
     }
 
     if (this.rolls.length > 1 && this.modifier > 0) {
-        return this.rolls.join(' + ') + ' + ' + this.modifier + ' = ' + this.total;
+        return (
+            this.rolls.join(" + ") + " + " + this.modifier + " = " + this.total
+        );
     }
 
     if (this.rolls.length === 1 && this.modifier < 0) {
-        return this.rolls[0] + ' - ' + Math.abs(this.modifier) + ' = ' + this.total;
+        return (
+            this.rolls[0] + " - " + Math.abs(this.modifier) + " = " + this.total
+        );
     }
 
     if (this.rolls.length > 1 && this.modifier < 0) {
-        return this.rolls.join(' + ') + ' - ' + Math.abs(this.modifier) + ' = ' + this.total;
+        return (
+            this.rolls.join(" + ") +
+            " - " +
+            Math.abs(this.modifier) +
+            " = " +
+            this.total
+        );
     }
 };
 
@@ -59,14 +69,16 @@ droll.parse = function (formula) {
     var result = new DrollFormula();
 
     pieces = formula.match(/^([1-9]\d*)?d([1-9]\d*)([+-]\d+)?$/i);
-    if (!pieces) { return false; }
+    if (!pieces) {
+        return false;
+    }
 
-    result.numDice = (pieces[1] - 0) || 1;
-    result.numSides = (pieces[2] - 0);
-    result.modifier = (pieces[3] - 0) || 0;
+    result.numDice = pieces[1] - 0 || 1;
+    result.numSides = pieces[2] - 0;
+    result.modifier = pieces[3] - 0 || 0;
 
-    result.minResult = (result.numDice * 1) + result.modifier;
-    result.maxResult = (result.numDice * result.numSides) + result.modifier;
+    result.minResult = result.numDice * 1 + result.modifier;
+    result.maxResult = result.numDice * result.numSides + result.modifier;
     result.avgResult = (result.maxResult + result.minResult) / 2;
 
     return result;
@@ -77,7 +89,7 @@ droll.parse = function (formula) {
  * Returns true on success or false on failure.
  */
 droll.validate = function (formula) {
-    return (droll.parse(formula)) ? true : false;
+    return droll.parse(formula) ? true : false;
 };
 
 /**
@@ -89,10 +101,12 @@ droll.roll = function (formula) {
     var result = new DrollResult();
 
     pieces = droll.parse(formula);
-    if (!pieces) { return false; }
+    if (!pieces) {
+        return false;
+    }
 
     for (var a = 0; a < pieces.numDice; a++) {
-        result.rolls[a] = (1 + Math.floor(Math.random() * pieces.numSides));
+        result.rolls[a] = 1 + Math.floor(Math.random() * pieces.numSides);
     }
 
     result.modifier = pieces.modifier;

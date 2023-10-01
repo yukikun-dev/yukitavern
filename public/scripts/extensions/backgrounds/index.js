@@ -4,25 +4,26 @@ import { registerSlashCommand } from "../../slash-commands.js";
 import { stringFormat } from "../../utils.js";
 export { MODULE_NAME };
 
-const MODULE_NAME = 'backgrounds';
-const METADATA_KEY = 'custom_background';
+const MODULE_NAME = "backgrounds";
+const METADATA_KEY = "custom_background";
 const UPDATE_INTERVAL = 1000;
 
 async function moduleWorker() {
     if (hasCustomBackground()) {
-        $('#unlock_background').show();
-        $('#lock_background').hide();
+        $("#unlock_background").show();
+        $("#lock_background").hide();
         setCustomBackground();
-    }
-    else {
-        $('#unlock_background').hide();
-        $('#lock_background').show();
+    } else {
+        $("#unlock_background").hide();
+        $("#lock_background").show();
         unsetCustomBackground();
     }
 }
 
 function onLockBackgroundClick() {
-    const bgImage = window.getComputedStyle(document.getElementById('bg1')).backgroundImage;
+    const bgImage = window.getComputedStyle(
+        document.getElementById("bg1"),
+    ).backgroundImage;
 
     // Extract the URL from the CSS string
     const urlRegex = /url\((['"])?(.*?)\1\)/;
@@ -31,19 +32,19 @@ function onLockBackgroundClick() {
 
     // Remove the protocol and host, leaving the relative URL
     const relativeUrl = new URL(url).pathname;
-    const relativeBgImage = `url("${relativeUrl}")`
+    const relativeBgImage = `url("${relativeUrl}")`;
 
     saveBackgroundMetadata(relativeBgImage);
     setCustomBackground();
-    $('#unlock_background').show();
-    $('#lock_background').hide();
+    $("#unlock_background").show();
+    $("#lock_background").hide();
 }
 
 function onUnlockBackgroundClick() {
     removeBackgroundMetadata();
     unsetCustomBackground();
-    $('#unlock_background').hide();
-    $('#lock_background').show();
+    $("#unlock_background").hide();
+    $("#lock_background").show();
 }
 
 function hasCustomBackground() {
@@ -77,8 +78,8 @@ function setCustomBackground() {
 }
 
 function unsetCustomBackground() {
-    $("#bg_custom").css("background-image", 'none');
-    $("#custom_bg_preview").css("background-image", 'none');
+    $("#bg_custom").css("background-image", "none");
+    $("#custom_bg_preview").css("background-image", "none");
 }
 
 function onSelectBackgroundClick() {
@@ -93,24 +94,28 @@ function onSelectBackgroundClick() {
 const autoBgPrompt = `Pause your roleplay and choose a location ONLY from the provided list that is the most suitable for the current scene. Do not output any other text:\n{0}`;
 
 async function autoBackgroundCommand() {
-    const options = Array.from(document.querySelectorAll('.BGSampleTitle')).map(x => ({ element: x, text: x.innerText.trim() })).filter(x => x.text.length > 0);
+    const options = Array.from(document.querySelectorAll(".BGSampleTitle"))
+        .map((x) => ({ element: x, text: x.innerText.trim() }))
+        .filter((x) => x.text.length > 0);
     if (options.length == 0) {
-        toastr.warning('No backgrounds to choose from. Please upload some images to the "backgrounds" folder.');
+        toastr.warning(
+            'No backgrounds to choose from. Please upload some images to the "backgrounds" folder.',
+        );
         return;
     }
 
-    const list = options.map(option => `- ${option.text}`).join('\n');
+    const list = options.map((option) => `- ${option.text}`).join("\n");
     const prompt = stringFormat(autoBgPrompt, list);
     const reply = await generateQuietPrompt(prompt);
-    const fuse = new Fuse(options, { keys: ['text'] });
+    const fuse = new Fuse(options, { keys: ["text"] });
     const bestMatch = fuse.search(reply, { limit: 1 });
 
     if (bestMatch.length == 0) {
-        toastr.warning('No match found. Please try again.');
+        toastr.warning("No match found. Please try again.");
         return;
     }
 
-    console.debug('Automatically choosing background:', bestMatch);
+    console.debug("Automatically choosing background:", bestMatch);
     bestMatch[0].item.element.click();
 }
 
@@ -155,16 +160,37 @@ $(document).ready(function () {
             </div>
         </div>
         `;
-        $('#extensions_settings').append(html);
-        $('#lock_background').on('click', onLockBackgroundClick);
-        $('#unlock_background').on('click', onUnlockBackgroundClick);
+        $("#extensions_settings").append(html);
+        $("#lock_background").on("click", onLockBackgroundClick);
+        $("#unlock_background").on("click", onUnlockBackgroundClick);
         $(document).on("click", ".bg_example", onSelectBackgroundClick);
-        $('#auto_background').on("click", autoBackgroundCommand);
+        $("#auto_background").on("click", autoBackgroundCommand);
     }
 
     addSettings();
     setInterval(moduleWorker, UPDATE_INTERVAL);
-    registerSlashCommand('lockbg', onLockBackgroundClick, ['bglock'], " – locks a background for the currently selected chat", true, true);
-    registerSlashCommand('unlockbg', onUnlockBackgroundClick, ['bgunlock'], ' – unlocks a background for the currently selected chat', true, true);
-    registerSlashCommand('autobg', autoBackgroundCommand, ['bgauto'], ' – automatically changes the background based on the chat context using the AI request prompt', true, true);
+    registerSlashCommand(
+        "lockbg",
+        onLockBackgroundClick,
+        ["bglock"],
+        " – locks a background for the currently selected chat",
+        true,
+        true,
+    );
+    registerSlashCommand(
+        "unlockbg",
+        onUnlockBackgroundClick,
+        ["bgunlock"],
+        " – unlocks a background for the currently selected chat",
+        true,
+        true,
+    );
+    registerSlashCommand(
+        "autobg",
+        autoBackgroundCommand,
+        ["bgauto"],
+        " – automatically changes the background based on the chat context using the AI request prompt",
+        true,
+        true,
+    );
 });

@@ -6,12 +6,12 @@
 //const {dirname} = require('path');
 //const appDir = dirname(require.main.filename);
 //const config = require(appDir + '/config.conf');
-const path = require('path');
-const config = require(path.join(process.cwd(), './config.conf'));
+const path = require("path");
+const config = require(path.join(process.cwd(), "./config.conf"));
 
 const unauthorizedResponse = (res) => {
-    res.set('WWW-Authenticate', 'Basic realm="SillyTavern", charset="UTF-8"');
-    return res.status(401).send('Authentication required');
+    res.set("WWW-Authenticate", 'Basic realm="SillyTavern", charset="UTF-8"');
+    return res.status(401).send("Authentication required");
 };
 
 const basicAuthMiddleware = function (request, response, callback) {
@@ -21,21 +21,24 @@ const basicAuthMiddleware = function (request, response, callback) {
         return unauthorizedResponse(response);
     }
 
-    const [scheme, credentials] = authHeader.split(' ');
+    const [scheme, credentials] = authHeader.split(" ");
 
-    if (scheme !== 'Basic' || !credentials) {
+    if (scheme !== "Basic" || !credentials) {
         return unauthorizedResponse(response);
     }
 
-    const [username, password] = Buffer.from(credentials, 'base64')
-        .toString('utf8')
-        .split(':');
+    const [username, password] = Buffer.from(credentials, "base64")
+        .toString("utf8")
+        .split(":");
 
-    if (username === config.basicAuthUser.username && password === config.basicAuthUser.password) {
+    if (
+        username === config.basicAuthUser.username &&
+        password === config.basicAuthUser.password
+    ) {
         return callback();
     } else {
         return unauthorizedResponse(response);
     }
-}
+};
 
 module.exports = basicAuthMiddleware;

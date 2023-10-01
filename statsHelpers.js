@@ -59,14 +59,14 @@ function timestampToMoment(timestamp) {
         hour,
         minute,
         second,
-        millisecond
+        millisecond,
     ) => {
         return `${year}-${month.padStart(2, "0")}-${day.padStart(
             2,
-            "0"
+            "0",
         )}T${hour.padStart(2, "0")}:${minute.padStart(
             2,
-            "0"
+            "0",
         )}:${second.padStart(2, "0")}.${millisecond.padStart(3, "0")}Z`;
     };
     const isoTimestamp1 = timestamp.replace(pattern1, replacement1);
@@ -97,10 +97,10 @@ function timestampToMoment(timestamp) {
                 : parseInt(hour, 10) % 12;
         return `${year}-${monthNum.toString().padStart(2, "0")}-${day.padStart(
             2,
-            "0"
+            "0",
         )}T${hour24.toString().padStart(2, "0")}:${minute.padStart(
             2,
-            "0"
+            "0",
         )}:00Z`;
     };
     const isoTimestamp2 = timestamp.replace(pattern2, replacement2);
@@ -125,7 +125,7 @@ async function collectAndCreateStats(chatsPath, charactersPath) {
     const pngFiles = files.filter((file) => file.endsWith(".png"));
 
     let processingPromises = pngFiles.map((file, index) =>
-        calculateStats(chatsPath, file, index)
+        calculateStats(chatsPath, file, index),
     );
     const statsArr = await Promise.all(processingPromises);
 
@@ -260,7 +260,7 @@ const calculateStats = (chatsPath, item, index) => {
                 const result = calculateTotalGenTimeAndWordCount(
                     char_dir,
                     chat,
-                    uniqueGenStartTimes
+                    uniqueGenStartTimes,
                 );
                 stats.total_gen_time += result.totalGenTime || 0;
                 stats.user_word_count += result.userWordCount || 0;
@@ -273,11 +273,11 @@ const calculateStats = (chatsPath, item, index) => {
                 stats.chat_size += chatStat.size;
                 stats.date_last_chat = Math.max(
                     stats.date_last_chat,
-                    Math.floor(chatStat.mtimeMs)
+                    Math.floor(chatStat.mtimeMs),
                 );
                 stats.date_first_chat = Math.min(
                     stats.date_first_chat,
-                    result.firstChatTime
+                    result.firstChatTime,
                 );
             }
         }
@@ -314,7 +314,7 @@ function setCharStats(stats) {
 function calculateTotalGenTimeAndWordCount(
     char_dir,
     chat,
-    uniqueGenStartTimes
+    uniqueGenStartTimes,
 ) {
     let filepath = path.join(char_dir, chat);
     let lines = readAndParseFile(filepath);
@@ -347,7 +347,7 @@ function calculateTotalGenTimeAndWordCount(
                 if (json.gen_started && json.gen_finished) {
                     let genTime = calculateGenTime(
                         json.gen_started,
-                        json.gen_finished
+                        json.gen_finished,
                     );
                     totalGenTime += genTime;
 
@@ -386,7 +386,7 @@ function calculateTotalGenTimeAndWordCount(
                         if (swipe.gen_started && swipe.gen_finished) {
                             totalGenTime += calculateGenTime(
                                 swipe.gen_started,
-                                swipe.gen_finished
+                                swipe.gen_finished,
                             );
                         }
                     }
@@ -395,7 +395,10 @@ function calculateTotalGenTimeAndWordCount(
                 // If this is the first user message, set the first chat time
                 if (json.is_user) {
                     //get min between firstChatTime and timestampToMoment(json.send_date)
-                    firstChatTime = Math.min(timestampToMoment(json.send_date), firstChatTime);
+                    firstChatTime = Math.min(
+                        timestampToMoment(json.send_date),
+                        firstChatTime,
+                    );
                 }
             } catch (error) {
                 console.error(`Error parsing line ${line}: ${error}`);

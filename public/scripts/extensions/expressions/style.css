@@ -39,7 +39,7 @@
     min-height: 100px;
     max-height: 90vh;
     max-width: 90vh;
-    width: calc((100vw - var(--sheldWidth)) /2);
+    width: calc((100vw - var(--sheldWidth)) / 2);
     position: absolute;
     bottom: 0;
     padding: 0;
@@ -48,7 +48,6 @@
     z-index: 2;
     overflow: hidden;
     resize: both;
-
 }
 
 img.expression {
@@ -177,7 +176,7 @@ img.expression.default {
     flex-direction: row;
 }
 
-@media screen and (max-width:1200px) {
+@media screen and (max-width: 1200px) {
     div.expression {
         display: none;
     }
