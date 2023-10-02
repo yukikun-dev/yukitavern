@@ -236,10 +236,8 @@ function countWordsInString(str) {
  * @param  {string} item     The name of the character.
  * @return {object}          An object containing the calculated statistics.
  */
-const calculateStats = (chatsPath, item, index) => {
+const calculateStats = (chatsPath, item) => {
     const char_dir = path.join(chatsPath, item.replace(".png", ""));
-    let chat_size = 0;
-    let date_last_chat = 0;
     const stats = {
         total_gen_time: 0,
         user_word_count: 0,
@@ -327,7 +325,7 @@ function calculateTotalGenTimeAndWordCount(
     let totalSwipeCount = 0;
     let firstChatTime = new Date("9999-12-31T23:59:59.999Z").getTime();
 
-    for (let [index, line] of lines.entries()) {
+    for (let line of lines.entries()) {
         if (line.length) {
             try {
                 let json = JSON.parse(line);
