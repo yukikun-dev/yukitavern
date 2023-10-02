@@ -33,7 +33,6 @@ export {
     sortCharactersList,
     fixMarkdown,
     power_user,
-    pygmalion_options,
     tokenizers,
     send_on_enter_options,
 };
@@ -50,12 +49,6 @@ export const chat_styles = {
     DEFAULT: 0,
     BUBBLES: 1,
     DOCUMENT: 2,
-};
-
-const pygmalion_options = {
-    DISABLED: -1,
-    AUTO: 0,
-    ENABLED: 1,
 };
 
 const tokenizers = {
@@ -86,7 +79,6 @@ let power_user = {
     tokenizer: tokenizers.BEST_MATCH,
     token_padding: 64,
     collapse_newlines: false,
-    pygmalion_formatting: pygmalion_options.AUTO,
     pin_examples: false,
     disable_description_formatting: false,
     disable_scenario_formatting: false,
@@ -793,9 +785,6 @@ function loadPowerUserSettings(settings, data) {
         "selected",
         true,
     );
-    $(
-        `#pygmalion_formatting option[value=${power_user.pygmalion_formatting}]`,
-    ).attr("selected", true);
     $(`#send_on_enter option[value=${power_user.send_on_enter}]`).attr(
         "selected",
         true,
@@ -1480,14 +1469,6 @@ $(document).ready(() => {
     // Settings that go to settings.json
     $("#collapse-newlines-checkbox").change(function () {
         power_user.collapse_newlines = !!$(this).prop("checked");
-        saveSettingsDebounced();
-    });
-
-    $("#pygmalion_formatting").change(function (e) {
-        power_user.pygmalion_formatting = Number(
-            $(this).find(":selected").val(),
-        );
-        getStatus();
         saveSettingsDebounced();
     });
 

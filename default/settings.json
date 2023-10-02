@@ -56,7 +56,6 @@
         "tokenizer": 99,
         "token_padding": 64,
         "collapse_newlines": false,
-        "pygmalion_formatting": 0,
         "pin_examples": false,
         "disable_description_formatting": false,
         "disable_scenario_formatting": false,

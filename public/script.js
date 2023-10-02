@@ -69,7 +69,6 @@ import {
     sortCharactersList,
     fixMarkdown,
     power_user,
-    pygmalion_options,
     tokenizers,
     persona_description_positions,
     getCustomStoppingStrings,
@@ -812,7 +811,6 @@ var user_avatar = "you.png";
 export var amount_gen = 80; //default max length of AI generated responses
 var max_context = 2048;
 
-var is_pygmalion = false;
 var tokens_already_generated = 0;
 var message_already_generated = "";
 var cycle_count_generation = 0;
@@ -910,19 +908,6 @@ async function getStatus() {
                 online_status = data.result;
                 if (online_status == undefined) {
                     online_status = "no_connection";
-                }
-                if (
-                    (online_status.toLowerCase().indexOf("pygmalion") != -1 &&
-                        power_user.pygmalion_formatting ==
-                            pygmalion_options.AUTO) ||
-                    (online_status !== "no_connection" &&
-                        power_user.pygmalion_formatting ==
-                            pygmalion_options.ENABLED)
-                ) {
-                    is_pygmalion = true;
-                    online_status += " (Pyg. formatting on)";
-                } else {
-                    is_pygmalion = false;
                 }
 
                 // determine if we can use stop sequence and streaming
@@ -1776,7 +1761,7 @@ function getStoppingStrings(isImpersonate, addSpace) {
 
     result.push(userString);
 
-    if (!is_pygmalion && result.includes(youString)) {
+    if (result.includes(youString)) {
         result.splice(result.indexOf(youString), 1);
     }
 
@@ -2008,11 +1993,6 @@ function getExtensionPrompt(position = 0, depth = undefined, separator = "\n") {
 
 function baseChatReplace(value, name1, name2) {
     if (value !== undefined && value.length > 0) {
-        if (is_pygmalion) {
-            value = value.replace(/{{user}}:/gi, "You:");
-            value = value.replace(/<USER>:/gi, "You:");
-        }
-
         value = substituteParams(value, name1, name2);
 
         if (power_user.collapse_newlines) {
@@ -2347,7 +2327,7 @@ async function Generate(
 
     message_already_generated = isImpersonate ? `${name1}: ` : `${name2}: `;
     // Name for the multigen prefix
-    const magName = isImpersonate ? (is_pygmalion ? "You" : name1) : name2;
+    const magName = isImpersonate ? name1 : name2;
 
     message_already_generated = `${magName}: `;
 
@@ -2558,8 +2538,6 @@ async function Generate(
                 ? power_user.custom_chat_separator
                 : power_user.disable_examples_formatting
                 ? ""
-                : is_pygmalion
-                ? "<START>"
                 : `This is how ${name2} should talk`;
         let mesExamplesArray = mesExamples
             .split(/<START>/gi)
@@ -2586,44 +2564,24 @@ async function Generate(
 
         let storyString = "";
 
-        if (is_pygmalion) {
-            storyString += appendToStoryString(
-                charDescription,
-                power_user.disable_description_formatting
-                    ? ""
-                    : name2 + "'s Persona: ",
-            );
-            storyString += appendToStoryString(
-                charPersonality,
-                power_user.disable_personality_formatting
-                    ? ""
-                    : "Personality: ",
-            );
-            storyString += appendToStoryString(
-                Scenario,
-                power_user.disable_scenario_formatting ? "" : "Scenario: ",
-            );
-        } else {
-            storyString += appendToStoryString(charDescription, "");
-            storyString += appendToStoryString(
-                charPersonality,
-                power_user.disable_personality_formatting
-                    ? ""
-                    : name2 + "'s personality: ",
-            );
-            storyString += appendToStoryString(
-                Scenario,
-                power_user.disable_scenario_formatting
-                    ? ""
-                    : "Circumstances and context of the dialogue: ",
-            );
-        }
+        storyString += appendToStoryString(charDescription, "");
+        storyString += appendToStoryString(
+            charPersonality,
+            power_user.disable_personality_formatting
+                ? ""
+                : name2 + "'s personality: ",
+        );
+        storyString += appendToStoryString(
+            Scenario,
+            power_user.disable_scenario_formatting
+                ? ""
+                : "Circumstances and context of the dialogue: ",
+        );
 
         // kingbri MARK: - Make sure the prompt bias isn't the same as the user bias
         if (
             (promptBias && !isUserPromptBias) ||
-            power_user.always_force_name2 ||
-            is_pygmalion
+            power_user.always_force_name2
         ) {
             force_name2 = true;
         }
@@ -2818,11 +2776,6 @@ async function Generate(
                         //item = item.substr(0, item.length - 1);
                         //}
                     }
-                    if (is_pygmalion) {
-                        if (item.trim().startsWith(name1)) {
-                            item = item.replace(name1 + ":", "You:");
-                        }
-                    }
 
                     if (i === 0) {
                         // Process those that couldn't get that far
@@ -2885,7 +2838,7 @@ async function Generate(
             function modifyLastPromptLine(mesSendString) {
                 // Add quiet generation prompt at depth 0
                 if (quiet_prompt && quiet_prompt.length) {
-                    const name = is_pygmalion ? "You" : name1;
+                    const name = name1;
                     const quietAppend = `\n${name}: ${quiet_prompt}`;
                     mesSendString += quietAppend;
                     // Bail out early
@@ -2893,7 +2846,7 @@ async function Generate(
                 }
 
                 if (isImpersonate && tokens_already_generated === 0) {
-                    const name = is_pygmalion ? "You" : name1;
+                    const name = name1;
                     if (!mesSendString.endsWith("\n")) {
                         mesSendString += "\n";
                     }
@@ -3600,7 +3553,7 @@ function addChatsSeparator(mesSendString) {
     }
 
     // add non-pygma dingus
-    else if (!is_pygmalion) {
+    else {
         mesSendString =
             "\nThen the roleplay chat between " +
             name1 +
@@ -3610,17 +3563,11 @@ function addChatsSeparator(mesSendString) {
             mesSendString;
     }
 
-    // add pygma <START>
-    else {
-        mesSendString = "<START>\n" + mesSendString;
-        //mesSendString = mesSendString; //This edit simply removes the first "<START>" that is prepended to all context prompts
-    }
-
     return mesSendString;
 }
 
 function appendZeroDepthAnchor(force_name2, zeroDepthAnchor, finalPromt) {
-    const trimBothEnds = !force_name2 && !is_pygmalion;
+    const trimBothEnds = !force_name2;
     let trimmedPrompt = trimBothEnds
         ? zeroDepthAnchor.trim()
         : zeroDepthAnchor.trimEnd();
@@ -3630,10 +3577,6 @@ function appendZeroDepthAnchor(force_name2, zeroDepthAnchor, finalPromt) {
     }
 
     finalPromt += trimmedPrompt;
-
-    if (force_name2 || is_pygmalion) {
-        finalPromt += " ";
-    }
 
     return finalPromt;
 }
@@ -4162,11 +4105,7 @@ function getGenerateUrl() {
 
 function shouldContinueMultigen(getMessage, isImpersonate) {
     // stopping name string
-    const nameString = isImpersonate
-        ? `${name2}:`
-        : is_pygmalion
-        ? "You:"
-        : `${name1}:`;
+    const nameString = isImpersonate ? `${name2}:` : `${name1}:`;
     // if there is no 'You:' in the response msg
     const doesNotContainName =
         message_already_generated.indexOf(nameString) === -1;
@@ -4269,11 +4208,6 @@ function cleanUpMessage(
     // "trailing whitespace on newlines       \nevery line of the string    \n?sample text" ->
     // "trailing whitespace on newlines\nevery line of the string\nsample text"
     getMessage = getMessage.replace(/[^\S\r\n]+$/gm, "");
-    if (is_pygmalion) {
-        getMessage = getMessage.replace(/<USER>/g, name1);
-        getMessage = getMessage.replace(/<BOT>/g, name2);
-        getMessage = getMessage.replace(/You:/g, name1 + ":");
-    }
 
     let nameToTrim = isImpersonate ? name2 : name1;
 
@@ -9060,7 +8994,6 @@ $(document).ready(function () {
     });
 
     $("#main_api").change(function () {
-        is_pygmalion = false;
         is_get_status = false;
         setOpenAIOnlineStatus(false);
         online_status = "no_connection";
