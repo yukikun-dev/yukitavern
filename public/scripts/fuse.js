@@ -11,10 +11,10 @@
     typeof exports === "object" && typeof module !== "undefined"
         ? (module.exports = factory())
         : typeof define === "function" && define.amd
-        ? define(factory)
-        : ((global =
+            ? define(factory)
+            : ((global =
               typeof globalThis !== "undefined" ? globalThis : global || self),
-          (global.Fuse = factory()));
+            (global.Fuse = factory()));
 })(this, function () {
     "use strict";
 
@@ -28,7 +28,7 @@
                     return Object.getOwnPropertyDescriptor(object, sym)
                         .enumerable;
                 })),
-                keys.push.apply(keys, symbols);
+            keys.push.apply(keys, symbols);
         }
 
         return keys;
@@ -39,20 +39,20 @@
             var source = null != arguments[i] ? arguments[i] : {};
             i % 2
                 ? ownKeys(Object(source), !0).forEach(function (key) {
-                      _defineProperty(target, key, source[key]);
-                  })
+                    _defineProperty(target, key, source[key]);
+                })
                 : Object.getOwnPropertyDescriptors
-                ? Object.defineProperties(
-                      target,
-                      Object.getOwnPropertyDescriptors(source),
-                  )
-                : ownKeys(Object(source)).forEach(function (key) {
-                      Object.defineProperty(
-                          target,
-                          key,
-                          Object.getOwnPropertyDescriptor(source, key),
-                      );
-                  });
+                    ? Object.defineProperties(
+                        target,
+                        Object.getOwnPropertyDescriptors(source),
+                    )
+                    : ownKeys(Object(source)).forEach(function (key) {
+                        Object.defineProperty(
+                            target,
+                            key,
+                            Object.getOwnPropertyDescriptor(source, key),
+                        );
+                    });
         }
 
         return target;
@@ -66,16 +66,16 @@
                 "function" == typeof Symbol &&
                 "symbol" == typeof Symbol.iterator
                     ? function (obj) {
-                          return typeof obj;
-                      }
+                        return typeof obj;
+                    }
                     : function (obj) {
-                          return obj &&
+                        return obj &&
                               "function" == typeof Symbol &&
                               obj.constructor === Symbol &&
                               obj !== Symbol.prototype
-                              ? "symbol"
-                              : typeof obj;
-                      }),
+                            ? "symbol"
+                            : typeof obj;
+                    }),
             _typeof(obj)
         );
     }
@@ -144,8 +144,8 @@
         _getPrototypeOf = Object.setPrototypeOf
             ? Object.getPrototypeOf
             : function _getPrototypeOf(o) {
-                  return o.__proto__ || Object.getPrototypeOf(o);
-              };
+                return o.__proto__ || Object.getPrototypeOf(o);
+            };
         return _getPrototypeOf(o);
     }
 
@@ -506,8 +506,8 @@
                     ? -1
                     : 1
                 : a.score < b.score
-                ? -1
-                : 1;
+                    ? -1
+                    : 1;
         },
     };
     var FuzzyOptions = {
@@ -2334,9 +2334,9 @@
                         arguments.length > 0 && arguments[0] !== undefined
                             ? arguments[0]
                             : function () /* doc, idx */
-                              {
-                                  return false;
-                              };
+                            {
+                                return false;
+                            };
                     var results = [];
 
                     for (var i = 0, len = this._docs.length; i < len; i += 1) {

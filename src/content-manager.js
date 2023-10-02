@@ -71,22 +71,22 @@ function checkForNewContent() {
 
 function getTargetByType(type) {
     switch (type) {
-        case "character":
-            return "public/characters";
-        case "sprites":
-            return "public/characters";
-        case "background":
-            return "public/backgrounds";
-        case "world":
-            return "public/worlds";
-        case "sound":
-            return "public/sounds";
-        case "avatar":
-            return "public/User Avatars";
-        case "theme":
-            return "public/themes";
-        default:
-            return null;
+    case "character":
+        return "public/characters";
+    case "sprites":
+        return "public/characters";
+    case "background":
+        return "public/backgrounds";
+    case "world":
+        return "public/worlds";
+    case "sound":
+        return "public/sounds";
+    case "avatar":
+        return "public/User Avatars";
+    case "theme":
+        return "public/themes";
+    default:
+        return null;
     }
 }
 
