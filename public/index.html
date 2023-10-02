@@ -87,7 +87,6 @@
     <script type="module" src="scripts/kai-settings.js"></script>
     <script type="module" src="scripts/textgen-settings.js"></script>
     <script type="module" src="scripts/bookmarks.js"></script>
-    <script type="module" src="scripts/horde.js"></script>
     <script type="module" src="scripts/RossAscends-mods.js"></script>
     <script type="module" src="scripts/slash-commands.js"></script>
     <script type="module" src="scripts/tags.js"></script>
@@ -1497,74 +1496,10 @@
                     <div id="main-API-selector-block">
                         <select id="main_api">
                             <option value="kobold"><span data-i18n="KoboldAI">KoboldAI</span></option>
-                            <option value="koboldhorde"><span data-i18n="KoboldAI Horde">KoboldAI Horde</span></option>
                             <option value="textgenerationwebui"><span data-i18n="Text Gen WebUI (ooba)">Text Gen WebUI (ooba)</span></option>
                             <option value="novel"><span data-i18n="NovelAI">NovelAI</span></option>
                             <option value="openai"><span data-i18n="Chat Completion (OpenAI, Claude, Window/OpenRouter, Scale)">Chat Completion (OpenAI, Claude, Window, OpenRouter, Scale)</span></option>
                         </select>
-                    </div>
-                    <div id="kobold_horde" style="position: relative;"> <!-- shows the kobold settings -->
-                        <form action="javascript:void(null);" method="post" enctype="multipart/form-data">
-                            <div id="kobold_horde_block">
-                                <ul>
-                                    <li data-i18n="Avoid sending sensitive information to the Horde.">
-                                        Avoid sending sensitive information to the Horde.
-                                        <a target="_blank" href="https://docs.sillytavern.app/usage/api-connections/horde/" data-i18n="Review the Privacy statement">Review the Privacy statement</a>
-                                    </li>
-                                    <li>
-                                        <a target="_blank" href="https://horde.koboldai.net/register" data-i18n="Register a Horde account for faster queue times">Register a Horde
-                                            account for faster queue times</a>
-                                    </li>
-                                    <li>
-                                        <a target="_blank" href="https://github.com/db0/AI-Horde-Worker#readme" data-i18n="Learn how to contribute your idel GPU cycles to the Horde">Learn
-                                            how to contribute your idle GPU cycles to the Horde</a>
-                                    </li>
-                                </ul>
-
-                                <label for="horde_auto_adjust_context_length" class="checkbox_label">
-                                    <input id="horde_auto_adjust_context_length" type="checkbox" />
-                                    <span data-i18n="Adjust context size to worker capabilities">Adjust context size to worker capabilities</span>
-                                </label>
-
-                                <label for="horde_auto_adjust_response_length" class="checkbox_label">
-                                    <input id="horde_auto_adjust_response_length" type="checkbox" />
-                                    <span data-i18n="Adjust response length to worker capabilities">Adjust response length to worker capabilities</span>
-                                </label>
-
-                                <label for="horde_trusted_workers_only" class="checkbox_label" title="Can help with bad responses by queueing only the approved workers. May slowdown the response time." data-i18n="[title]Can help with bad responses by queueing only the approved workers. May slowdown the response time.">
-                                    <input id="horde_trusted_workers_only" type="checkbox" />
-                                    <span data-i18n="Trusted workers only">Trusted workers only</span>
-                                </label>
-
-                                <h4 data-i18n="API key">API key</h4>
-                                <small>Get it here: <a target="_blank" href="https://horde.koboldai.net/register">Register</a> (<a id="horde_kudos" href="javascript:void(0);">View my Kudos</a>)<br>
-                                    Enter <span class="monospace">0000000000</span> to use anonymous mode.
-                                </small>
-                                <!-- <div>
-                                    <a id="horde_kudos" href="javascript:void(0);">View my Kudos</a>
-                                </div> -->
-                                <div class="flex-container">
-                                    <input id="horde_api_key" name="horde_api_key" class="text_pole flex1" maxlength="500" type="text" placeholder="0000000000" autocomplete="off">
-                                    <div title="Clear your API key" data-i18n="[title]Clear your API key" class="menu_button fa-solid fa-circle-xmark clear-api-key" data-key="api_key_horde"></div>
-                                </div>
-                                <div data-for="horde_api_key" class="neutral_warning" data-i18n="For privacy reasons, your API key will be hidden after you reload the page.">
-                                    For privacy reasons, your API key will be hidden after you reload the page.
-                                </div>
-                                <h4 class="horde_model_title">
-                                    Models
-                                    <div id="horde_refresh" title="Refresh models" data-i18n="[title]Refresh models" class="right_menu_button">
-                                        <div class="fa-solid fa-repeat "></div>
-                                    </div>
-                                </h4>
-                                <select id="horde_model" multiple>
-                                    <option data-i18n="-- Horde models not loaded --">-- Horde models not loaded --</option>
-                                </select>
-                            </div>
-                            <div id="online_status_horde">
-                                <div id="online_status_indicator_horde"></div>
-                                <div id="online_status_text_horde" data-i18n="Not connected">Not connected</div>
-                            </div>
-                        </form>
                     </div>
                     <div id="kobold_api" style="position: relative;"> <!-- shows the kobold settings -->
                         <form action="javascript:void(null);" method="post" enctype="multipart/form-data">

@@ -7,7 +7,7 @@
     "user_avatar": "user-default.png",
     "amount_gen": 250,
     "max_context": 2048,
-    "main_api": "koboldhorde",
+    "main_api": "openai",
     "world_info": {
         "globalSelect": []
     },
@@ -52,12 +52,6 @@
         "rep_pen_size": 0
     },
     "swipes": true,
-    "horde_settings": {
-        "models": [],
-        "auto_adjust_response_length": true,
-        "auto_adjust_context_length": false,
-        "trusted_workers_only": false
-    },
     "power_user": {
         "tokenizer": 99,
         "token_padding": 64,
@@ -237,9 +231,6 @@
             "model": "",
             "restore_faces": false,
             "enable_hr": false,
-            "horde": true,
-            "horde_nsfw": false,
-            "horde_karras": true,
             "refine_mode": false,
             "prompts": {
                 "0": "[In the next response I want you to provide only a detailed comma-delimited list of keywords and phrases which describe {{char}}. The list must include all of the following items in this order: name, species and race, gender, age, clothing, occupation, physical features and appearances. Do not include descriptions of non-visual qualities such as personality, movements, scents, mental traits, or anything which could not be seen in a still photograph. Do not write in full sentences. Prefix your description with the phrase 'full body portrait,']",

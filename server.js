@@ -136,14 +136,6 @@ const axios = require("axios");
 const tiktoken = require("@dqbd/tiktoken");
 const WebSocket = require("ws");
 
-function getHordeClient() {
-    const AIHorde = require("./src/horde");
-    const ai_horde = new AIHorde({
-        client_agent: getVersion()?.agent || "SillyTavern:UNKNOWN:Cohee#1207",
-    });
-    return ai_horde;
-}
-
 const ipMatching = require("ip-matching");
 const yauzl = require("yauzl");
 
@@ -4069,8 +4061,6 @@ app.post("/savepreset_openai", jsonParser, function (request, response) {
 function getPresetFolderByApiId(apiId) {
     switch (apiId) {
         case "kobold":
-        case "koboldhorde":
-            return directories.koboldAI_Settings;
         case "novel":
             return directories.novelAI_Settings;
         case "textgenerationwebui":
@@ -4348,7 +4338,6 @@ function ensurePublicDirectoriesExist() {
 const SECRETS_FILE = "./secrets.json";
 const SETTINGS_FILE = "./public/settings.json";
 const SECRET_KEYS = {
-    HORDE: "api_key_horde",
     MANCER: "api_key_mancer",
     OPENAI: "api_key_openai",
     NOVEL: "api_key_novel",
@@ -4369,20 +4358,12 @@ function migrateSecrets() {
         const fileContents = fs.readFileSync(SETTINGS_FILE);
         const settings = JSON.parse(fileContents);
         const oaiKey = settings?.api_key_openai;
-        const hordeKey = settings?.horde_settings?.api_key;
         const novelKey = settings?.api_key_novel;
 
         if (typeof oaiKey === "string") {
             console.log("Migrating OpenAI key...");
             writeSecret(SECRET_KEYS.OPENAI, oaiKey);
             delete settings.api_key_openai;
-            modified = true;
-        }
-
-        if (typeof hordeKey === "string") {
-            console.log("Migrating Horde key...");
-            writeSecret(SECRET_KEYS.HORDE, hordeKey);
-            delete settings.horde_settings.api_key;
             modified = true;
         }
 
@@ -4434,29 +4415,6 @@ app.post("/readsecretstate", jsonParser, (_, response) => {
 
 const ANONYMOUS_KEY = "0000000000";
 
-app.post("/generate_horde", jsonParser, async (request, response) => {
-    const api_key_horde = readSecret(SECRET_KEYS.HORDE) || ANONYMOUS_KEY;
-    const url = "https://horde.koboldai.net/api/v2/generate/text/async";
-
-    const args = {
-        body: JSON.stringify(request.body),
-        headers: {
-            "Content-Type": "application/json",
-            "Client-Agent": request.header("Client-Agent"),
-            apikey: api_key_horde,
-        },
-    };
-
-    console.log(args.body);
-    try {
-        const data = await postAsync(url, args);
-        return response.send(data);
-    } catch (error) {
-        console.error(error);
-        return response.sendStatus(500);
-    }
-});
-
 app.post("/viewsecrets", jsonParser, async (_, response) => {
     if (!allowKeysExposure) {
         console.error(
@@ -4474,114 +4432,6 @@ app.post("/viewsecrets", jsonParser, async (_, response) => {
         const fileContents = fs.readFileSync(SECRETS_FILE);
         const secrets = JSON.parse(fileContents);
         return response.send(secrets);
-    } catch (error) {
-        console.error(error);
-        return response.sendStatus(500);
-    }
-});
-
-app.post("/horde_samplers", jsonParser, async (_, response) => {
-    try {
-        const ai_horde = getHordeClient();
-        const samplers = Object.values(
-            ai_horde.ModelGenerationInputStableSamplers,
-        );
-        response.send(samplers);
-    } catch (error) {
-        console.error(error);
-        response.sendStatus(500);
-    }
-});
-
-app.post("/horde_models", jsonParser, async (_, response) => {
-    try {
-        const ai_horde = getHordeClient();
-        const models = await ai_horde.getModels();
-        response.send(models);
-    } catch (error) {
-        console.error(error);
-        response.sendStatus(500);
-    }
-});
-
-app.post("/horde_userinfo", jsonParser, async (_, response) => {
-    const api_key_horde = readSecret(SECRET_KEYS.HORDE);
-
-    if (!api_key_horde) {
-        return response.send({ anonymous: true });
-    }
-
-    try {
-        const ai_horde = getHordeClient();
-        const user = await ai_horde.findUser({ token: api_key_horde });
-        return response.send(user);
-    } catch (error) {
-        console.error(error);
-        return response.sendStatus(500);
-    }
-});
-
-app.post("/horde_generateimage", jsonParser, async (request, response) => {
-    const MAX_ATTEMPTS = 200;
-    const CHECK_INTERVAL = 3000;
-    const api_key_horde = readSecret(SECRET_KEYS.HORDE) || ANONYMOUS_KEY;
-    console.log("Stable Horde request:", request.body);
-
-    try {
-        const ai_horde = getHordeClient();
-        const generation = await ai_horde.postAsyncImageGenerate(
-            {
-                prompt: `${request.body.prompt_prefix} ${request.body.prompt} ### ${request.body.negative_prompt}`,
-                params: {
-                    sampler_name: request.body.sampler,
-                    hires_fix: request.body.enable_hr,
-                    use_gfpgan: request.body.restore_faces,
-                    cfg_scale: request.body.scale,
-                    steps: request.body.steps,
-                    width: request.body.width,
-                    height: request.body.height,
-                    karras: Boolean(request.body.karras),
-                    n: 1,
-                },
-                r2: false,
-                nsfw: request.body.nfsw,
-                models: [request.body.model],
-            },
-            { token: api_key_horde },
-        );
-
-        if (!generation.id) {
-            console.error(
-                "Image generation request is not satisfyable:",
-                generation.message || "unknown error",
-            );
-            return response.sendStatus(400);
-        }
-
-        for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-            await delay(CHECK_INTERVAL);
-            const check = await ai_horde.getImageGenerationCheck(generation.id);
-            console.log(check);
-
-            if (check.done) {
-                const result = await ai_horde.getImageGenerationStatus(
-                    generation.id,
-                );
-                return response.send(result.generations[0].img);
-            }
-
-            /*
-            if (!check.is_possible) {
-                return response.sendStatus(503);
-            }
-            */
-
-            if (check.faulted) {
-                return response.sendStatus(500);
-            }
-        }
-
-        return response.sendStatus(504);
     } catch (error) {
         console.error(error);
         return response.sendStatus(500);

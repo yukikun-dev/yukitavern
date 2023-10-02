@@ -60,7 +60,7 @@ function autoSelectPreset() {
 }
 
 function getPresetManager() {
-    const apiId = main_api == "koboldhorde" ? "kobold" : main_api;
+    const apiId = main_api;
 
     if (!Object.keys(presetManagers).includes(apiId)) {
         return null;
@@ -147,7 +147,6 @@ class PresetManager {
         let preset_names = {};
 
         switch (this.apiId) {
-            case "koboldhorde":
             case "kobold":
                 presets = koboldai_settings;
                 preset_names = koboldai_setting_names;
@@ -218,7 +217,6 @@ class PresetManager {
     getPresetSettings() {
         function getSettingsByApiId(apiId) {
             switch (apiId) {
-                case "koboldhorde":
                 case "kobold":
                     return kai_settings;
                 case "novel":

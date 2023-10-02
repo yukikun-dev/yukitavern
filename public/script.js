@@ -116,16 +116,6 @@ import {
 } from "./scripts/bookmarks.js";
 
 import {
-    horde_settings,
-    loadHordeSettings,
-    generateHorde,
-    checkHordeStatus,
-    getHordeModels,
-    adjustHordeGenerationParams,
-    MIN_AMOUNT_GEN,
-} from "./scripts/horde.js";
-
-import {
     debounce,
     delay,
     restoreCaretPosition,
@@ -329,7 +319,6 @@ let backgrounds = [];
 const default_avatar = "img/ai4.png";
 export const system_avatar = "img/five.png";
 export const comment_avatar = "img/quill.png";
-export let CLIENT_VERSION = "SillyTavern:UNKNOWN:Cohee#1207"; // For Horde header
 let optionsPopper = Popper.createPopper(
     document.getElementById("options_button"),
     document.getElementById("options"),
@@ -636,11 +625,7 @@ function getTokenizerBestMatch() {
             return tokenizers.NERD2;
         }
     }
-    if (
-        main_api === "kobold" ||
-        main_api === "textgenerationwebui" ||
-        main_api === "koboldhorde"
-    ) {
+    if (main_api === "kobold" || main_api === "textgenerationwebui") {
         return tokenizers.LLAMA;
     }
 
@@ -882,8 +867,6 @@ var css_send_form_display = $("<div id=send_form></div>").css("display");
 let generate_loop_counter = 0;
 const MAX_GENERATION_LOOPS = 5;
 
-var kobold_horde_model = "";
-
 let token;
 
 var PromptArrayItemForRawPromptDisplay;
@@ -919,8 +902,6 @@ function checkOnlineStatus() {
     if (online_status == "no_connection") {
         $("#online_status_indicator2").css("background-color", "red"); //Kobold
         $("#online_status_text2").html("No connection...");
-        $("#online_status_indicator_horde").css("background-color", "red"); //Kobold Horde
-        $("#online_status_text_horde").html("No connection...");
         $("#online_status_indicator3").css("background-color", "red"); //Novel
         $("#online_status_text3").html("No connection...");
         $(".online_status_indicator4").css("background-color", "red"); //OAI / ooba
@@ -931,8 +912,6 @@ function checkOnlineStatus() {
     } else {
         $("#online_status_indicator2").css("background-color", "green"); //kobold
         $("#online_status_text2").html(online_status);
-        $("#online_status_indicator_horde").css("background-color", "green"); //Kobold Horde
-        $("#online_status_text_horde").html(online_status);
         $("#online_status_indicator3").css("background-color", "green"); //novel
         $("#online_status_text3").html(online_status);
         $(".online_status_indicator4").css("background-color", "green"); //OAI / ooba
@@ -950,23 +929,6 @@ export function setActiveGroup(group) {
 
 async function getStatus() {
     if (is_get_status) {
-        if (main_api == "koboldhorde") {
-            try {
-                const hordeStatus = await checkHordeStatus();
-                online_status = hordeStatus ? "Connected" : "no_connection";
-                resultCheckStatus();
-
-                if (online_status !== "no_connection") {
-                    getStatusDebounced();
-                }
-            } catch {
-                online_status = "no_connection";
-                resultCheckStatus();
-            }
-
-            return;
-        }
-
         jQuery.ajax({
             type: "POST", //
             url: "/getstatus", //
@@ -1007,7 +969,7 @@ async function getStatus() {
                 }
 
                 // determine if we can use stop sequence and streaming
-                if (main_api === "kobold" || main_api === "koboldhorde") {
+                if (main_api === "kobold") {
                     kai_settings.use_stop_sequence = canUseKoboldStopSequence(
                         data.version,
                     );
@@ -2550,11 +2512,6 @@ async function Generate(
         return;
     }
 
-    if (isHordeGenerationNotAllowed()) {
-        is_send_press = false;
-        return;
-    }
-
     // Hide swipes on either multigen or real streaming
     if (isStreamingEnabled() || isMultigenEnabled()) {
         hideSwipeButtons();
@@ -2806,28 +2763,6 @@ async function Generate(
                         coreChat[j].mes.length,
                 );
                 continue_mag = coreChat[j].mes;
-            }
-        }
-
-        // Adjust token limit for Horde
-        let adjustedParams;
-        if (
-            main_api == "koboldhorde" &&
-            (horde_settings.auto_adjust_context_length ||
-                horde_settings.auto_adjust_response_length)
-        ) {
-            try {
-                adjustedParams = await adjustHordeGenerationParams(
-                    max_context,
-                    amount_gen,
-                );
-            } catch {
-                activateSendButtons();
-                return;
-            }
-            if (horde_settings.auto_adjust_context_length) {
-                this_max_context =
-                    adjustedParams.maxContextLength - adjustedParams.maxLength;
             }
         }
 
@@ -3234,19 +3169,8 @@ async function Generate(
 
             let thisPromptBits = [];
 
-            if (
-                main_api == "koboldhorde" &&
-                horde_settings.auto_adjust_response_length
-            ) {
-                this_amount_gen = Math.min(
-                    this_amount_gen,
-                    adjustedParams.maxLength,
-                );
-                this_amount_gen = Math.max(this_amount_gen, MIN_AMOUNT_GEN); // prevent validation errors
-            }
-
             let generate_data;
-            if (main_api == "koboldhorde" || main_api == "kobold") {
+            if (main_api == "kobold") {
                 generate_data = {
                     prompt: finalPromt,
                     gui_settings: true,
@@ -3257,11 +3181,7 @@ async function Generate(
                 };
 
                 if (preset_settings != "gui") {
-                    const maxContext =
-                        adjustedParams &&
-                        horde_settings.auto_adjust_context_length
-                            ? adjustedParams.maxContextLength
-                            : max_context;
+                    const maxContext = adjustedParams && max_context;
                     generate_data = getKoboldGenerationData(
                         finalPromt,
                         this_settings,
@@ -3384,10 +3304,6 @@ async function Generate(
                         .then(onSuccess)
                         .catch(onError);
                 }
-            } else if (main_api == "koboldhorde") {
-                generateHorde(finalPromt, generate_data, abortController.signal)
-                    .then(onSuccess)
-                    .catch(onError);
             } else if (
                 main_api == "textgenerationwebui" &&
                 isStreamingEnabled() &&
@@ -3467,7 +3383,6 @@ async function Generate(
                     //const getData = await response.json();
                     let getMessage = extractMessageFromData(data);
                     let title = extractTitleFromData(data);
-                    kobold_horde_model = title;
 
                     //Pygmalion run again
                     // to make it continue generating so long as it's under max_amount and hasn't signaled
@@ -3838,11 +3753,7 @@ export async function sendMessageAsUser(textareaText, messageBias) {
 
 function getMaxContextSize() {
     let this_max_context = 1487;
-    if (
-        main_api == "kobold" ||
-        main_api == "koboldhorde" ||
-        main_api == "textgenerationwebui"
-    ) {
+    if (main_api == "kobold" || main_api == "textgenerationwebui") {
         this_max_context = max_context - amount_gen;
     }
     if (main_api == "novel") {
@@ -4550,10 +4461,6 @@ function throwCircuitBreakerError() {
 }
 
 function extractTitleFromData(data) {
-    if (main_api == "koboldhorde") {
-        return data.workerName;
-    }
-
     return undefined;
 }
 
@@ -4561,8 +4468,6 @@ function extractMessageFromData(data) {
     switch (main_api) {
         case "kobold":
             return data.results[0].text;
-        case "koboldhorde":
-            return data.text;
         case "textgenerationwebui":
             return data.results[0].text;
         case "novel":
@@ -4847,9 +4752,6 @@ function getGeneratingModel(mes) {
         case "textgenerationwebui":
             model = online_status;
             break;
-        case "koboldhorde":
-            model = kobold_horde_model;
-            break;
     }
     return model;
 }
@@ -4868,7 +4770,6 @@ export function isMultigenEnabled() {
         power_user.multigen &&
         (main_api == "textgenerationwebui" ||
             main_api == "kobold" ||
-            main_api == "koboldhorde" ||
             main_api == "novel")
     );
 }
@@ -5293,14 +5194,6 @@ function changeMainAPI() {
     const selectedVal = $("#main_api").val();
     //console.log(selectedVal);
     const apiElements = {
-        koboldhorde: {
-            apiSettings: $("#kobold_api-settings"),
-            apiConnector: $("#kobold_horde"),
-            apiPresets: $("#kobold_api-presets"),
-            apiRanges: $("#range_block"),
-            maxContextElem: $("#max_context_block"),
-            amountGenElem: $("#amount_gen_block"),
-        },
         kobold: {
             apiSettings: $("#kobold_api-settings"),
             apiConnector: $("#kobold_api"),
@@ -5386,12 +5279,6 @@ function changeMainAPI() {
         oai_settings.chat_completion_source == chat_completion_sources.WINDOWAI
     ) {
         $("#api_button_openai").trigger("click");
-    }
-
-    if (main_api == "koboldhorde") {
-        is_get_status = true;
-        getStatus();
-        getHordeModels();
     }
 }
 
@@ -6076,9 +5963,6 @@ async function getSettings(type) {
         // OpenAI
         loadOpenAISettings(data, settings);
 
-        // Horde
-        loadHordeSettings(settings);
-
         // Load power user settings
         loadPowerUserSettings(settings, data);
 
@@ -6182,7 +6066,6 @@ async function saveSettings(type) {
                 world_info_settings: getWorldInfoSettings(),
                 textgenerationwebui_settings: textgenerationwebui_settings,
                 swipes: swipes,
-                horde_settings: horde_settings,
                 power_user: power_user,
                 extension_settings: extension_settings,
                 context_settings: context_settings,
@@ -7141,17 +7024,6 @@ function setGenerationProgress(progress) {
     }
 }
 
-function isHordeGenerationNotAllowed() {
-    if (main_api == "koboldhorde" && preset_settings == "gui") {
-        toastr.error(
-            "GUI Settings preset is not supported for Horde. Please select another preset.",
-        );
-        return true;
-    }
-
-    return false;
-}
-
 export function cancelTtsPlay() {
     if ("speechSynthesis" in window) {
         speechSynthesis.cancel();
@@ -7918,10 +7790,6 @@ const swipe_right = () => {
         closeMessageEditor();
     }
 
-    if (isHordeGenerationNotAllowed()) {
-        return;
-    }
-
     if (chat.length == 1) {
         if (
             chat[0]["swipe_id"] !== undefined &&
@@ -8234,9 +8102,6 @@ function connectAPISlash(_, text) {
         kobold: {
             button: "#api_button",
         },
-        horde: {
-            selected: "koboldhorde",
-        },
         novel: {
             button: "#api_button_novel",
         },
@@ -8532,7 +8397,7 @@ $(document).ready(function () {
         "api",
         connectAPISlash,
         [],
-        "(kobold, horde, novel, ooba, oai, claude, windowai) – connect to an API",
+        "(kobold, novel, ooba, oai, claude, windowai) – connect to an API",
         true,
         true,
     );
