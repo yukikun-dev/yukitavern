@@ -87,7 +87,6 @@ const max_4k = 4095;
 const max_8k = 8191;
 const max_16k = 16383;
 const max_32k = 32767;
-const scale_max = 7900; // Probably more. Save some for the system prompt defined on Scale site.
 const claude_max = 8000; // We have a proper tokenizer, so theoretically could be larger (up to 9k)
 const palm2_max = 7500; // The real context window is 8192, spare some for padding due to using turbo tokenizer
 const claude_100k_max = 99000;
@@ -953,13 +952,11 @@ async function sendOpenAIRequest(type, openai_msgs_tosend, signal) {
     const isOpenRouter =
         oai_settings.chat_completion_source ==
         chat_completion_sources.OPENROUTER;
-    const isScale =
-        oai_settings.chat_completion_source == chat_completion_sources.SCALE;
     const isTextCompletion =
         oai_settings.chat_completion_source == chat_completion_sources.OPENAI &&
         (oai_settings.openai_model.startsWith("text-") ||
             oai_settings.openai_model.startsWith("code-"));
-    const stream = type !== "quiet" && oai_settings.stream_openai && !isScale;
+    const stream = type !== "quiet" && oai_settings.stream_openai;
     const isQuiet = type === "quiet";
 
     // If we're using the window.ai extension, use that instead
@@ -1027,11 +1024,6 @@ async function sendOpenAIRequest(type, openai_msgs_tosend, signal) {
     if (isOpenRouter) {
         generate_data["use_openrouter"] = true;
         generate_data["top_k"] = parseFloat(oai_settings.top_k_openai);
-    }
-
-    if (isScale) {
-        generate_data["use_scale"] = true;
-        generate_data["api_url_scale"] = oai_settings.api_url_scale;
     }
 
     const generate_url = "/generate_openai";
@@ -2210,21 +2202,6 @@ async function onModelChange() {
         oai_settings.openrouter_model = value;
     }
 
-    if (oai_settings.chat_completion_source == chat_completion_sources.SCALE) {
-        if (oai_settings.max_context_unlocked) {
-            $("#openai_max_context").attr("max", unlocked_max);
-        } else {
-            $("#openai_max_context").attr("max", scale_max);
-        }
-        oai_settings.openai_max_context = Math.min(
-            Number($("#openai_max_context").attr("max")),
-            oai_settings.openai_max_context,
-        );
-        $("#openai_max_context")
-            .val(oai_settings.openai_max_context)
-            .trigger("input");
-    }
-
     if (
         oai_settings.chat_completion_source ==
         chat_completion_sources.OPENROUTER
@@ -2412,24 +2389,6 @@ async function onConnectButtonClick(e) {
 
         if (!secret_state[SECRET_KEYS.OPENROUTER]) {
             console.log("No secret key saved for OpenRouter");
-            return;
-        }
-    }
-
-    if (oai_settings.chat_completion_source == chat_completion_sources.SCALE) {
-        const api_key_scale = $("#api_key_scale").val().trim();
-
-        if (api_key_scale.length) {
-            await writeSecret(SECRET_KEYS.SCALE, api_key_scale);
-        }
-
-        if (!oai_settings.api_url_scale) {
-            console.log("No API URL saved for Scale");
-            return;
-        }
-
-        if (!secret_state[SECRET_KEYS.SCALE]) {
-            console.log("No secret key saved for Scale");
             return;
         }
     }
