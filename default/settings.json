@@ -322,11 +322,7 @@
             "color": "rgba(108, 32, 32, 1)"
         }
     ],
-    "tag_map": {
-        "default_FluxTheCat.png": ["1345561466591"],
-        "default_Seraphina.png": ["1345561466591"],
-        "default_CodingSensei.png": ["1345561466591"]
-    },
+    "tag_map": {},
     "nai_settings": {
         "temperature": 0.63,
         "repetition_penalty": 1.148125,
