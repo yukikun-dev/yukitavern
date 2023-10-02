@@ -72,9 +72,6 @@ import {
     power_user,
     pygmalion_options,
     tokenizers,
-    formatInstructModeChat,
-    formatInstructStoryString,
-    formatInstructModePrompt,
     persona_description_positions,
     loadMovingUIState,
     getCustomStoppingStrings,
@@ -1798,31 +1795,6 @@ function getStoppingStrings(isImpersonate, addSpace) {
         }
     }
 
-    // Cohee: oobabooga's textgen always appends newline before the sequence as a stopping string
-    // But it's a problem for Metharme which doesn't use newlines to separate them.
-    const wrap = (s) => (power_user.instruct.wrap ? "\n" + s : s);
-
-    if (power_user.instruct.enabled) {
-        if (power_user.instruct.input_sequence) {
-            result.push(
-                substituteParams(
-                    wrap(power_user.instruct.input_sequence),
-                    name1,
-                    name2,
-                ),
-            );
-        }
-        if (power_user.instruct.output_sequence) {
-            result.push(
-                substituteParams(
-                    wrap(power_user.instruct.output_sequence),
-                    name1,
-                    name2,
-                ),
-            );
-        }
-    }
-
     if (power_user.custom_stopping_strings) {
         const customStoppingStrings = getCustomStoppingStrings();
         if (power_user.custom_stopping_strings_macro) {
@@ -2376,25 +2348,13 @@ async function Generate(
         abortController = new AbortController();
     }
 
-    // OpenAI doesn't need instruct mode. Use OAI main prompt instead.
-    const isInstruct = power_user.instruct.enabled && main_api !== "openai";
     const isImpersonate = type == "impersonate";
 
     message_already_generated = isImpersonate ? `${name1}: ` : `${name2}: `;
     // Name for the multigen prefix
     const magName = isImpersonate ? (is_pygmalion ? "You" : name1) : name2;
 
-    if (isInstruct) {
-        message_already_generated = formatInstructModePrompt(
-            magName,
-            isImpersonate,
-            false,
-            name1,
-            name2,
-        );
-    } else {
-        message_already_generated = `${magName}: `;
-    }
+    message_already_generated = `${magName}: `;
 
     // To trim after multigen ended
     const magFirst = message_already_generated;
@@ -2691,7 +2651,7 @@ async function Generate(
                 break;
             }
 
-            chat2[i] = formatMessageHistoryItem(coreChat[j], isInstruct);
+            chat2[i] = formatMessageHistoryItem(coreChat[j]);
 
             // Do not suffix the message for continuation
             if (i === 0 && isContinue) {
@@ -2727,11 +2687,6 @@ async function Generate(
         // Pre-format the World Info into the story string
         if (main_api !== "openai") {
             storyString = worldInfoBefore + storyString + worldInfoAfter;
-        }
-
-        // Format the instruction string
-        if (isInstruct) {
-            storyString = formatInstructStoryString(storyString, systemPrompt);
         }
 
         if (main_api === "openai") {
@@ -2868,7 +2823,7 @@ async function Generate(
                         //item = item.substr(0, item.length - 1);
                         //}
                     }
-                    if (is_pygmalion && !isInstruct) {
+                    if (is_pygmalion) {
                         if (item.trim().startsWith(name1)) {
                             item = item.replace(name1 + ":", "You:");
                         }
@@ -2936,44 +2891,13 @@ async function Generate(
                 // Add quiet generation prompt at depth 0
                 if (quiet_prompt && quiet_prompt.length) {
                     const name = is_pygmalion ? "You" : name1;
-                    const quietAppend = isInstruct
-                        ? formatInstructModeChat(
-                              name,
-                              quiet_prompt,
-                              false,
-                              true,
-                              false,
-                              name1,
-                              name2,
-                          )
-                        : `\n${name}: ${quiet_prompt}`;
+                    const quietAppend = `\n${name}: ${quiet_prompt}`;
                     mesSendString += quietAppend;
                     // Bail out early
                     return mesSendString;
                 }
 
-                // Get instruct mode line
-                if (isInstruct && tokens_already_generated === 0) {
-                    const name = isImpersonate
-                        ? is_pygmalion
-                            ? "You"
-                            : name1
-                        : name2;
-                    mesSendString += formatInstructModePrompt(
-                        name,
-                        isImpersonate,
-                        promptBias,
-                        name1,
-                        name2,
-                    );
-                }
-
-                // Get non-instruct impersonation line
-                if (
-                    !isInstruct &&
-                    isImpersonate &&
-                    tokens_already_generated === 0
-                ) {
+                if (isImpersonate && tokens_already_generated === 0) {
                     const name = is_pygmalion ? "You" : name1;
                     if (!mesSendString.endsWith("\n")) {
                         mesSendString += "\n";
@@ -2982,11 +2906,7 @@ async function Generate(
                 }
 
                 // Add character's name
-                if (
-                    !isInstruct &&
-                    force_name2 &&
-                    tokens_already_generated === 0
-                ) {
+                if (force_name2 && tokens_already_generated === 0) {
                     if (!mesSendString.endsWith("\n")) {
                         mesSendString += "\n";
                     }
@@ -3004,11 +2924,7 @@ async function Generate(
                         console.debug(`A prompt bias was found: ${promptBias}`);
                         mesSendString += `${name2}: ${promptBias}`;
                     }
-                } else if (
-                    power_user.user_prompt_bias &&
-                    !isImpersonate &&
-                    !isInstruct
-                ) {
+                } else if (power_user.user_prompt_bias && !isImpersonate) {
                     console.debug(
                         `A prompt bias was found without character's name appended: ${promptBias}`,
                     );
@@ -3194,13 +3110,6 @@ async function Generate(
                 this_max_context: this_max_context,
                 padding: power_user.token_padding,
                 main_api: main_api,
-                instruction: isInstruct
-                    ? substituteParams(
-                          power_user.prefer_character_prompt && systemPrompt
-                              ? systemPrompt
-                              : power_user.instruct.system_prompt,
-                      )
-                    : "",
                 userPersona: power_user.persona_description || "",
             };
 
@@ -3350,13 +3259,7 @@ async function Generate(
                                 .trigger("input");
                         }
 
-                        if (
-                            shouldContinueMultigen(
-                                getMessage,
-                                isImpersonate,
-                                isInstruct,
-                            )
-                        ) {
+                        if (shouldContinueMultigen(getMessage, isImpersonate)) {
                             hideSwipeButtons();
                             tokens_already_generated += this_amount_gen; // add new gen amt to any prev gen counter..
                             getMessage = message_already_generated;
@@ -3605,7 +3508,7 @@ export function getBiasStrings(textareaText, type) {
     return { messageBias, promptBias, isUserPromptBias };
 }
 
-function formatMessageHistoryItem(chatItem, isInstruct) {
+function formatMessageHistoryItem(chatItem) {
     const isNarratorType =
         chatItem?.extra?.type === system_message_types.NARRATOR;
     const characterName =
@@ -3618,18 +3521,6 @@ function formatMessageHistoryItem(chatItem, isInstruct) {
     let textResult = shouldPrependName
         ? `${itemName}: ${chatItem.mes}\n`
         : `${chatItem.mes}\n`;
-
-    if (isInstruct) {
-        textResult = formatInstructModeChat(
-            itemName,
-            chatItem.mes,
-            chatItem.is_user,
-            isNarratorType,
-            chatItem.force_avatar,
-            name1,
-            name2,
-        );
-    }
 
     textResult = replaceBiasMarkup(textResult);
 
@@ -3938,9 +3829,6 @@ function promptItemize(itemizedPrompts, requestedMesId) {
             mesSendStringTokens -
             (allAnchorsTokens - afterScenarioAnchorTokens) +
             power_user.token_padding;
-        var instructionTokens = getTokenCount(
-            itemizedPrompts[thisPromptSet].instruction,
-        );
         var promptBiasTokens = getTokenCount(
             itemizedPrompts[thisPromptSet].promptBias,
         );
@@ -4196,10 +4084,6 @@ function promptItemize(itemizedPrompts, requestedMesId) {
                             <div  class=" flex1 tokenItemizingSubclass">-- User Persona:</div>
                             <div  class="tokenItemizingSubclass"> ${userPersonaStringTokens}</div>
                         </div>
-                        <div class="flex-container ">
-                            <div  class=" flex1 tokenItemizingSubclass">-- System Prompt (Instruct):</div>
-                            <div class="tokenItemizingSubclass"> ${instructionTokens}</div>
-                        </div>
                     </div>
                     <div class="wide100p flex-container">
                         <div  class="flex1" style="color: gold;">World Info:</div>
@@ -4281,17 +4165,7 @@ function getGenerateUrl() {
     return generate_url;
 }
 
-function shouldContinueMultigen(getMessage, isImpersonate, isInstruct) {
-    if (isInstruct && power_user.instruct.stop_sequence) {
-        if (
-            message_already_generated.indexOf(
-                power_user.instruct.stop_sequence,
-            ) !== -1
-        ) {
-            return false;
-        }
-    }
-
+function shouldContinueMultigen(getMessage, isImpersonate) {
     // stopping name string
     const nameString = isImpersonate
         ? `${name2}:`
@@ -4320,7 +4194,7 @@ function extractNameFromMessage(getMessage, force_name2, isImpersonate) {
     } else {
         this_mes_is_name = false;
     }
-    if (force_name2 || power_user.instruct.enabled) this_mes_is_name = true;
+    if (force_name2) this_mes_is_name = true;
 
     if (isImpersonate) {
         getMessage = getMessage.trim();
@@ -4426,27 +4300,7 @@ function cleanUpMessage(
     if (getMessage.indexOf("<|endoftext|>") != -1) {
         getMessage = getMessage.substr(0, getMessage.indexOf("<|endoftext|>"));
     }
-    const isInstruct = power_user.instruct.enabled && main_api !== "openai";
-    if (isInstruct && power_user.instruct.stop_sequence) {
-        if (getMessage.indexOf(power_user.instruct.stop_sequence) != -1) {
-            getMessage = getMessage.substring(
-                0,
-                getMessage.indexOf(power_user.instruct.stop_sequence),
-            );
-        }
-    }
-    if (isInstruct && power_user.instruct.input_sequence && isImpersonate) {
-        getMessage = getMessage.replaceAll(
-            power_user.instruct.input_sequence,
-            "",
-        );
-    }
-    if (isInstruct && power_user.instruct.output_sequence && !isImpersonate) {
-        getMessage = getMessage.replaceAll(
-            power_user.instruct.output_sequence,
-            "",
-        );
-    }
+
     // clean-up group message from excessive generations
     if (selected_group) {
         getMessage = cleanGroupMessage(getMessage);

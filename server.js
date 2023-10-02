@@ -327,7 +327,6 @@ const directories = {
     themes: "public/themes",
     movingUI: "public/movingUI",
     extensions: "public/scripts/extensions",
-    instruct: "public/instruct",
     context: "public/context",
     backups: "backups/",
     quickreplies: "public/QuickReplies",
@@ -1901,7 +1900,6 @@ app.post("/getsettings", jsonParser, (request, response) => {
         directories.quickreplies,
     );
 
-    const instruct = readAndParseFromDirectory(directories.instruct);
     const context = readAndParseFromDirectory(directories.context);
 
     response.send({
@@ -1916,7 +1914,6 @@ app.post("/getsettings", jsonParser, (request, response) => {
         themes,
         movingUIPresets,
         quickReplyPresets,
-        instruct,
         context,
         enable_extensions: enableExtensions,
     });

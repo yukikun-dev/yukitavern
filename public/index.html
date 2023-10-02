@@ -1504,91 +1504,6 @@
                                 <input id="markdown_escape_strings" class="text_pole textarea_compact" type="text"  placeholder="separate with commas w/o space between" maxlength="100" />
                             </div>
                         </div>
-                        <div>
-
-                            <h4 >Instruct mode
-                                <a href="https://docs.sillytavern.app/usage/core-concepts/instructmode/" class="notes-link" target="_blank">
-                                    <span class="note-link-span">?</span>
-                                </a>
-                            </h4>
-                            <div>
-                                <label for="instruct_enabled" class="checkbox_label">
-                                    <input id="instruct_enabled" type="checkbox" />
-                                    <span >Enabled</span>
-                                </label>
-                                <label for="instruct_wrap" class="checkbox_label">
-                                    <input id="instruct_wrap" type="checkbox" />
-                                    <span >Wrap Sequences with Newline</span>
-                                </label>
-                                <label for="instruct_macro" class="checkbox_label">
-                                    <input id="instruct_macro" type="checkbox" />
-                                    <span >Replace Macro in Sequences</span>
-                                </label>
-                                <label for="instruct_names" class="checkbox_label">
-                                    <input id="instruct_names" type="checkbox" />
-                                    <span >Include Names</span>
-                                </label>
-                                <label for="instruct_names_force_groups" class="checkbox_label indent20p">
-                                    <input id="instruct_names_force_groups" type="checkbox" />
-                                    <span >Force for Groups and Personas</span>
-                                </label>
-                            </div>
-                            <label for="instruct_presets">
-                                <span >Presets</span>
-                            </label>
-                            <select id="instruct_presets"></select>
-                            <label>
-                                <span >System Prompt</span>
-                            </label>
-                            <div class="prompt_overridden">
-                                Overridden by the Character Definitions.
-                            </div>
-                            <textarea id="instruct_system_prompt" class="text_pole textarea_compact"></textarea>
-                            <div class="flex-container">
-                                <div class="flex1">
-                                    <label for="instruct_input_sequence">
-                                        <span >Input Sequence</span>
-                                    </label>
-                                    <div>
-                                        <textarea id="instruct_input_sequence" class="text_pole textarea_compact" type="text" maxlength="500" rows="1"></textarea>
-                                    </div>
-                                </div>
-                                <div class="flex1">
-                                    <label for="instruct_output_sequence">
-                                        <span >Output Sequence</span>
-                                    </label>
-                                    <div>
-                                        <textarea id="instruct_output_sequence" class="text_pole wide100p textarea_compact" type="text" maxlength="500" rows="1"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex-container">
-                                <div class="flex1">
-                                    <label for="instruct_system_sequence">
-                                        <small >System Sequence</small>
-                                    </label>
-                                    <div>
-                                        <textarea id="instruct_system_sequence" class="text_pole textarea_compact" type="text" maxlength="500" rows="1"></textarea>
-                                    </div>
-                                </div>
-                                <div class="flex1">
-                                    <label for="instruct_stop_sequence">
-                                        <small >Stop Sequence</small>
-                                    </label>
-                                    <div>
-                                        <textarea id="instruct_stop_sequence" class="text_pole wide100p textarea_compact" type="text" maxlength="500" rows="1"></textarea>
-                                    </div>
-                                </div>
-                                <div class="flex1">
-                                    <label for="instruct_separator_sequence">
-                                        <small >Separator</small>
-                                    </label>
-                                    <div>
-                                        <textarea id="instruct_separator_sequence" class="text_pole wide100p textarea_compact" type="text" maxlength="500" rows="1"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <div name="ContextFormatting" class="flex1">
                         <h4><span >Context Formatting</span></h4>
@@ -2733,7 +2648,7 @@
         <div class="inline-drawer">
             <div class="inline-drawer-toggle inline-drawer-header">
                 <h4 >
-                    Prompt Overrides <small>(For OpenAI/Claude/Scale APIs, Window/OpenRouter, and Instruct mode)</small>
+                    Prompt Overrides <small>(For OpenAI/Claude/Scale APIs, Window/OpenRouter)</small>
                 </h4>
 
 
@@ -2885,7 +2800,6 @@
                         <li><code>{{mesExamples}}</code> - message examples</li>
                         <li><code>{{wiBeforeCharacter}}</code> - activated World Info entries (Before Char)</li>
                         <li><code>{{wiAfterCharacter}}</code> - activated World Info entries (After Char)</li>
-                        <li><code>{{instructSystemPrompt}}</code> - system prompt (Instruct mode only)</li>
                     </ul>
                 </div>
             </div>
