@@ -100,17 +100,6 @@ import {
 } from "./scripts/openai.js";
 
 import {
-    generateNovelWithStreaming,
-    getNovelGenerationData,
-    getKayraMaxContextTokens,
-    getNovelTier,
-    loadNovelPreset,
-    loadNovelSettings,
-    nai_settings,
-    setNovelData,
-} from "./scripts/nai-settings.js";
-
-import {
     createNewBookmark,
     showBookmarksButtons,
 } from "./scripts/bookmarks.js";
@@ -232,7 +221,6 @@ export {
     main_api,
     api_server,
     system_messages,
-    nai_settings,
     token,
     name1,
     name2,
@@ -611,20 +599,6 @@ async function getClientVersion() {
 }
 
 function getTokenizerBestMatch() {
-    if (main_api === "novel") {
-        if (
-            nai_settings.model_novel.includes("krake") ||
-            nai_settings.model_novel.includes("euterpe")
-        ) {
-            return tokenizers.CLASSIC;
-        }
-        if (nai_settings.model_novel.includes("clio")) {
-            return tokenizers.NERD;
-        }
-        if (nai_settings.model_novel.includes("kayra")) {
-            return tokenizers.NERD2;
-        }
-    }
     if (main_api === "kobold" || main_api === "textgenerationwebui") {
         return tokenizers.LLAMA;
     }
@@ -819,11 +793,8 @@ let online_status = "no_connection";
 let api_server = "";
 let api_server_textgenerationwebui = "";
 //var interval_timer = setInterval(getStatus, 2000);
-let interval_timer_novel = setInterval(getStatusNovel, 90000);
 let is_get_status = false;
-let is_get_status_novel = false;
 let is_api_button_press = false;
-let is_api_button_press_novel = false;
 let api_use_mancer_webui = false;
 
 let is_send_press = false; //Send generation
@@ -856,9 +827,6 @@ var swipes = true;
 let extension_prompts = {};
 
 var main_api; // = "kobold";
-//novel settings
-export let novelai_settings;
-export let novelai_setting_names;
 let abortController;
 
 //css
@@ -902,18 +870,13 @@ function checkOnlineStatus() {
     if (online_status == "no_connection") {
         $("#online_status_indicator2").css("background-color", "red"); //Kobold
         $("#online_status_text2").html("No connection...");
-        $("#online_status_indicator3").css("background-color", "red"); //Novel
-        $("#online_status_text3").html("No connection...");
         $(".online_status_indicator4").css("background-color", "red"); //OAI / ooba
         $(".online_status_text4").html("No connection...");
         is_get_status = false;
-        is_get_status_novel = false;
         setOpenAIOnlineStatus(false);
     } else {
         $("#online_status_indicator2").css("background-color", "green"); //kobold
         $("#online_status_text2").html(online_status);
-        $("#online_status_indicator3").css("background-color", "green"); //novel
-        $("#online_status_text3").html(online_status);
         $(".online_status_indicator4").css("background-color", "green"); //OAI / ooba
         $(".online_status_text4").html(online_status);
     }
@@ -1001,7 +964,7 @@ async function getStatus() {
             },
         });
     } else {
-        if (is_get_status_novel != true && is_get_status_openai != true) {
+        if (is_get_status_openai != true) {
             online_status = "no_connection";
         }
     }
@@ -2129,7 +2092,6 @@ function isStreamingEnabled() {
             (main_api == "kobold" &&
                 kai_settings.streaming_kobold &&
                 kai_settings.can_use_streaming) ||
-            (main_api == "novel" && nai_settings.streaming_novel) ||
             (main_api == "textgenerationwebui" &&
                 textgenerationwebui_settings.streaming)) &&
         !isMultigenEnabled()
@@ -3198,19 +3160,6 @@ async function Generate(
                     isImpersonate,
                 );
                 generate_data.use_mancer = api_use_mancer_webui;
-            } else if (main_api == "novel") {
-                const this_settings =
-                    novelai_settings[
-                        novelai_setting_names[
-                            nai_settings.preset_settings_novel
-                        ]
-                    ];
-                generate_data = getNovelGenerationData(
-                    finalPromt,
-                    this_settings,
-                    this_amount_gen,
-                    isImpersonate,
-                );
             } else if (main_api == "openai") {
                 let [prompt, counts] = await prepareOpenAIMessages({
                     systemPrompt: systemPrompt,
@@ -3314,15 +3263,6 @@ async function Generate(
                         generate_data,
                         streamingProcessor.abortController.signal,
                     );
-            } else if (
-                main_api == "novel" &&
-                isStreamingEnabled() &&
-                type !== "quiet"
-            ) {
-                streamingProcessor.generator = await generateNovelWithStreaming(
-                    generate_data,
-                    streamingProcessor.abortController.signal,
-                );
             } else if (
                 main_api == "kobold" &&
                 isStreamingEnabled() &&
@@ -3756,34 +3696,6 @@ function getMaxContextSize() {
     if (main_api == "kobold" || main_api == "textgenerationwebui") {
         this_max_context = max_context - amount_gen;
     }
-    if (main_api == "novel") {
-        this_max_context = Number(max_context);
-        if (
-            nai_settings.model_novel == "krake-v2" ||
-            nai_settings.model_novel == "euterpe-v2"
-        ) {
-            this_max_context = Math.min(max_context, 2048);
-        }
-        if (nai_settings.model_novel == "clio-v1") {
-            this_max_context = Math.min(max_context, 8192);
-        }
-        if (nai_settings.model_novel == "kayra-v1") {
-            this_max_context = Math.min(max_context, 8192);
-
-            const subscriptionLimit = getKayraMaxContextTokens();
-            if (
-                typeof subscriptionLimit === "number" &&
-                this_max_context > subscriptionLimit
-            ) {
-                this_max_context = subscriptionLimit;
-                console.log(
-                    `NovelAI subscription limit reached. Max context size is now ${this_max_context}`,
-                );
-            }
-        }
-
-        this_max_context = this_max_context - amount_gen;
-    }
     if (main_api == "openai") {
         this_max_context = oai_settings.openai_max_context;
     }
@@ -3809,8 +3721,7 @@ function parseTokenCounts(counts, thisPromptBits) {
 }
 
 function addChatsPreamble(mesSendString) {
-    const preamble = main_api === "novel" ? nai_settings.preamble : "";
-    return preamble + "\n" + mesSendString;
+    return "\n" + mesSendString;
 }
 
 function addChatsSeparator(mesSendString) {
@@ -3824,8 +3735,6 @@ function addChatsSeparator(mesSendString) {
     // if chat start formatting is disabled
     else if (power_user.disable_start_formatting) {
         mesSendString = mesSendString;
-    } else if (main_api === "novel") {
-        mesSendString = "\n***\n" + mesSendString;
     }
 
     // add non-pygma dingus
@@ -4392,8 +4301,6 @@ function getGenerateUrl() {
         generate_url = "/generate";
     } else if (main_api == "textgenerationwebui") {
         generate_url = "/generate_textgenerationwebui";
-    } else if (main_api == "novel") {
-        generate_url = "/generate_novelai";
     }
     return generate_url;
 }
@@ -4470,8 +4377,6 @@ function extractMessageFromData(data) {
             return data.results[0].text;
         case "textgenerationwebui":
             return data.results[0].text;
-        case "novel":
-            return data.output;
         case "openai":
             return data;
         default:
@@ -4743,9 +4648,6 @@ function getGeneratingModel(mes) {
         case "kobold":
             model = online_status;
             break;
-        case "novel":
-            model = nai_settings.model_novel;
-            break;
         case "openai":
             model = getChatCompletionModel();
             break;
@@ -4768,9 +4670,7 @@ function extractImageFromMessage(getMessage) {
 export function isMultigenEnabled() {
     return (
         power_user.multigen &&
-        (main_api == "textgenerationwebui" ||
-            main_api == "kobold" ||
-            main_api == "novel")
+        (main_api == "textgenerationwebui" || main_api == "kobold")
     );
 }
 
@@ -4822,13 +4722,6 @@ function setEditedMessageId(value) {
 
 function setSendButtonState(value) {
     is_send_press = value;
-}
-
-function resultCheckStatusNovel() {
-    is_api_button_press_novel = false;
-    checkOnlineStatus();
-    $("#api_loading_novel").css("display", "none");
-    $("#api_button_novel").css("display", "inline-block");
 }
 
 async function renameCharacter() {
@@ -5210,14 +5103,6 @@ function changeMainAPI() {
             maxContextElem: $("#max_context_block"),
             amountGenElem: $("#amount_gen_block"),
         },
-        novel: {
-            apiSettings: $("#novel_api-settings"),
-            apiConnector: $("#novel_api"),
-            apiPresets: $("#novel_api-presets"),
-            apiRanges: $("#range_block_novel"),
-            maxContextElem: $("#max_context_block"),
-            amountGenElem: $("#amount_gen_block"),
-        },
         openai: {
             apiSettings: $("#openai_settings"),
             apiConnector: $("#openai_api"),
@@ -5256,8 +5141,8 @@ function changeMainAPI() {
         activeItem.apiPresets.css("display", "flex");
     }
 
-    if (selectedVal === "textgenerationwebui" || selectedVal === "novel") {
-        console.log("enabling amount_gen for ooba/novel");
+    if (selectedVal === "textgenerationwebui") {
+        console.log("enabling amount_gen for ooba");
         activeItem.amountGenElem.find("input").prop("disabled", false);
         activeItem.amountGenElem.css("opacity", 1.0);
     }
@@ -5916,24 +5801,7 @@ async function getSettings(type) {
                 selectKoboldGuiPreset();
             }
         }
-
-        novelai_setting_names = data.novelai_setting_names;
-        novelai_settings = data.novelai_settings;
-        novelai_settings.forEach(function (item, i, arr) {
-            novelai_settings[i] = JSON.parse(item);
-        });
         arr_holder = {};
-
-        $("#settings_perset_novel").empty();
-
-        novelai_setting_names.forEach(function (item, i, arr) {
-            arr_holder[item] = i;
-            $("#settings_perset_novel").append(
-                `<option value=${i}>${item}</option>`,
-            );
-        });
-        novelai_setting_names = {};
-        novelai_setting_names = arr_holder;
 
         //Load AI model config settings
 
@@ -5948,14 +5816,6 @@ async function getSettings(type) {
 
         // Kobold
         loadKoboldSettings(settings.kai_settings ?? settings);
-
-        // Novel
-        loadNovelSettings(settings.nai_settings ?? settings);
-        $(
-            `#settings_perset_novel option[value=${
-                novelai_setting_names[nai_settings.preset_settings_novel]
-            }]`,
-        ).attr("selected", "true");
 
         // TextGen
         loadTextGenSettings(data, settings);
@@ -6071,7 +5931,6 @@ async function saveSettings(type) {
                 context_settings: context_settings,
                 tags: tags,
                 tag_map: tag_map,
-                nai_settings: nai_settings,
                 kai_settings: kai_settings,
                 ...oai_settings,
             },
@@ -6356,42 +6215,6 @@ export async function displayPastChats() {
                     .find(".select_chat_block:last")
                     .attr("highlight", true);
             }
-        }
-    }
-}
-
-//************************************************************
-//************************Novel.AI****************************
-//************************************************************
-async function getStatusNovel() {
-    if (is_get_status_novel) {
-        const data = {};
-
-        jQuery.ajax({
-            type: "POST", //
-            url: "/getstatus_novelai", //
-            data: JSON.stringify(data),
-            beforeSend: function () {},
-            cache: false,
-            dataType: "json",
-            contentType: "application/json",
-            success: function (data) {
-                if (data.error != true) {
-                    setNovelData(data);
-                    online_status = `${getNovelTier(data.tier)}`;
-                }
-                resultCheckStatusNovel();
-            },
-            error: function (jqXHR, exception) {
-                online_status = "no_connection";
-                console.log(exception);
-                console.log(jqXHR);
-                resultCheckStatusNovel();
-            },
-        });
-    } else {
-        if (is_get_status != true && is_get_status_openai != true) {
-            online_status = "no_connection";
         }
     }
 }
@@ -8102,9 +7925,7 @@ function connectAPISlash(_, text) {
         kobold: {
             button: "#api_button",
         },
-        novel: {
-            button: "#api_button_novel",
-        },
+
         ooba: {
             button: "#api_button_textgenerationwebui",
         },
@@ -8397,7 +8218,7 @@ $(document).ready(function () {
         "api",
         connectAPISlash,
         [],
-        "(kobold, novel, ooba, oai, claude, windowai) – connect to an API",
+        "(kobold, ooba, oai, claude, windowai) – connect to an API",
         true,
         true,
     );
@@ -9426,26 +9247,9 @@ $(document).ready(function () {
         saveSettingsDebounced();
     });
 
-    $("#settings_perset_novel").change(function () {
-        nai_settings.preset_settings_novel = $("#settings_perset_novel")
-            .find(":selected")
-            .text();
-
-        const preset =
-            novelai_settings[
-                novelai_setting_names[nai_settings.preset_settings_novel]
-            ];
-        loadNovelPreset(preset);
-        amount_gen = parseInt($("#amount_gen").val());
-        max_context = parseInt($("#max_context").val());
-
-        saveSettingsDebounced();
-    });
-
     $("#main_api").change(function () {
         is_pygmalion = false;
         is_get_status = false;
-        is_get_status_novel = false;
         setOpenAIOnlineStatus(false);
         online_status = "no_connection";
         checkOnlineStatus();
@@ -9838,27 +9642,6 @@ $(document).ready(function () {
         await reloadCurrentChat();
     });
     //Select chat
-
-    $("#api_button_novel").on("click", async function (e) {
-        e.stopPropagation();
-        const api_key_novel = $("#api_key_novel").val().trim();
-
-        if (api_key_novel.length) {
-            await writeSecret(SECRET_KEYS.NOVEL, api_key_novel);
-        }
-
-        if (!secret_state[SECRET_KEYS.NOVEL]) {
-            console.log("No secret key saved for NovelAI");
-            return;
-        }
-
-        $("#api_loading_novel").css("display", "inline-block");
-        $("#api_button_novel").css("display", "none");
-        is_get_status_novel = true;
-        is_api_button_press_novel = true;
-        // Check near immediately rather than waiting for up to 90s
-        setTimeout(getStatusNovel, 10);
-    });
 
     $(document).on("click", ".bind_user_name", bindUserNameToPersona);
     $(document).on("click", ".delete_avatar", deleteUserAvatar);

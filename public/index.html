@@ -150,17 +150,6 @@
                                     <i data-preset-manager-delete="kobold" class="menu_button fa-solid fa-trash-can" title="Delete the preset" data-i18n="[title]Delete the preset"></i>
                                 </div>
                             </div>
-                            <div id="novel_api-presets">
-                                <h3>
-                                    <span data-i18n="novelaipreserts">NovelAI Presets</span>
-                                    <a href="https://docs.sillytavern.app/usage/api-connections/novelai/" class="notes-link" target="_blank">
-                                        <span class="note-link-span">?</span>
-                                    </a>
-                                </h3>
-                                <select id="settings_perset_novel" data-preset-manager-for="novel">
-                                    <option value="gui" data-i18n="default">Default</option>
-                                </select>
-                            </div>
                             <div id="openai_api-presets">
                                 <div>
                                     <h4><span data-i18n="openaipresets">Chat Completion Presets</span></h4>
@@ -308,124 +297,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="range_block_novel">
-                                <div class="range-block">
-                                    <label class="checkbox_label widthFreeExpand">
-                                        <input id="streaming_novel" type="checkbox" />
-                                        <span data-i18n="Streaming">Streaming</span>
-                                    </label>
-                                    <div class="toggle-description justifyLeft">
-                                        <span data-i18n="Display the response bit by bit as it is generated.">
-                                            Display the response bit by bit as it is generated.</span><br>
-                                        <span data-i18n="When this is off, responses will be displayed all at once when they are complete.">
-                                            When this is off, responses will be displayed all at once when they are complete.
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="range-block-title" data-i18n="temperature">
-                                    Temperature
-                                </div>
-                                <div class="range-block-range-and-counter">
-                                    <div class="range-block-range">
-                                        <input type="range" id="temp_novel" name="volume" min="0.1" max="2.50" step="0.01">
-                                    </div>
-                                    <div class="range-block-counter">
-                                        <div contenteditable="true" data-for="temp_novel" id="temp_counter_novel">
-                                            select
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="rep.pen">
-                                        Rep. Pen.
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="rep_pen_novel" name="volume" min="1" max="8" step="0.05">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="rep_pen_novel" id="rep_pen_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Rep. Pen. Range.">
-                                        Rep. Pen. Range.
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="rep_pen_size_novel" name="volume" min="0" max="2048" step="1">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="rep_pen_size_novel" id="rep_pen_size_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Rep. Pen. Slope">
-                                        Rep. Pen. Slope
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="rep_pen_slope_novel" name="volume" min="0.01" max="10" step="0.01">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="rep_pen_slope_novel" id="rep_pen_slope_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Rep. Pen. Freq.">
-                                        Rep. Pen. Freq.
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="rep_pen_freq_novel" name="volume" min="0" max="1" step="0.01">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="rep_pen_freq_novel" id="rep_pen_freq_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Rep. Pen. Presence">
-                                        Rep. Pen. Presence
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="rep_pen_presence_novel" name="volume" min="0" max="1" step="0.01">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="rep_pen_presence_novel" id="rep_pen_presence_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Tail Free Sampling">
-                                        Tail Free Sampling
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="tail_free_sampling_novel" name="volume" min="0" max="1" step="0.001">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="tail_free_sampling_novel" id="tail_free_sampling_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    
                             <div id="range_block_textgenerationwebui">
                                 <div class="range-block">
                                     <div class="range-block-title" data-i18n="temperature">
@@ -833,172 +705,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="novel_api-settings">
-                                <div class="range-block">
-                                    <div class="range-block-title openai_restorable">
-                                        <span data-i18n="Preamble">Preamble</span>
-                                        <div id="nai_preamble_restore" title="Restore default prompt" data-i18n="[title]Restore default prompt" class="right_menu_button">
-                                            <div class="fa-solid fa-clock-rotate-left "></div>
-                                        </div>
-                                    </div>
-                                    <div class="toggle-description justifyLeft" data-i18n="Use style tags to modify the writing style of the output">
-                                        Use style tags to modify the writing style of the output
-                                    </div>
-                                    <div class="wide100p">
-                                        <textarea id="nai_preamble_textarea" class="text_pole textarea_compact" name="nai_preamble" rows="2" placeholder=""></textarea>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Top P">
-                                        Top P
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="top_p_novel" name="volume" min="0" max="1" step="0.01">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="top_p_novel" id="top_p_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Top A">
-                                        Top A
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="top_a_novel" name="volume" min="0" max="1" step="0.01">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="top_a_novel" id="top_a_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Top K">
-                                        Top K
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="top_k_novel" name="volume" min="0" max="300" step="1">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="top_k_novel" id="top_k_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Top G">
-                                        Top G
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="top_g_novel" name="volume" min="0" max="20" step="1">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="top_g_novel" id="top_g_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Mirostat Tau">
-                                        Mirostat Tau
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="mirostat_tau_novel" name="volume" min="0" max="6" step="0.01">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="mirostat_tau_novel" id="mirostat_tau_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Mirostat LR">
-                                        Mirostat LR
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="mirostat_lr_novel" name="volume" min="0" max="1" step="0.01">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="mirostat_lr_novel" id="mirostat_lr_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Typical P">
-                                        Typical P
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="typical_p_novel" name="volume" min="0" max="1" step="0.01">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="typical_p_novel" id="typical_p_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="CFG Scale">
-                                        CFG Scale
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="cfg_scale_novel" name="volume" min="1" max="3" step="0.05">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="cfg_scale_novel" id="cfg_scale_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Phrase Repetition Penalty">
-                                        Phrase Repetition Penalty
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="phrase_rep_pen_novel" name="volume" min="0" max="5" step="1">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="phrase_rep_pen_novel" id="phrase_rep_pen_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="range-block">
-                                    <div class="range-block-title" data-i18n="Min Length">
-                                        Min Length
-                                    </div>
-                                    <div class="range-block-range-and-counter">
-                                        <div class="range-block-range">
-                                            <input type="range" id="min_length_novel" name="volume" min="0" max="1024" step="1">
-                                        </div>
-                                        <div class="range-block-counter">
-                                            <div contenteditable="true" data-for="min_length_novel" id="min_length_counter_novel">
-                                                select
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            
                             <div id="textgenerationwebui_api-settings">
                                 <div class="range-block">
                                     <div class="range-block-title" data-i18n="Top K">
@@ -1497,7 +1204,6 @@
                         <select id="main_api">
                             <option value="kobold"><span data-i18n="KoboldAI">KoboldAI</span></option>
                             <option value="textgenerationwebui"><span data-i18n="Text Gen WebUI (ooba)">Text Gen WebUI (ooba)</span></option>
-                            <option value="novel"><span data-i18n="NovelAI">NovelAI</span></option>
                             <option value="openai"><span data-i18n="Chat Completion (OpenAI, Claude, Window/OpenRouter, Scale)">Chat Completion (OpenAI, Claude, Window, OpenRouter, Scale)</span></option>
                         </select>
                     </div>
@@ -1516,46 +1222,7 @@
                             </div>
                         </form>
                     </div>
-                    <div id="novel_api" style="display: none;position: relative;"> <!-- shows the novel settings -->
-                        <form action="javascript:void(null);" method="post" enctype="multipart/form-data">
-
-                            <h4 data-i18n="Novel API key">Novel API key</h4>
-                            <span>
-                                <ol>
-                                    <li>
-                                        <a href="https://docs.sillytavern.app/usage/api-connections/novelai/" class="notes-link" target="_blank"> <span data-i18n="Get your NovelAI API Key">Get your NovelAI API key</span></a>
-                                    </li>
-                                    <li><span data-i18n="Enter it in the box below">Enter it in the box below:</span>
-                                    </li>
-                                </ol>
-                            </span>
-                            <div class="flex-container">
-                                <input id="api_key_novel" name="api_key_novel" class="text_pole flex1 wide100p" maxlength="500" size="35" type="text" autocomplete="off">
-                                <div title="Clear your API key" data-i18n="[title]Clear your API key" class="menu_button fa-solid fa-circle-xmark clear-api-key" data-key="api_key_novel">
-                                </div>
-                            </div>
-                            <div data-for="api_key_novel" class="neutral_warning" data-i18n="For privacy reasons, your API key will be hidden after you reload the page.">
-                                For privacy reasons, your API key will be hidden after you reload the page.
-                            </div>
-                            <input id="api_button_novel" class="menu_button" type="submit" value="Connect">
-                            <div id="api_loading_novel" class="api-load-icon fa-solid fa-hourglass fa-spin"></div>
-                            <h4><span data-i18n="Novel AI Model">Novel AI Model</span>
-                                <a href="https://docs.sillytavern.app/usage/api-connections/novelai/#models" class="notes-link" target="_blank">
-                                    <span class="note-link-span">?</span>
-                                </a>
-                            </h4>
-                            <select id="model_novel_select">
-                                <option value="euterpe-v2">Euterpe</option>
-                                <option value="krake-v2">Krake</option>
-                                <option value="clio-v1">Clio</option>
-                                <option value="kayra-v1">Kayra</option>
-                            </select>
-                        </form>
-                        <div id="online_status3">
-                            <div id="online_status_indicator3"></div>
-                            <div id="online_status_text3" data-i18n="No connection...">No connection...</div>
-                        </div>
-                    </div>
+                    
                     <div id="textgenerationwebui_api" style="display: none;position: relative;">
                         <form action="javascript:void(null);" method="post" enctype="multipart/form-data">
                             If you are using:
@@ -1972,9 +1639,7 @@
                                 <option value="1">GPT-3 (OpenAI)</option>
                                 <option value="2">GPT-3 (Alternative / Classic)</option>
                                 <option value="3">Sentencepiece (LLaMA)</option>
-                                <option value="4">NerdStash (NovelAI Clio)</option>
-                                <option value="5">NerdStash v2 (NovelAI Kayra)</option>
-                                <option value="6">API (WebUI)</option>
+                                <option value="4">API (WebUI)</option>
                             </select>
                         </div>
                         <div class="range-block">
@@ -2031,9 +1696,6 @@
                                 </span>
                             </label>
                             <h4>
-                                <span data-i18n="Custom Stopping Strings">
-                                    Custom Stopping Strings (KoboldAI/TextGen/NovelAI)
-                                </span>
                                 <div>
                                     <small>
                                         <span data-i18n="JSON serialized array of strings">JSON serialized array of strings, for example:</span><br>

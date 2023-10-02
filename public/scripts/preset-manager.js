@@ -9,9 +9,6 @@ import {
     koboldai_settings,
     main_api,
     max_context,
-    nai_settings,
-    novelai_setting_names,
-    novelai_settings,
     saveSettingsDebounced,
     this_chid,
 } from "../script.js";
@@ -151,10 +148,7 @@ class PresetManager {
                 presets = koboldai_settings;
                 preset_names = koboldai_setting_names;
                 break;
-            case "novel":
-                presets = novelai_settings;
-                preset_names = novelai_setting_names;
-                break;
+
             case "textgenerationwebui":
                 presets = textgenerationwebui_presets;
                 preset_names = textgenerationwebui_preset_names;
@@ -219,8 +213,6 @@ class PresetManager {
             switch (apiId) {
                 case "kobold":
                     return kai_settings;
-                case "novel":
-                    return nai_settings;
                 case "textgenerationwebui":
                     return textgenerationwebui_settings;
                 default:

@@ -3,7 +3,6 @@ import { callPopup, getRequestHeaders } from "../script.js";
 export const SECRET_KEYS = {
     MANCER: "api_key_mancer",
     OPENAI: "api_key_openai",
-    NOVEL: "api_key_novel",
     CLAUDE: "api_key_claude",
     OPENROUTER: "api_key_openrouter",
     SCALE: "api_key_scale",
@@ -12,7 +11,6 @@ export const SECRET_KEYS = {
 const INPUT_MAP = {
     [SECRET_KEYS.MANCER]: "#api_key_mancer",
     [SECRET_KEYS.OPENAI]: "#api_key_openai",
-    [SECRET_KEYS.NOVEL]: "#api_key_novel",
     [SECRET_KEYS.CLAUDE]: "#api_key_claude",
     [SECRET_KEYS.OPENROUTER]: "#api_key_openrouter",
     [SECRET_KEYS.SCALE]: "#api_key_scale",
