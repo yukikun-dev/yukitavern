@@ -201,7 +201,6 @@
         "expressions": {
             "showDefault": false
         },
-        "dice": {},
         "regex": [],
         "tts": {
             "voiceMap": "",
