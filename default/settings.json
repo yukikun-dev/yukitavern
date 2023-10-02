@@ -243,12 +243,6 @@
             "character_prompts": {}
         },
         "chromadb": {},
-        "translate": {
-            "target_language": "en",
-            "internal_language": "en",
-            "provider": "google",
-            "auto_mode": "none"
-        },
         "objective": {
             "customPrompts": {
                 "default": {
