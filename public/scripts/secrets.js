@@ -41,7 +41,7 @@ async function viewSecrets() {
 
     if (response.status == 403) {
         callPopup(
-            "<h3>Forbidden</h3><p>To view your API keys here, set the value of allowKeysExposure to true in config.conf file and restart the SillyTavern server.</p>",
+            "<h3>Forbidden</h3><p>To view your API keys here, set the value of allowKeysExposure to true in config.conf file and restart the yukitavern server.</p>",
             "text",
         );
         return;

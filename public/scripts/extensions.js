@@ -88,7 +88,7 @@ const extension_settings = {
 let modules = [];
 let activeExtensions = new Set();
 
-const getContext = () => window["SillyTavern"].getContext();
+const getContext = () => window["yukitavern"].getContext();
 const getApiUrl = () => extension_settings.apiUrl;
 let connectedToApi = false;
 

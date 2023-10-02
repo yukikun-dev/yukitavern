@@ -26,7 +26,7 @@ import {
 export { MODULE_NAME };
 
 const MODULE_NAME = "chromadb";
-const dbStore = new IndexedDBStore("SillyTavern", MODULE_NAME);
+const dbStore = new IndexedDBStore("yukitavern", MODULE_NAME);
 
 const defaultSettings = {
     strategy: "original",

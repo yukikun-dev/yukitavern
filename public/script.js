@@ -235,7 +235,7 @@ export {
 };
 
 // API OBJECT FOR EXTERNAL WIRING
-window["SillyTavern"] = {};
+window["yukitavern"] = {};
 
 // Event source init
 export const event_types = {
@@ -274,10 +274,10 @@ console.debug("initializing Prompt Itemization Array on Startup");
 let itemizedPrompts = [];
 
 /* let bg_menu_toggle = false; */
-export const systemUserName = "SillyTavern System";
+export const systemUserName = "yukitavern System";
 let default_user_name = "User";
 let name1 = default_user_name;
-let name2 = "SillyTavern System";
+let name2 = "yukitavern System";
 let chat = [];
 let safetychat = [
     {
@@ -382,7 +382,7 @@ const system_messages = {
             <li><a href="#" data-displayHelp="3">Hotkeys</a> (or <tt>/help hotkeys</tt>)</li>
             <li><a href="#" data-displayHelp="4">{{Macros}}</a> (or <tt>/help macros</tt>)</li>
             </ul>
-            <br><b>Still got questions left? The <a target="_blank" href="https://docs.sillytavern.app/">Official SillyTavern Documentation Website</a> has much more information!</b>`,
+            <br><b>Still got questions left? The <a target="_blank" href="https://docs.yukitavern.app/">Official yukitavern Documentation Website</a> has much more information!</b>`,
     },
     slash_commands: {
         name: systemUserName,
@@ -488,17 +488,17 @@ this
         is_system: true,
         is_name: true,
         mes: [
-            '<h3><span id="version_display_welcome">SillyTavern</span><div id="version_display_welcome"></div></h3>',
-            "<a href='https://docs.sillytavern.app/usage/update/' target='_blank'>Want to update?</a>",
+            '<h3><span id="version_display_welcome">yukitavern</span><div id="version_display_welcome"></div></h3>',
+            "<a href='https://docs.yukitavern.app/usage/update/' target='_blank'>Want to update?</a>",
             "<hr>",
             "<h3>How to start chatting?</h3>",
             "<ol>",
-            '<li>Click <code><i class="fa-solid fa-plug"></i></code> and select a <a href="https://docs.sillytavern.app/usage/api-connections/" target_"blank">Chat API</a>.</li>',
+            '<li>Click <code><i class="fa-solid fa-plug"></i></code> and select a <a href="https://docs.yukitavern.app/usage/api-connections/" target_"blank">Chat API</a>.</li>',
             '<li>Click <code><i class="fa-solid fa-address-card"></i></code> and pick a character</li>',
             "</ol>",
             "<hr>",
             "<h3>Want more characters?</h3>",
-            "<i>Not controlled by SillyTavern team.</i>",
+            "<i>Not controlled by yukitavern team.</i>",
             "<ul>",
             '<li><a target="_blank" href="https://discord.gg/pygmalionai">Pygmalion AI Discord</a></li>',
             '<li><a target="_blank" href="https://chub.ai/">Chub (NSFW)</a></li>',
@@ -508,17 +508,17 @@ this
             "<ul>",
             '<li><span class="note-link-span">?</span> - click these icons!</li>',
             "<li>Enter <code>/?</code> in the chat bar</li>",
-            '<li><a target="_blank" href="https://docs.sillytavern.app/">SillyTavern Documentation Site</a></li>',
-            '<li><a target="_blank" href="https://docs.sillytavern.app/extras/installation/">Extras Installation Guide</a></li>',
+            '<li><a target="_blank" href="https://docs.yukitavern.app/">yukitavern Documentation Site</a></li>',
+            '<li><a target="_blank" href="https://docs.yukitavern.app/extras/installation/">Extras Installation Guide</a></li>',
 
             "</ul>",
 
             "<hr>",
             "<h3>Still have questions?</h3 > ",
             "<ul>",
-            '<li><a target="_blank" href="https://discord.gg/RZdyAEUPvj">Join the SillyTavern Discord</a></li>',
-            '<li><a target="_blank" href="https://github.com/SillyTavern/SillyTavern/issues">Post a GitHub issue</a></li>',
-            '<li><a target="_blank" href="https://github.com/SillyTavern/SillyTavern#questions-or-suggestions">Contact the developers</a></li>',
+            '<li><a target="_blank" href="https://discord.gg/RZdyAEUPvj">Join the yukitavern Discord</a></li>',
+            '<li><a target="_blank" href="https://github.com/yukitavern/yukitavern/issues">Post a GitHub issue</a></li>',
+            '<li><a target="_blank" href="https://github.com/yukitavern/yukitavern#questions-or-suggestions">Contact the developers</a></li>',
         ].join(""),
     },
     group: {
@@ -568,7 +568,7 @@ $(document).ajaxError(function myErrorHandler(_, xhr) {
     if (xhr.status == 403) {
         toastr.warning(
             "doubleCsrf errors in console are NORMAL in this case. If you want to run ST in multiple tabs, start the server with --disableCsrf option.",
-            "Looks like you've opened SillyTavern in another browser tab",
+            "Looks like you've opened yukitavern in another browser tab",
             { timeOut: 0, extendedTimeOut: 0, preventDuplicates: true },
         );
     }
@@ -579,7 +579,7 @@ async function getClientVersion() {
         const response = await fetch("/version");
         const data = await response.json();
         CLIENT_VERSION = data.agent;
-        let displayVersion = `SillyTavern ${data.pkgVersion}`;
+        let displayVersion = `yukitavern ${data.pkgVersion}`;
 
         if (data.gitRevision && data.gitBranch) {
             displayVersion += ` '${data.gitBranch}'(${data.gitRevision})`;
@@ -7237,7 +7237,7 @@ async function createOrEditCharacter(e) {
     }
 }
 
-window["SillyTavern"].getContext = function () {
+window["yukitavern"].getContext = function () {
     return {
         chat: chat,
         characters: characters,
@@ -9553,7 +9553,7 @@ $(document).ready(function () {
 
         if (selected_group && file.name.endsWith(".json")) {
             toastr.warning(
-                "Only SillyTavern's own format is supported for group chat imports. Sorry!",
+                "Only yukitavern's own format is supported for group chat imports. Sorry!",
             );
             return;
         }

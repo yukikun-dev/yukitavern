@@ -97,7 +97,7 @@ class StreamingSttProvider {
         if (!modules.includes("streaming-stt")) {
             console.debug(
                 DEBUG_PREFIX +
-                    "Module streaming-stt must be activated in Sillytavern Extras for streaming user voice.",
+                    "Module streaming-stt must be activated in yukitavern Extras for streaming user voice.",
             );
             return "";
         }

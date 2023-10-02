@@ -409,7 +409,7 @@ function onSttProviderChange() {
 function onSttProviderSettingsInput() {
     sttProvider.onSettingsChange();
 
-    // Persist changes to SillyTavern stt extension settings
+    // Persist changes to yukitavern stt extension settings
     extension_settings.speech_recognition[sttProviderName] =
         sttProvider.settings;
     saveSettingsDebounced();

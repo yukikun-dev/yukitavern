@@ -404,14 +404,14 @@ app.use(function (req, res, next) {
         console.log(
             "Forbidden: Connection attempt from " +
                 clientIp +
-                ". If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of SillyTavern folder.\n",
+                ". If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of yukitavern folder.\n",
         );
         return res
             .status(403)
             .send(
                 "<b>Forbidden</b>: Connection attempt from <b>" +
                     clientIp +
-                    "</b>. If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of SillyTavern folder.",
+                    "</b>. If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of yukitavern folder.",
             );
     }
     next();
@@ -906,7 +906,7 @@ function getVersion() {
         // suppress exception
     }
 
-    const agent = `SillyTavern:${pkgVersion}:Cohee#1207`;
+    const agent = `yukitavern:${pkgVersion}:Cohee#1207`;
     return { agent, pkgVersion, gitRevision, gitBranch };
 }
 
@@ -2146,7 +2146,6 @@ app.post(
 
                     if (jsonData.spec !== undefined) {
                         console.log("importing from v2 json");
-                        importRisuSprites(jsonData);
                         unsetFavFlag(jsonData);
                         jsonData = readFromV2(jsonData);
                         png_name = getPngName(
@@ -2276,7 +2275,6 @@ app.post(
 
                     if (jsonData.spec !== undefined) {
                         console.log("Found a v2 character file.");
-                        importRisuSprites(jsonData);
                         unsetFavFlag(jsonData);
                         jsonData = readFromV2(jsonData);
                         let char = JSON.stringify(jsonData);
@@ -3886,7 +3884,7 @@ const setupTasks = async function () {
     const version = getVersion();
 
     console.log(
-        `SillyTavern ${version.pkgVersion}` +
+        `yukitavern ${version.pkgVersion}` +
             (version.gitBranch
                 ? ` '${version.gitBranch}' (${version.gitRevision})`
                 : ""),
@@ -3920,11 +3918,11 @@ const setupTasks = async function () {
     console.log("Launching...");
 
     if (autorun) open(autorunUrl.toString());
-    console.log("SillyTavern is listening on: " + tavernUrl);
+    console.log("yukitavern is listening on: " + tavernUrl);
 
     if (listen) {
         console.log(
-            "\n0.0.0.0 means SillyTavern is listening on all network interfaces (Wi-Fi, LAN, localhost). If you want to limit it only to internal localhost (127.0.0.1), change the setting in config.conf to “listen=false”\n",
+            "\n0.0.0.0 means yukitavern is listening on all network interfaces (Wi-Fi, LAN, localhost). If you want to limit it only to internal localhost (127.0.0.1), change the setting in config.conf to “listen=false”\n",
         );
     }
 };
@@ -3936,7 +3934,7 @@ if (listen && !config.whitelistMode && !config.basicAuthMode) {
         );
     else {
         console.error(
-            "Your SillyTavern is currently unsecurely open to the public. Enable whitelisting or basic authentication.",
+            "Your yukitavern is currently unsecurely open to the public. Enable whitelisting or basic authentication.",
         );
         process.exit(1);
     }
@@ -4268,7 +4266,7 @@ async function downloadChubLorebook(id) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             fullPath: id,
-            format: "SILLYTAVERN",
+            format: "yukitavern",
         }),
     });
 
@@ -4349,71 +4347,6 @@ function parseChubUrl(str) {
     }
 
     return null;
-}
-
-function importRisuSprites(data) {
-    try {
-        const name = data?.data?.name;
-        const risuData = data?.data?.extensions?.risuai;
-
-        // Not a Risu AI character
-        if (!risuData || !name) {
-            return;
-        }
-
-        let images = [];
-
-        if (Array.isArray(risuData.additionalAssets)) {
-            images = images.concat(risuData.additionalAssets);
-        }
-
-        if (Array.isArray(risuData.emotions)) {
-            images = images.concat(risuData.emotions);
-        }
-
-        // No sprites to import
-        if (images.length === 0) {
-            return;
-        }
-
-        // Create sprites folder if it doesn't exist
-        const spritesPath = path.join(directories.characters, name);
-        if (!fs.existsSync(spritesPath)) {
-            fs.mkdirSync(spritesPath);
-        }
-
-        // Path to sprites is not a directory. This should never happen.
-        if (!fs.statSync(spritesPath).isDirectory()) {
-            return;
-        }
-
-        console.log(
-            `RisuAI: Found ${images.length} sprites for ${name}. Writing to disk.`,
-        );
-        const files = fs.readdirSync(spritesPath);
-
-        outer: for (const [label, fileBase64] of images) {
-            // Remove existing sprite with the same label
-            for (const file of files) {
-                if (path.parse(file).name === label) {
-                    console.log(
-                        `RisuAI: The sprite ${label} for ${name} already exists. Skipping.`,
-                    );
-                    continue outer;
-                }
-            }
-
-            const filename = label + ".png";
-            const pathToFile = path.join(spritesPath, filename);
-            fs.writeFileSync(pathToFile, fileBase64, { encoding: "base64" });
-        }
-
-        // Remove additionalAssets and emotions from data (they are now in the sprites folder)
-        delete data.data.extensions.risuai.additionalAssets;
-        delete data.data.extensions.risuai.emotions;
-    } catch (error) {
-        console.error(error);
-    }
 }
 
 function writeSecret(key, value) {

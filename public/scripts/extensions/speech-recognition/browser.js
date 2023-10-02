@@ -161,7 +161,7 @@ class BrowserSttProvider {
             );
             $("#microphone_button").hide();
             toastr.error(
-                "Speech recognition is not supported in this browser, use another browser or another provider of SillyTavern-extras Speech recognition extension.",
+                "Speech recognition is not supported in this browser, use another browser or another provider of yukitavern-extras Speech recognition extension.",
                 "Speech recognition activation Failed (Browser)",
                 {
                     timeOut: 10000,

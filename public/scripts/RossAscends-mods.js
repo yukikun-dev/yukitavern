@@ -400,7 +400,7 @@ export function RA_CountCharTokens() {
                 </small>
                 <i title='Click for stats!' class="fa-solid fa-circle-info rm_stats_button"></i>
             </div>
-            <div id="chartokenwarning" class="menu_button margin0 whitespacenowrap"><a href="https://docs.sillytavern.app/usage/core-concepts/characterdesign/#character-tokens" target="_blank">About Token 'Limits'</a></div>
+            <div id="chartokenwarning" class="menu_button margin0 whitespacenowrap"><a href="https://docs.yukitavern.app/usage/core-concepts/characterdesign/#character-tokens" target="_blank">About Token 'Limits'</a></div>
         </div>`);
     } //warn if either are over 1024
     $(".rm_stats_button").on("click", function () {

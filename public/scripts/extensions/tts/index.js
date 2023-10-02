@@ -695,7 +695,7 @@ function onTtsProviderChange() {
 function onTtsProviderSettingsInput() {
     ttsProvider.onSettingsChange();
 
-    // Persist changes to SillyTavern tts extension settings
+    // Persist changes to yukitavern tts extension settings
 
     extension_settings.tts[ttsProviderName] = ttsProvider.setttings;
     saveSettingsDebounced();
