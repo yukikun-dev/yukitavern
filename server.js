@@ -153,8 +153,6 @@ let main_api = "kobold";
 
 let characters = {};
 let response_dw_bg;
-let response_getstatus;
-let first_run = true;
 
 function get_mancer_headers() {
     const api_key_mancer = readSecret(SECRET_KEYS.MANCER);
@@ -170,7 +168,7 @@ function get_mancer_headers() {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const { SentencePieceProcessor, cleanText } = require("sentencepiece-js");
+const { SentencePieceProcessor } = require("sentencepiece-js");
 const { Tokenizer } = require("@mlc-ai/web-tokenizers");
 const CHARS_PER_TOKEN = 3.35;
 
@@ -309,7 +307,6 @@ const AVATAR_WIDTH = 400;
 const AVATAR_HEIGHT = 600;
 const jsonParser = express.json({ limit: "100mb" });
 const urlencodedParser = express.urlencoded({ extended: true, limit: "100mb" });
-const baseRequestArgs = { headers: { "Content-Type": "application/json" } };
 const directories = {
     worlds: "public/worlds/",
     avatars: "public/User Avatars",
@@ -876,11 +873,6 @@ app.post(
             });
     },
 );
-
-const formatApiUrl = (url) =>
-    url.indexOf("localhost") !== -1
-        ? url.replace("localhost", "127.0.0.1")
-        : url;
 
 function getVersion() {
     let pkgVersion = "UNKNOWN";
@@ -1819,7 +1811,7 @@ function sortByModifiedDate(directory) {
         new Date(fs.statSync(`${directory}/${a}`).mtime);
 }
 
-function sortByName(_) {
+function sortByName() {
     return (a, b) => a.localeCompare(b);
 }
 
@@ -3702,11 +3694,7 @@ app.post(
             }
         }
 
-        function handleErrorResponse(
-            response,
-            response_generate_openai,
-            request,
-        ) {
+        function handleErrorResponse(response, response_generate_openai) {
             if (response.status >= 400 && response.status <= 504) {
                 console.log("Error occurred:", response.status, response.data);
                 response_generate_openai.send({ error: true });
@@ -4027,54 +4015,6 @@ else
         setupTasks,
     );
 
-async function convertWebp() {
-    const files = fs
-        .readdirSync(directories.characters)
-        .filter((e) => e.endsWith(".webp"));
-
-    if (!files.length) {
-        return;
-    }
-
-    console.log(`${files.length} WEBP files will be automatically converted.`);
-
-    for (const file of files) {
-        try {
-            const source = path.join(directories.characters, file);
-            const dest = path.join(
-                directories.characters,
-                path.basename(file, ".webp") + ".png",
-            );
-
-            if (fs.existsSync(dest)) {
-                console.log(
-                    `${dest} already exists. Delete ${source} manually`,
-                );
-                continue;
-            }
-
-            console.log(`Read... ${source}`);
-            const data = await charaRead(source);
-
-            console.log(`Convert... ${source} -> ${dest}`);
-            await webp.dwebp(source, dest, "-o");
-
-            console.log(`Write... ${dest}`);
-            const success = await charaWrite(dest, data, path.parse(dest).name);
-
-            if (!success) {
-                console.log(`Failure on ${source} -> ${dest}`);
-                continue;
-            }
-
-            console.log(`Remove... ${source}`);
-            fs.rmSync(source);
-        } catch (err) {
-            console.log(err);
-        }
-    }
-}
-
 function backupSettings() {
     const MAX_BACKUPS = 25;
 
@@ -4191,8 +4131,6 @@ app.post("/readsecretstate", jsonParser, (_, response) => {
         return response.send({});
     }
 });
-
-const ANONYMOUS_KEY = "0000000000";
 
 app.post("/viewsecrets", jsonParser, async (_, response) => {
     if (!allowKeysExposure) {
