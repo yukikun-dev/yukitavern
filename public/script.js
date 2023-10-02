@@ -2031,10 +2031,7 @@ function appendToStoryString(value, prefix) {
 
 function isStreamingEnabled() {
     return (
-        ((main_api == "openai" &&
-            oai_settings.stream_openai &&
-            oai_settings.chat_completion_source !==
-                chat_completion_sources.SCALE) ||
+        ((main_api == "openai" && oai_settings.stream_openai) ||
             (main_api == "kobold" &&
                 kai_settings.streaming_kobold &&
                 kai_settings.can_use_streaming) ||
@@ -4986,13 +4983,6 @@ function changeMainAPI() {
 
     main_api = selectedVal;
     online_status = "no_connection";
-
-    if (
-        main_api == "openai" &&
-        oai_settings.chat_completion_source == chat_completion_sources.WINDOWAI
-    ) {
-        $("#api_button_openai").trigger("click");
-    }
 }
 
 ////////////////////////////////////////////////////
@@ -7767,11 +7757,6 @@ function connectAPISlash(_, text) {
             source: "claude",
             button: "#api_button_openai",
         },
-        windowai: {
-            selected: "openai",
-            source: "windowai",
-            button: "#api_button_openai",
-        },
         openrouter: {
             selected: "openai",
             source: "openrouter",
@@ -8045,7 +8030,7 @@ $(document).ready(function () {
         "api",
         connectAPISlash,
         [],
-        "(kobold, ooba, oai, claude, windowai) – connect to an API",
+        "(kobold, ooba, oai, claude) – connect to an API",
         true,
         true,
     );
