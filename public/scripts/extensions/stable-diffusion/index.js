@@ -165,15 +165,6 @@ const defaultSettings = {
     sampler: "DDIM",
     model: "",
 
-    // Automatic1111/Horde exclusives
-    restore_faces: false,
-    enable_hr: false,
-
-    // Horde settings
-    horde: false,
-    horde_nsfw: false,
-    horde_karras: true,
-
     // Refine mode
     refine_mode: false,
 
@@ -203,9 +194,6 @@ async function loadSettings() {
         .trigger("input");
     $("#sd_width").val(extension_settings.sd.width).trigger("input");
     $("#sd_height").val(extension_settings.sd.height).trigger("input");
-    $("#sd_horde").prop("checked", extension_settings.sd.horde);
-    $("#sd_horde_nsfw").prop("checked", extension_settings.sd.horde_nsfw);
-    $("#sd_horde_karras").prop("checked", extension_settings.sd.horde_karras);
     $("#sd_restore_faces").prop("checked", extension_settings.sd.restore_faces);
     $("#sd_enable_hr").prop("checked", extension_settings.sd.enable_hr);
     $("#sd_refine_mode").prop("checked", extension_settings.sd.refine_mode);
@@ -366,24 +354,6 @@ function onHeightInput() {
     saveSettingsDebounced();
 }
 
-async function onHordeInput() {
-    extension_settings.sd.model = null;
-    extension_settings.sd.sampler = null;
-    extension_settings.sd.horde = !!$(this).prop("checked");
-    saveSettingsDebounced();
-    await Promise.all([loadModels(), loadSamplers()]);
-}
-
-async function onHordeNsfwInput() {
-    extension_settings.sd.horde_nsfw = !!$(this).prop("checked");
-    saveSettingsDebounced();
-}
-
-async function onHordeKarrasInput() {
-    extension_settings.sd.horde_karras = !!$(this).prop("checked");
-    saveSettingsDebounced();
-}
-
 function onRestoreFacesInput() {
     extension_settings.sd.restore_faces = !!$(this).prop("checked");
     saveSettingsDebounced();
@@ -397,10 +367,6 @@ function onHighResFixInput() {
 async function onModelChange() {
     extension_settings.sd.model = $("#sd_model").find(":selected").val();
     saveSettingsDebounced();
-
-    if (!extension_settings.sd.horde) {
-        await updateExtrasRemoteModel();
-    }
 }
 
 async function updateExtrasRemoteModel() {
@@ -421,11 +387,7 @@ async function loadSamplers() {
     $("#sd_sampler").empty();
     let samplers = [];
 
-    if (extension_settings.sd.horde) {
-        samplers = await loadHordeSamplers();
-    } else {
-        samplers = await loadExtrasSamplers();
-    }
+    samplers = await loadExtrasSamplers();
 
     for (const sampler of samplers) {
         const option = document.createElement("option");
@@ -434,20 +396,6 @@ async function loadSamplers() {
         option.selected = sampler === extension_settings.sd.sampler;
         $("#sd_sampler").append(option);
     }
-}
-
-async function loadHordeSamplers() {
-    const result = await fetch("/horde_samplers", {
-        method: "POST",
-        headers: getRequestHeaders(),
-    });
-
-    if (result.ok) {
-        const data = await result.json();
-        return data;
-    }
-
-    return [];
 }
 
 async function loadExtrasSamplers() {
@@ -471,11 +419,7 @@ async function loadModels() {
     $("#sd_model").empty();
     let models = [];
 
-    if (extension_settings.sd.horde) {
-        models = await loadHordeModels();
-    } else {
-        models = await loadExtrasModels();
-    }
+    models = await loadExtrasModels();
 
     for (const model of models) {
         const option = document.createElement("option");
@@ -484,25 +428,6 @@ async function loadModels() {
         option.selected = model.value === extension_settings.sd.model;
         $("#sd_model").append(option);
     }
-}
-
-async function loadHordeModels() {
-    const result = await fetch("/horde_models", {
-        method: "POST",
-        headers: getRequestHeaders(),
-    });
-
-    if (result.ok) {
-        const data = await result.json();
-        data.sort((a, b) => b.count - a.count);
-        const models = data.map((x) => ({
-            value: x.name,
-            text: `${x.name} (ETA: ${x.eta}s, Queue: ${x.queued}, Workers: ${x.count})`,
-        }));
-        return models;
-    }
-
-    return [];
 }
 
 async function loadExtrasModels() {
@@ -592,7 +517,7 @@ async function generatePicture(_, trigger, message, callback) {
         return;
     }
 
-    if (!modules.includes("sd") && !extension_settings.sd.horde) {
+    if (!modules.includes("sd")) {
         toastr.warning(
             "Extensions API is not connected or doesn't provide SD module. Enable Stable Horde to generate images.",
         );
@@ -666,11 +591,7 @@ async function generatePrompt(quiet_prompt) {
 }
 
 async function sendGenerationRequest(prompt, callback) {
-    if (extension_settings.sd.horde) {
-        await generateHordeImage(prompt, callback);
-    } else {
-        await generateExtrasImage(prompt, callback);
-    }
+    await generateExtrasImage(prompt, callback);
 }
 
 async function generateExtrasImage(prompt, callback) {
@@ -694,7 +615,6 @@ async function generateExtrasImage(prompt, callback) {
             negative_prompt: extension_settings.sd.negative_prompt,
             restore_faces: !!extension_settings.sd.restore_faces,
             enable_hr: !!extension_settings.sd.enable_hr,
-            karras: !!extension_settings.sd.horde_karras,
         }),
     });
 
@@ -706,40 +626,6 @@ async function generateExtrasImage(prompt, callback) {
             : sendMessage(prompt, base64Image);
     } else {
         callPopup("Image generation has failed. Please try again.", "text");
-    }
-}
-
-async function generateHordeImage(prompt, callback) {
-    const result = await fetch("/horde_generateimage", {
-        method: "POST",
-        headers: getRequestHeaders(),
-        body: JSON.stringify({
-            prompt: prompt,
-            sampler: extension_settings.sd.sampler,
-            steps: extension_settings.sd.steps,
-            scale: extension_settings.sd.scale,
-            width: extension_settings.sd.width,
-            height: extension_settings.sd.height,
-            prompt_prefix: combinePrefixes(
-                extension_settings.sd.prompt_prefix,
-                getCharacterPrefix(),
-            ),
-            negative_prompt: extension_settings.sd.negative_prompt,
-            model: extension_settings.sd.model,
-            nsfw: extension_settings.sd.horde_nsfw,
-            restore_faces: !!extension_settings.sd.restore_faces,
-            enable_hr: !!extension_settings.sd.enable_hr,
-        }),
-    });
-
-    if (result.ok) {
-        const data = await result.text();
-        const base64Image = `data:image/webp;base64,${data}`;
-        callback
-            ? callback(prompt, base64Image)
-            : sendMessage(prompt, base64Image);
-    } else {
-        toastr.error("Image generation has failed. Please try again.");
     }
 }
 
@@ -829,7 +715,7 @@ function isConnectedToExtras() {
 }
 
 async function moduleWorker() {
-    if (isConnectedToExtras() || extension_settings.sd.horde) {
+    if (isConnectedToExtras()) {
         $("#sd_gen").show();
         $(".sd_message_gen").show();
     } else {
@@ -1022,9 +908,6 @@ jQuery(async () => {
     $("#sd_negative_prompt").on("input", onNegativePromptInput);
     $("#sd_width").on("input", onWidthInput);
     $("#sd_height").on("input", onHeightInput);
-    $("#sd_horde").on("input", onHordeInput);
-    $("#sd_horde_nsfw").on("input", onHordeNsfwInput);
-    $("#sd_horde_karras").on("input", onHordeKarrasInput);
     $("#sd_restore_faces").on("input", onRestoreFacesInput);
     $("#sd_enable_hr").on("input", onHighResFixInput);
     $("#sd_refine_mode").on("input", onRefineModeInput);

@@ -66,7 +66,6 @@ const extension_settings = {
         refine_mode: false,
     },
     expressions: {},
-    dice: {},
     regex: [],
     tts: {},
     sd: {

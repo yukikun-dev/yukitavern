@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const process = require("process");
 const config = require(path.join(process.cwd(), "./config.conf"));
 const contentDirectory = path.join(process.cwd(), "default/content");
 const contentLogPath = path.join(contentDirectory, "content.log");

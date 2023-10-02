@@ -9,9 +9,6 @@ import {
     koboldai_settings,
     main_api,
     max_context,
-    nai_settings,
-    novelai_setting_names,
-    novelai_settings,
     saveSettingsDebounced,
     this_chid,
 } from "../script.js";
@@ -60,7 +57,7 @@ function autoSelectPreset() {
 }
 
 function getPresetManager() {
-    const apiId = main_api == "koboldhorde" ? "kobold" : main_api;
+    const apiId = main_api;
 
     if (!Object.keys(presetManagers).includes(apiId)) {
         return null;
@@ -147,15 +144,11 @@ class PresetManager {
         let preset_names = {};
 
         switch (this.apiId) {
-            case "koboldhorde":
             case "kobold":
                 presets = koboldai_settings;
                 preset_names = koboldai_setting_names;
                 break;
-            case "novel":
-                presets = novelai_settings;
-                preset_names = novelai_setting_names;
-                break;
+
             case "textgenerationwebui":
                 presets = textgenerationwebui_presets;
                 preset_names = textgenerationwebui_preset_names;
@@ -218,11 +211,8 @@ class PresetManager {
     getPresetSettings() {
         function getSettingsByApiId(apiId) {
             switch (apiId) {
-                case "koboldhorde":
                 case "kobold":
                     return kai_settings;
-                case "novel":
-                    return nai_settings;
                 case "textgenerationwebui":
                     return textgenerationwebui_settings;
                 default:

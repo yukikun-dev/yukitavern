@@ -7,7 +7,7 @@
     "user_avatar": "user-default.png",
     "amount_gen": 250,
     "max_context": 2048,
-    "main_api": "koboldhorde",
+    "main_api": "openai",
     "world_info": {
         "globalSelect": []
     },
@@ -52,12 +52,6 @@
         "rep_pen_size": 0
     },
     "swipes": true,
-    "horde_settings": {
-        "models": [],
-        "auto_adjust_response_length": true,
-        "auto_adjust_context_length": false,
-        "trusted_workers_only": false
-    },
     "power_user": {
         "tokenizer": 99,
         "token_padding": 64,
@@ -103,9 +97,6 @@
         "bot_mes_blur_tint_color": "rgba(0, 0, 0, 0.9)",
         "shadow_color": "rgba(0, 0, 0, 1)",
         "waifuMode": false,
-        "movingUI": false,
-        "movingUIState": {},
-        "movingUIPreset": "Default",
         "noShadows": true,
         "theme": "Default (Dark) 1.7.1",
         "auto_swipe": false,
@@ -128,19 +119,6 @@
         "prefer_character_jailbreak": true,
         "continue_on_send": false,
         "trim_spaces": true,
-        "instruct": {
-            "enabled": false,
-            "wrap": true,
-            "names": false,
-            "system_prompt": "Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\nWrite {{char}}'s next reply in a fictional roleplay chat between {{user}} and {{char}}. Write 1 reply only.",
-            "system_sequence": "",
-            "stop_sequence": "",
-            "input_sequence": "### Instruction:",
-            "output_sequence": "### Response:",
-            "preset": "Alpaca",
-            "separator_sequence": "",
-            "macro": false
-        },
         "personas": {},
         "default_persona": null,
         "persona_descriptions": {},
@@ -207,7 +185,6 @@
         "expressions": {
             "showDefault": false
         },
-        "dice": {},
         "regex": [],
         "tts": {
             "voiceMap": "",
@@ -237,9 +214,6 @@
             "model": "",
             "restore_faces": false,
             "enable_hr": false,
-            "horde": true,
-            "horde_nsfw": false,
-            "horde_karras": true,
             "refine_mode": false,
             "prompts": {
                 "0": "[In the next response I want you to provide only a detailed comma-delimited list of keywords and phrases which describe {{char}}. The list must include all of the following items in this order: name, species and race, gender, age, clothing, occupation, physical features and appearances. Do not include descriptions of non-visual qualities such as personality, movements, scents, mental traits, or anything which could not be seen in a still photograph. Do not write in full sentences. Prefix your description with the phrase 'full body portrait,']",
@@ -252,12 +226,6 @@
             "character_prompts": {}
         },
         "chromadb": {},
-        "translate": {
-            "target_language": "en",
-            "internal_language": "en",
-            "provider": "google",
-            "auto_mode": "none"
-        },
         "objective": {
             "customPrompts": {
                 "default": {
@@ -322,28 +290,7 @@
             "color": "rgba(108, 32, 32, 1)"
         }
     ],
-    "tag_map": {
-        "default_FluxTheCat.png": ["1345561466591"],
-        "default_Seraphina.png": ["1345561466591"],
-        "default_CodingSensei.png": ["1345561466591"]
-    },
-    "nai_settings": {
-        "temperature": 0.63,
-        "repetition_penalty": 1.148125,
-        "repetition_penalty_range": 2048,
-        "repetition_penalty_slope": 0.09,
-        "repetition_penalty_frequency": 0,
-        "repetition_penalty_presence": 0,
-        "tail_free_sampling": 0.975,
-        "top_k": 0,
-        "top_p": 0.975,
-        "top_a": 1,
-        "typical_p": 1,
-        "min_length": 1,
-        "model_novel": "euterpe-v2",
-        "preset_settings_novel": "Classic-Euterpe",
-        "streaming_novel": false
-    },
+    "tag_map": {},
     "kai_settings": {
         "temp": 1,
         "rep_pen": 1.1,

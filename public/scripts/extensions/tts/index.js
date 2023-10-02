@@ -21,7 +21,6 @@ import { SileroTtsProvider } from "./silerotts.js";
 //import { CoquiTtsProvider } from './coquitts.js'
 import { CoquiTtsProvider } from "./coqui.js"; // TODO: rename once done
 import { SystemTtsProvider } from "./system.js";
-import { NovelTtsProvider } from "./novel.js";
 import { power_user } from "../../power-user.js";
 import { rvcVoiceConversion } from "../rvc/index.js";
 export { talkingAnimation };
@@ -90,7 +89,6 @@ let ttsProviders = {
     System: SystemTtsProvider,
     Coqui: CoquiTtsProvider,
     Edge: EdgeTtsProvider,
-    Novel: NovelTtsProvider,
 };
 let ttsProvider;
 let ttsProviderName;

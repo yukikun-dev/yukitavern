@@ -1315,8 +1315,7 @@
             [
                 {
                     key: "search",
-                    value: function /*text*/
-                    search() {},
+                    value: function /*text*/ search() {},
                 },
             ],
             [

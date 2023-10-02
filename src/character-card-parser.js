@@ -70,6 +70,7 @@ const parse = async (cardUrl, format) => {
                 throw new Error("No PNG metadata.");
             }
 
+            const Buffer = require("buffer").Buffer;
             return Buffer.from(textChunks[0].text, "base64").toString("utf8");
         default:
             break;

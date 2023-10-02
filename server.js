@@ -105,7 +105,9 @@ const { TextEncoder, TextDecoder } = require("util");
 const utf8Encode = new TextEncoder();
 const commandExistsSync = require("command-exists").sync;
 
-// impoort from statsHelpers.js
+const _ = require("lodash");
+
+// import from statsHelpers.js
 const statsHelpers = require("./statsHelpers.js");
 
 const characterCardParser = require("./src/character-card-parser.js");
@@ -123,7 +125,9 @@ if (fs.existsSync(whitelistPath)) {
             .split("\n")
             .filter((ip) => ip)
             .map((ip) => ip.trim());
-    } catch (e) {}
+    } catch (e) {
+        _.noop;
+    }
 }
 
 const whitelistMode = config.whitelistMode;
@@ -136,14 +140,6 @@ const axios = require("axios");
 const tiktoken = require("@dqbd/tiktoken");
 const WebSocket = require("ws");
 
-function getHordeClient() {
-    const AIHorde = require("./src/horde");
-    const ai_horde = new AIHorde({
-        client_agent: getVersion()?.agent || "SillyTavern:UNKNOWN:Cohee#1207",
-    });
-    return ai_horde;
-}
-
 const ipMatching = require("ip-matching");
 const yauzl = require("yauzl");
 
@@ -155,16 +151,12 @@ client.on("error", (err) => {
 });
 
 let api_server = "http://0.0.0.0:5000";
-let api_novelai = "https://api.novelai.net";
 let api_openai = "https://api.openai.com/v1";
 let api_claude = "https://api.anthropic.com/v1";
 let main_api = "kobold";
 
-let response_generate_novel;
 let characters = {};
 let response_dw_bg;
-let response_getstatus;
-let first_run = true;
 
 function get_mancer_headers() {
     const api_key_mancer = readSecret(SECRET_KEYS.MANCER);
@@ -180,7 +172,7 @@ function get_mancer_headers() {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const { SentencePieceProcessor, cleanText } = require("sentencepiece-js");
+const { SentencePieceProcessor } = require("sentencepiece-js");
 const { Tokenizer } = require("@mlc-ai/web-tokenizers");
 const CHARS_PER_TOKEN = 3.35;
 
@@ -313,14 +305,12 @@ function humanizedISO8601DateTime() {
     return HumanizedDateTime;
 }
 
-var is_colab = process.env.colaburl !== undefined;
 var charactersPath = "public/characters/";
 var chatsPath = "public/chats/";
 const AVATAR_WIDTH = 400;
 const AVATAR_HEIGHT = 600;
 const jsonParser = express.json({ limit: "100mb" });
 const urlencodedParser = express.urlencoded({ extended: true, limit: "100mb" });
-const baseRequestArgs = { headers: { "Content-Type": "application/json" } };
 const directories = {
     worlds: "public/worlds/",
     avatars: "public/User Avatars",
@@ -329,7 +319,6 @@ const directories = {
     chats: "public/chats/",
     characters: "public/characters/",
     backgrounds: "public/backgrounds",
-    novelAI_Settings: "public/NovelAI Settings",
     koboldAI_Settings: "public/KoboldAI Settings",
     openAI_Settings: "public/OpenAI Settings",
     textGen_Settings: "public/TextGen Settings",
@@ -337,9 +326,7 @@ const directories = {
     thumbnailsBg: "thumbnails/bg/",
     thumbnailsAvatar: "thumbnails/avatar/",
     themes: "public/themes",
-    movingUI: "public/movingUI",
     extensions: "public/scripts/extensions",
-    instruct: "public/instruct",
     context: "public/context",
     backups: "backups/",
     quickreplies: "public/QuickReplies",
@@ -428,31 +415,6 @@ app.use(function (req, res, next) {
             );
     }
     next();
-});
-
-app.use((req, res, next) => {
-    if (
-        req.url.startsWith("/characters/") &&
-        is_colab &&
-        process.env.googledrive == 2
-    ) {
-        const filePath = path.join(
-            charactersPath,
-            decodeURIComponent(req.url.substr("/characters".length)),
-        );
-        console.log("req.url: " + req.url);
-        console.log(filePath);
-        fs.access(filePath, fs.constants.R_OK, (err) => {
-            if (!err) {
-                res.sendFile(filePath, { root: process.cwd() });
-            } else {
-                res.send("Character not found: " + filePath);
-                //next();
-            }
-        });
-    } else {
-        next();
-    }
 });
 
 app.use(express.static(process.cwd() + "/public", { refresh: true }));
@@ -584,7 +546,7 @@ app.post(
                 sampler_order: sampler_order,
                 singleline: !!request.body.singleline,
             };
-            if (!!request.body.stop_sequence) {
+            if (request.body.stop_sequence) {
                 this_settings["stop_sequence"] = request.body.stop_sequence;
             }
         }
@@ -915,11 +877,6 @@ app.post(
             });
     },
 );
-
-const formatApiUrl = (url) =>
-    url.indexOf("localhost") !== -1
-        ? url.replace("localhost", "127.0.0.1")
-        : url;
 
 function getVersion() {
     let pkgVersion = "UNKNOWN";
@@ -1457,10 +1414,9 @@ async function charaWrite(
         for (let tEXtChunk of tEXtChunks) {
             chunks.splice(chunks.indexOf(tEXtChunk), 1);
         }
-        // Add new chunks before the IEND chunk
+        const Buffer = require("buffer").Buffer;
         const base64EncodedData = Buffer.from(data, "utf8").toString("base64");
         chunks.splice(-1, 0, PNGtext.encode("chara", base64EncodedData));
-        //chunks.splice(-1, 0, text.encode('lorem', 'ipsum'));
 
         fs.writeFileSync(
             charactersPath + target_img + ".png",
@@ -1651,13 +1607,7 @@ app.post("/getbackgrounds", jsonParser, function (request, response) {
     var images = getImages("public/backgrounds");
     response.send(JSON.stringify(images));
 });
-app.post("/iscolab", jsonParser, function (request, response) {
-    let send_data = false;
-    if (is_colab) {
-        send_data = String(process.env.colaburl).trim();
-    }
-    response.send({ colaburl: send_data });
-});
+
 app.post("/getuseravatars", jsonParser, function (request, response) {
     var images = getImages("public/User Avatars");
     response.send(JSON.stringify(images));
@@ -1864,7 +1814,7 @@ function sortByModifiedDate(directory) {
         new Date(fs.statSync(`${directory}/${a}`).mtime);
 }
 
-function sortByName(_) {
+function sortByName() {
     return (a, b) => a.localeCompare(b);
 }
 
@@ -1907,13 +1857,6 @@ app.post("/getsettings", jsonParser, (request, response) => {
         },
     );
 
-    // NovelAI Settings
-    const { fileContents: novelai_settings, fileNames: novelai_setting_names } =
-        readPresetsFromDirectory(directories.novelAI_Settings, {
-            sortFunction: sortByName(directories.novelAI_Settings),
-            removeFileExtension: true,
-        });
-
     // OpenAI Settings
     const { fileContents: openai_settings, fileNames: openai_setting_names } =
         readPresetsFromDirectory(directories.openAI_Settings, {
@@ -1946,12 +1889,10 @@ app.post("/getsettings", jsonParser, (request, response) => {
     const world_names = worldFiles.map((item) => path.parse(item).name);
 
     const themes = readAndParseFromDirectory(directories.themes);
-    const movingUIPresets = readAndParseFromDirectory(directories.movingUI);
     const quickReplyPresets = readAndParseFromDirectory(
         directories.quickreplies,
     );
 
-    const instruct = readAndParseFromDirectory(directories.instruct);
     const context = readAndParseFromDirectory(directories.context);
 
     response.send({
@@ -1959,16 +1900,12 @@ app.post("/getsettings", jsonParser, (request, response) => {
         koboldai_settings,
         koboldai_setting_names,
         world_names,
-        novelai_settings,
-        novelai_setting_names,
         openai_settings,
         openai_setting_names,
         textgenerationwebui_presets,
         textgenerationwebui_preset_names,
         themes,
-        movingUIPresets,
         quickReplyPresets,
-        instruct,
         context,
         enable_extensions: enableExtensions,
     });
@@ -2009,20 +1946,6 @@ app.post("/savetheme", jsonParser, (request, response) => {
 
     const filename = path.join(
         directories.themes,
-        sanitize(request.body.name) + ".json",
-    );
-    fs.writeFileSync(filename, JSON.stringify(request.body, null, 4), "utf8");
-
-    return response.sendStatus(200);
-});
-
-app.post("/savemovingui", jsonParser, (request, response) => {
-    if (!request.body || !request.body.name) {
-        return response.sendStatus(400);
-    }
-
-    const filename = path.join(
-        directories.movingUI,
         sanitize(request.body.name) + ".json",
     );
     fs.writeFileSync(filename, JSON.stringify(request.body, null, 4), "utf8");
@@ -2102,184 +2025,6 @@ function getImages(path) {
         })
         .sort(Intl.Collator().compare);
 }
-
-//***********Novel.ai API
-
-app.post(
-    "/getstatus_novelai",
-    jsonParser,
-    function (request, response_getstatus_novel = response) {
-        if (!request.body) return response_getstatus_novel.sendStatus(400);
-        const api_key_novel = readSecret(SECRET_KEYS.NOVEL);
-
-        if (!api_key_novel) {
-            return response_getstatus_novel.sendStatus(401);
-        }
-
-        var data = {};
-        var args = {
-            data: data,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + api_key_novel,
-            },
-        };
-        client
-            .get(
-                api_novelai + "/user/subscription",
-                args,
-                function (data, response) {
-                    if (response.statusCode == 200) {
-                        //console.log(data);
-                        response_getstatus_novel.send(data); //data);
-                    } else {
-                        if (response.statusCode == 401) {
-                            console.log("Access Token is incorrect.");
-                        }
-
-                        console.log(data);
-                        response_getstatus_novel.send({ error: true });
-                    }
-                },
-            )
-            .on("error", function () {
-                response_getstatus_novel.send({ error: true });
-            });
-    },
-);
-
-app.post(
-    "/generate_novelai",
-    jsonParser,
-    async function (request, response_generate_novel = response) {
-        if (!request.body) return response_generate_novel.sendStatus(400);
-
-        const api_key_novel = readSecret(SECRET_KEYS.NOVEL);
-
-        if (!api_key_novel) {
-            return response_generate_novel.sendStatus(401);
-        }
-
-        const controller = new AbortController();
-        request.socket.removeAllListeners("close");
-        request.socket.on("close", function () {
-            controller.abort();
-        });
-
-        const novelai = require("./src/novelai");
-        const isNewModel =
-            request.body.model.includes("clio") ||
-            request.body.model.includes("kayra");
-        const isKrake = request.body.model.includes("krake");
-        const data = {
-            input: request.body.input,
-            model: request.body.model,
-            parameters: {
-                use_string: request.body.use_string,
-                temperature: request.body.temperature,
-                max_length: request.body.max_length,
-                min_length: request.body.min_length,
-                tail_free_sampling: request.body.tail_free_sampling,
-                repetition_penalty: request.body.repetition_penalty,
-                repetition_penalty_range: request.body.repetition_penalty_range,
-                repetition_penalty_slope: request.body.repetition_penalty_slope,
-                repetition_penalty_frequency:
-                    request.body.repetition_penalty_frequency,
-                repetition_penalty_presence:
-                    request.body.repetition_penalty_presence,
-                repetition_penalty_whitelist: isNewModel
-                    ? novelai.repPenaltyAllowList
-                    : null,
-                top_a: request.body.top_a,
-                top_p: request.body.top_p,
-                top_k: request.body.top_k,
-                typical_p: request.body.typical_p,
-                top_g: request.body.top_g,
-                mirostat_lr: request.body.mirostat_lr,
-                mirostat_tau: request.body.mirostat_tau,
-                cfg_scale: request.body.cfg_scale,
-                cfg_uc: request.body.cfg_uc,
-                phrase_rep_pen: request.body.phrase_rep_pen,
-                stop_sequences: request.body.stop_sequences,
-                //"stop_sequences": {{187}},
-                bad_words_ids: isNewModel
-                    ? novelai.badWordsList
-                    : isKrake
-                    ? novelai.krakeBadWordsList
-                    : novelai.euterpeBadWordsList,
-                logit_bias_exp: isNewModel ? novelai.logitBiasExp : null,
-                //generate_until_sentence = true;
-                use_cache: request.body.use_cache,
-                use_string: true,
-                return_full_text: request.body.return_full_text,
-                prefix: request.body.prefix,
-                order: request.body.order,
-            },
-        };
-        const util = require("util");
-        console.log(util.inspect(data, { depth: 4 }));
-
-        const args = {
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + api_key_novel,
-            },
-            signal: controller.signal,
-        };
-
-        try {
-            const fetch = require("node-fetch").default;
-            const url = request.body.streaming
-                ? `${api_novelai}/ai/generate-stream`
-                : `${api_novelai}/ai/generate`;
-            const response = await fetch(url, {
-                method: "POST",
-                timeout: 0,
-                ...args,
-            });
-
-            if (request.body.streaming) {
-                // Pipe remote SSE stream to Express response
-                response.body.pipe(response_generate_novel);
-
-                request.socket.on("close", function () {
-                    response.body.destroy(); // Close the remote stream
-                    response_generate_novel.end(); // End the Express response
-                });
-
-                response.body.on("end", function () {
-                    console.log("Streaming request finished");
-                    response_generate_novel.end();
-                });
-            } else {
-                if (!response.ok) {
-                    const text = await response.text();
-                    let message = text;
-                    console.log(
-                        `Novel API returned error: ${response.status} ${response.statusText} ${text}`,
-                    );
-
-                    try {
-                        const data = JSON.parse(text);
-                        message = data.message;
-                    } catch {
-                        // ignore
-                    }
-
-                    return response_generate_novel
-                        .status(response.status)
-                        .send({ error: { message } });
-                }
-
-                const data = await response.json();
-                return response_generate_novel.send(data);
-            }
-        } catch (error) {
-            return response_generate_novel.send({ error: true });
-        }
-    },
-);
 
 app.post("/getallchatsofcharacter", jsonParser, function (request, response) {
     if (!request.body) return response.sendStatus(400);
@@ -3636,62 +3381,6 @@ function convertClaudePrompt(messages, addHumanPrefix, addAssistantPostfix) {
     return requestPrompt;
 }
 
-async function sendScaleRequest(request, response) {
-    const fetch = require("node-fetch").default;
-
-    const api_url = new URL(request.body.api_url_scale).toString();
-    const api_key_scale = readSecret(SECRET_KEYS.SCALE);
-
-    if (!api_key_scale) {
-        return response.status(401).send({ error: true });
-    }
-
-    const requestPrompt = convertChatMLPrompt(request.body.messages);
-    console.log("Scale request:", requestPrompt);
-
-    try {
-        const controller = new AbortController();
-        request.socket.removeAllListeners("close");
-        request.socket.on("close", function () {
-            controller.abort();
-        });
-
-        const generateResponse = await fetch(api_url, {
-            method: "POST",
-            body: JSON.stringify({ input: { input: requestPrompt } }),
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Basic ${api_key_scale}`,
-            },
-            timeout: 0,
-        });
-
-        if (!generateResponse.ok) {
-            console.log(
-                `Scale API returned error: ${generateResponse.status} ${
-                    generateResponse.statusText
-                } ${await generateResponse.text()}`,
-            );
-            return response
-                .status(generateResponse.status)
-                .send({ error: true });
-        }
-
-        const generateResponseJson = await generateResponse.json();
-        console.log("Scale response:", generateResponseJson);
-
-        const reply = {
-            choices: [{ message: { content: generateResponseJson.output } }],
-        };
-        return response.send(reply);
-    } catch (error) {
-        console.log(error);
-        if (!response.headersSent) {
-            return response.status(500).send({ error: true });
-        }
-    }
-}
-
 async function sendClaudeRequest(request, response) {
     const fetch = require("node-fetch").default;
 
@@ -3796,10 +3485,6 @@ app.post(
 
         if (request.body.use_claude) {
             return sendClaudeRequest(request, response_generate_openai);
-        }
-
-        if (request.body.use_scale) {
-            return sendScaleRequest(request, response_generate_openai);
         }
 
         let api_url;
@@ -3952,11 +3637,7 @@ app.post(
             }
         }
 
-        function handleErrorResponse(
-            response,
-            response_generate_openai,
-            request,
-        ) {
+        function handleErrorResponse(response, response_generate_openai) {
             if (response.status >= 400 && response.status <= 504) {
                 console.log("Error occurred:", response.status, response.data);
                 response_generate_openai.send({ error: true });
@@ -4101,10 +3782,6 @@ app.post("/savepreset_openai", jsonParser, function (request, response) {
 function getPresetFolderByApiId(apiId) {
     switch (apiId) {
         case "kobold":
-        case "koboldhorde":
-            return directories.koboldAI_Settings;
-        case "novel":
-            return directories.novelAI_Settings;
         case "textgenerationwebui":
             return directories.textGen_Settings;
         default:
@@ -4221,9 +3898,6 @@ const setupTasks = async function () {
     await ensureThumbnailCache();
     contentManager.checkForNewContent();
 
-    // Colab users could run the embedded tool
-    if (!is_colab) await convertWebp();
-
     [spp_llama, spp_nerd, spp_nerd_v2, claude_tokenizer] = await Promise.all([
         loadSentencepieceTokenizer("src/sentencepiece/tokenizer.model"),
         loadSentencepieceTokenizer("src/sentencepiece/nerdstash.model"),
@@ -4284,54 +3958,6 @@ else
         setupTasks,
     );
 
-async function convertWebp() {
-    const files = fs
-        .readdirSync(directories.characters)
-        .filter((e) => e.endsWith(".webp"));
-
-    if (!files.length) {
-        return;
-    }
-
-    console.log(`${files.length} WEBP files will be automatically converted.`);
-
-    for (const file of files) {
-        try {
-            const source = path.join(directories.characters, file);
-            const dest = path.join(
-                directories.characters,
-                path.basename(file, ".webp") + ".png",
-            );
-
-            if (fs.existsSync(dest)) {
-                console.log(
-                    `${dest} already exists. Delete ${source} manually`,
-                );
-                continue;
-            }
-
-            console.log(`Read... ${source}`);
-            const data = await charaRead(source);
-
-            console.log(`Convert... ${source} -> ${dest}`);
-            await webp.dwebp(source, dest, "-o");
-
-            console.log(`Write... ${dest}`);
-            const success = await charaWrite(dest, data, path.parse(dest).name);
-
-            if (!success) {
-                console.log(`Failure on ${source} -> ${dest}`);
-                continue;
-            }
-
-            console.log(`Remove... ${source}`);
-            fs.rmSync(source);
-        } catch (err) {
-            console.log(err);
-        }
-    }
-}
-
 function backupSettings() {
     const MAX_BACKUPS = 25;
 
@@ -4383,14 +4009,11 @@ function ensurePublicDirectoriesExist() {
 const SECRETS_FILE = "./secrets.json";
 const SETTINGS_FILE = "./public/settings.json";
 const SECRET_KEYS = {
-    HORDE: "api_key_horde",
     MANCER: "api_key_mancer",
     OPENAI: "api_key_openai",
-    NOVEL: "api_key_novel",
     CLAUDE: "api_key_claude",
     DEEPL: "deepl",
     OPENROUTER: "api_key_openrouter",
-    SCALE: "api_key_scale",
 };
 
 function migrateSecrets() {
@@ -4404,27 +4027,11 @@ function migrateSecrets() {
         const fileContents = fs.readFileSync(SETTINGS_FILE);
         const settings = JSON.parse(fileContents);
         const oaiKey = settings?.api_key_openai;
-        const hordeKey = settings?.horde_settings?.api_key;
-        const novelKey = settings?.api_key_novel;
 
         if (typeof oaiKey === "string") {
             console.log("Migrating OpenAI key...");
             writeSecret(SECRET_KEYS.OPENAI, oaiKey);
             delete settings.api_key_openai;
-            modified = true;
-        }
-
-        if (typeof hordeKey === "string") {
-            console.log("Migrating Horde key...");
-            writeSecret(SECRET_KEYS.HORDE, hordeKey);
-            delete settings.horde_settings.api_key;
-            modified = true;
-        }
-
-        if (typeof novelKey === "string") {
-            console.log("Migrating Novel key...");
-            writeSecret(SECRET_KEYS.NOVEL, novelKey);
-            delete settings.api_key_novel;
             modified = true;
         }
 
@@ -4467,31 +4074,6 @@ app.post("/readsecretstate", jsonParser, (_, response) => {
     }
 });
 
-const ANONYMOUS_KEY = "0000000000";
-
-app.post("/generate_horde", jsonParser, async (request, response) => {
-    const api_key_horde = readSecret(SECRET_KEYS.HORDE) || ANONYMOUS_KEY;
-    const url = "https://horde.koboldai.net/api/v2/generate/text/async";
-
-    const args = {
-        body: JSON.stringify(request.body),
-        headers: {
-            "Content-Type": "application/json",
-            "Client-Agent": request.header("Client-Agent"),
-            apikey: api_key_horde,
-        },
-    };
-
-    console.log(args.body);
-    try {
-        const data = await postAsync(url, args);
-        return response.send(data);
-    } catch (error) {
-        console.error(error);
-        return response.sendStatus(500);
-    }
-});
-
 app.post("/viewsecrets", jsonParser, async (_, response) => {
     if (!allowKeysExposure) {
         console.error(
@@ -4509,240 +4091,6 @@ app.post("/viewsecrets", jsonParser, async (_, response) => {
         const fileContents = fs.readFileSync(SECRETS_FILE);
         const secrets = JSON.parse(fileContents);
         return response.send(secrets);
-    } catch (error) {
-        console.error(error);
-        return response.sendStatus(500);
-    }
-});
-
-app.post("/horde_samplers", jsonParser, async (_, response) => {
-    try {
-        const ai_horde = getHordeClient();
-        const samplers = Object.values(
-            ai_horde.ModelGenerationInputStableSamplers,
-        );
-        response.send(samplers);
-    } catch (error) {
-        console.error(error);
-        response.sendStatus(500);
-    }
-});
-
-app.post("/horde_models", jsonParser, async (_, response) => {
-    try {
-        const ai_horde = getHordeClient();
-        const models = await ai_horde.getModels();
-        response.send(models);
-    } catch (error) {
-        console.error(error);
-        response.sendStatus(500);
-    }
-});
-
-app.post("/horde_userinfo", jsonParser, async (_, response) => {
-    const api_key_horde = readSecret(SECRET_KEYS.HORDE);
-
-    if (!api_key_horde) {
-        return response.send({ anonymous: true });
-    }
-
-    try {
-        const ai_horde = getHordeClient();
-        const user = await ai_horde.findUser({ token: api_key_horde });
-        return response.send(user);
-    } catch (error) {
-        console.error(error);
-        return response.sendStatus(500);
-    }
-});
-
-app.post("/horde_generateimage", jsonParser, async (request, response) => {
-    const MAX_ATTEMPTS = 200;
-    const CHECK_INTERVAL = 3000;
-    const api_key_horde = readSecret(SECRET_KEYS.HORDE) || ANONYMOUS_KEY;
-    console.log("Stable Horde request:", request.body);
-
-    try {
-        const ai_horde = getHordeClient();
-        const generation = await ai_horde.postAsyncImageGenerate(
-            {
-                prompt: `${request.body.prompt_prefix} ${request.body.prompt} ### ${request.body.negative_prompt}`,
-                params: {
-                    sampler_name: request.body.sampler,
-                    hires_fix: request.body.enable_hr,
-                    use_gfpgan: request.body.restore_faces,
-                    cfg_scale: request.body.scale,
-                    steps: request.body.steps,
-                    width: request.body.width,
-                    height: request.body.height,
-                    karras: Boolean(request.body.karras),
-                    n: 1,
-                },
-                r2: false,
-                nsfw: request.body.nfsw,
-                models: [request.body.model],
-            },
-            { token: api_key_horde },
-        );
-
-        if (!generation.id) {
-            console.error(
-                "Image generation request is not satisfyable:",
-                generation.message || "unknown error",
-            );
-            return response.sendStatus(400);
-        }
-
-        for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-            await delay(CHECK_INTERVAL);
-            const check = await ai_horde.getImageGenerationCheck(generation.id);
-            console.log(check);
-
-            if (check.done) {
-                const result = await ai_horde.getImageGenerationStatus(
-                    generation.id,
-                );
-                return response.send(result.generations[0].img);
-            }
-
-            /*
-            if (!check.is_possible) {
-                return response.sendStatus(503);
-            }
-            */
-
-            if (check.faulted) {
-                return response.sendStatus(500);
-            }
-        }
-
-        return response.sendStatus(504);
-    } catch (error) {
-        console.error(error);
-        return response.sendStatus(500);
-    }
-});
-
-app.post("/google_translate", jsonParser, async (request, response) => {
-    const {
-        generateRequestUrl,
-        normaliseResponse,
-    } = require("google-translate-api-browser");
-
-    const text = request.body.text;
-    const lang = request.body.lang;
-
-    if (!text || !lang) {
-        return response.sendStatus(400);
-    }
-
-    console.log("Input text: " + text);
-
-    const url = generateRequestUrl(text, { to: lang });
-
-    https
-        .get(url, (resp) => {
-            let data = "";
-
-            resp.on("data", (chunk) => {
-                data += chunk;
-            });
-
-            resp.on("end", () => {
-                const result = normaliseResponse(JSON.parse(data));
-                console.log("Translated text: " + result.text);
-                return response.send(result.text);
-            });
-        })
-        .on("error", (err) => {
-            console.log("Translation error: " + err.message);
-            return response.sendStatus(500);
-        });
-});
-
-app.post("/deepl_translate", jsonParser, async (request, response) => {
-    const key = readSecret(SECRET_KEYS.DEEPL);
-
-    if (!key) {
-        return response.sendStatus(401);
-    }
-
-    const text = request.body.text;
-    const lang = request.body.lang;
-
-    if (!text || !lang) {
-        return response.sendStatus(400);
-    }
-
-    console.log("Input text: " + text);
-
-    const fetch = require("node-fetch").default;
-    const params = new URLSearchParams();
-    params.append("text", text);
-    params.append("target_lang", lang);
-
-    try {
-        const result = await fetch("https://api-free.deepl.com/v2/translate", {
-            method: "POST",
-            body: params,
-            headers: {
-                Accept: "application/json",
-                Authorization: `DeepL-Auth-Key ${key}`,
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            timeout: 0,
-        });
-
-        if (!result.ok) {
-            return response.sendStatus(result.status);
-        }
-
-        const json = await result.json();
-        console.log("Translated text: " + json.translations[0].text);
-
-        return response.send(json.translations[0].text);
-    } catch (error) {
-        console.log("Translation error: " + error.message);
-        return response.sendStatus(500);
-    }
-});
-
-app.post("/novel_tts", jsonParser, async (request, response) => {
-    const token = readSecret(SECRET_KEYS.NOVEL);
-
-    if (!token) {
-        return response.sendStatus(401);
-    }
-
-    const text = request.body.text;
-    const voice = request.body.voice;
-
-    if (!text || !voice) {
-        return response.sendStatus(400);
-    }
-
-    try {
-        const fetch = require("node-fetch").default;
-        const url = `${api_novelai}/ai/generate-voice?text=${encodeURIComponent(
-            text,
-        )}&voice=-1&seed=${encodeURIComponent(voice)}&opus=false&version=v2`;
-        const result = await fetch(url, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: "audio/mpeg",
-            },
-            timeout: 0,
-        });
-
-        if (!result.ok) {
-            return response.sendStatus(result.status);
-        }
-
-        const chunks = await readAllChunks(result.body);
-        const buffer = Buffer.concat(chunks);
-        response.setHeader("Content-Type", "audio/mpeg");
-        return response.send(buffer);
     } catch (error) {
         console.error(error);
         return response.sendStatus(500);
@@ -5142,6 +4490,7 @@ async function getImageBuffers(zipFilePath) {
                                     chunks.push(chunk);
                                 });
 
+                                const Buffer = require("buffer").Buffer;
                                 readStream.on("end", () => {
                                     imageBuffers.push([
                                         path.parse(entry.fileName).base,

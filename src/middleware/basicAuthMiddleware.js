@@ -7,6 +7,7 @@
 //const appDir = dirname(require.main.filename);
 //const config = require(appDir + '/config.conf');
 const path = require("path");
+const process = require("process");
 const config = require(path.join(process.cwd(), "./config.conf"));
 
 const unauthorizedResponse = (res) => {
@@ -27,6 +28,7 @@ const basicAuthMiddleware = function (request, response, callback) {
         return unauthorizedResponse(response);
     }
 
+    const Buffer = require("buffer").Buffer;
     const [username, password] = Buffer.from(credentials, "base64")
         .toString("utf8")
         .split(":");

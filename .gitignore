@@ -16,7 +16,6 @@ public/stats.json
 /uploads/
 *.jsonl
 /config.conf
-/docker/config
 .DS_Store
 public/settings.json
 /thumbnails
@@ -25,7 +24,5 @@ whitelist.txt
 secrets.json
 /dist
 /backups/
-public/movingUI/
 public/QuickReplies/
 content.log
-cloudflared.exe

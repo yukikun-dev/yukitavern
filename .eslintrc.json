@@ -1,0 +1,18 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        // "indent": ["error", 4, { "SwitchCase": 4 }],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "double", { "avoidEscape": true }],
+        "semi": ["error", "always"],
+        "no-unused-vars": ["warn"]
+    }
+}

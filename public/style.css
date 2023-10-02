@@ -1414,7 +1414,6 @@ select option:not(:checked) {
 }
 
 #api_button:hover,
-#api_button_novel:hover,
 #api_button_textgenerationwebui:hover {
     background-color: green;
 }
@@ -2178,7 +2177,7 @@ grammarly-extension {
     position: absolute;
 }
 
-/* ------ online status indicators and texts. 2 = kobold AI, 3 = Novel AI  ----------*/
+/* ------ online status indicators and texts. 2 = kobold AI ----------*/
 #online_status2,
 #online_status_horde,
 .online_status4 {
@@ -2203,38 +2202,6 @@ grammarly-extension {
     margin-left: 4px;
     display: inline-block;
 }
-
-#online_status3 {
-    opacity: 0.5;
-    margin-top: 2px;
-
-    margin-bottom: 30px;
-}
-
-#online_status_indicator3 {
-    border-radius: 7px;
-    width: 14px;
-    height: 14px;
-    background-color: red;
-    display: inline-block;
-}
-
-#online_status_text3 {
-    margin-left: 4px;
-    display: inline-block;
-}
-
-#horde_model {
-    height: 150px;
-}
-
-.horde_model_title {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    column-gap: 20px;
-}
-
 .drag-handle {
     cursor: grab;
 }
@@ -3257,10 +3224,7 @@ h5 {
     color: red;
     line-height: calc(var(--mainFontSize) * 1.3);
     text-align: center;
-    text-shadow:
-        1px 1px 0px black,
-        -1px -1px 0px black,
-        -1px 1px 0px black,
+    text-shadow: 1px 1px 0px black, -1px -1px 0px black, -1px 1px 0px black,
         1px -1px 0px black;
     opacity: 1;
 }
@@ -4748,21 +4712,6 @@ body.waifuMode .expression-holder {
     right: 0;
 }
 
-/* movingUI*/
-
-body.movingUI .drag-grabber {
-    display: inline;
-}
-
-body.movingUI #sheld,
-body.movingUI .drawer-content,
-body.movingUI #expression-holder,
-body.movingUI .zoomed_avatar,
-body.movingUI #floatingPrompt,
-body.movingUI #groupMemberListPopout {
-    resize: both;
-}
-
 #expression-image.default,
 #expression-holder:has(.default) {
     height: 120px;
@@ -5321,10 +5270,6 @@ body.waifuMode .zoomed_avatar {
     .scrollableInner {
         overflow-y: auto;
         overflow-x: hidden;
-    }
-
-    #horde_model {
-        height: unset;
     }
 }
 

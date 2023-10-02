@@ -18,7 +18,7 @@ import {
     setCharacterId,
     setEditedMessageId,
 } from "../script.js";
-import { favsToHotswap, isMobile, initMovingUI } from "./RossAscends-mods.js";
+import { favsToHotswap, isMobile } from "./RossAscends-mods.js";
 import { groups, resetSelectedGroup, selected_group } from "./group-chats.js";
 
 import { registerSlashCommand } from "./slash-commands.js";
@@ -27,7 +27,6 @@ import { delay } from "./utils.js";
 
 export {
     loadPowerUserSettings,
-    loadMovingUIState,
     collapseNewlines,
     playMessageSound,
     sortGroupMembers,
@@ -146,9 +145,6 @@ let power_user = {
         .trim()}`,
 
     waifuMode: false,
-    movingUI: false,
-    movingUIState: {},
-    movingUIPreset: "",
     noShadows: false,
     theme: "Default (Dark) 1.7.1",
 
@@ -175,22 +171,6 @@ let power_user = {
     trim_spaces: true,
     relaxed_api_urls: false,
 
-    instruct: {
-        enabled: false,
-        wrap: true,
-        names: false,
-        system_prompt:
-            "Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\nWrite {{char}}'s next reply in a fictional roleplay chat between {{user}} and {{char}}. Write 1 reply only.",
-        system_sequence: "",
-        stop_sequence: "",
-        input_sequence: "### Instruction:",
-        output_sequence: "### Response:",
-        preset: "Alpaca",
-        separator_sequence: "",
-        macro: false,
-        names_force_groups: true,
-    },
-
     personas: {},
     default_persona: null,
     persona_descriptions: {},
@@ -207,8 +187,6 @@ let power_user = {
 };
 
 let themes = [];
-let movingUIPresets = [];
-let instruct_presets = [];
 
 const storage_keys = {
     fast_ui_mode: "TavernAI_fast_ui_mode",
@@ -228,7 +206,6 @@ const storage_keys = {
     shadow_width: "TavernAI_shadow_width",
 
     waifuMode: "TavernAI_waifuMode",
-    movingUI: "TavernAI_movingUI",
     noShadows: "TavernAI_noShadows",
 
     hotswap_enabled: "HotswapEnabled",
@@ -366,18 +343,6 @@ function peekSpoilerMode() {
     $("#description_textarea").toggle();
     $("#firstmessage_textarea").toggle();
     $("#first_message_div").toggle();
-}
-
-function switchMovingUI() {
-    const movingUI = localStorage.getItem(storage_keys.movingUI);
-    power_user.movingUI = movingUI === null ? false : movingUI == "true";
-    $("body").toggleClass("movingUI", power_user.movingUI);
-    if (power_user.movingUI === true) {
-        initMovingUI();
-        if (power_user.movingUIState) {
-            loadMovingUIState();
-        }
-    }
 }
 
 function noShadows() {
@@ -727,20 +692,6 @@ async function applyTheme(name) {
     console.log("theme applied: " + name);
 }
 
-async function applyMovingUIPreset(name) {
-    resetMovablePanels("quiet");
-    const movingUIPreset = movingUIPresets.find((x) => x.name == name);
-
-    if (!movingUIPreset) {
-        return;
-    }
-
-    power_user.movingUIState = movingUIPreset.movingUIState;
-
-    console.log("MovingUI Preset applied: " + name);
-    loadMovingUIState();
-}
-
 switchUiMode();
 applyFontScale();
 applyThemeColor();
@@ -748,7 +699,6 @@ applyChatWidth();
 applyAvatarStyle();
 applyBlurStrength();
 applyShadowWidth();
-switchMovingUI();
 noShadows();
 switchHotswap();
 switchTimer();
@@ -765,17 +715,8 @@ function loadPowerUserSettings(settings, data) {
         themes = data.themes;
     }
 
-    if (data.movingUIPresets !== undefined) {
-        movingUIPresets = data.movingUIPresets;
-    }
-
-    if (data.instruct !== undefined) {
-        instruct_presets = data.instruct;
-    }
-
     // These are still local storage
     const fastUi = localStorage.getItem(storage_keys.fast_ui_mode);
-    const movingUI = localStorage.getItem(storage_keys.movingUI);
     const noShadows = localStorage.getItem(storage_keys.noShadows);
     const hotswap = localStorage.getItem(storage_keys.hotswap_enabled);
     const timer = localStorage.getItem(storage_keys.timer_enabled);
@@ -784,7 +725,6 @@ function loadPowerUserSettings(settings, data) {
         storage_keys.mesIDDisplay_enabled,
     );
     power_user.fast_ui_mode = fastUi === null ? true : fastUi == "true";
-    power_user.movingUI = movingUI === null ? false : movingUI == "true";
     power_user.noShadows = noShadows === null ? false : noShadows == "true";
     power_user.hotswap_enabled = hotswap === null ? true : hotswap == "true";
     power_user.timer_enabled = timer === null ? true : timer == "true";
@@ -904,7 +844,6 @@ function loadPowerUserSettings(settings, data) {
     $("#markdown_escape_strings").val(power_user.markdown_escape_strings);
     $("#fast_ui_mode").prop("checked", power_user.fast_ui_mode);
     $("#waifuMode").prop("checked", power_user.waifuMode);
-    $("#movingUImode").prop("checked", power_user.movingUI);
     $("#noShadowsmode").prop("checked", power_user.noShadows);
     $("#start_reply_with").val(power_user.user_prompt_bias);
     $("#chat-show-reply-prefix-checkbox").prop(
@@ -982,24 +921,14 @@ function loadPowerUserSettings(settings, data) {
         $("#themes").append(option);
     }
 
-    for (const movingUIPreset of movingUIPresets) {
-        const option = document.createElement("option");
-        option.value = movingUIPreset.name;
-        option.innerText = movingUIPreset.name;
-        option.selected = movingUIPreset.name == power_user.movingUIPreset;
-        $("#movingUIPresets").append(option);
-    }
-
     $(
         `#character_sort_order option[data-order="${power_user.sort_order}"][data-field="${power_user.sort_field}"]`,
     ).prop("selected", true);
     sortCharactersList();
     reloadMarkdownProcessor(power_user.render_formulas);
-    loadInstructMode();
     loadMaxContextUnlocked();
     switchWaifuMode();
     switchSpoilerMode();
-    loadMovingUIState();
     loadCharListState();
 }
 
@@ -1016,37 +945,6 @@ async function loadCharListState() {
         console.debug("charlist not ready yet");
         await delay(100);
         loadCharListState();
-    }
-}
-
-function loadMovingUIState() {
-    if (
-        isMobile() === false &&
-        power_user.movingUIState &&
-        power_user.movingUI === true
-    ) {
-        console.debug("loading movingUI state");
-        for (var elmntName of Object.keys(power_user.movingUIState)) {
-            var elmntState = power_user.movingUIState[elmntName];
-            try {
-                var elmnt = $("#" + $.escapeSelector(elmntName));
-                if (elmnt.length) {
-                    console.debug(`loading state for ${elmntName}`);
-                    elmnt.css(elmntState);
-                } else {
-                    console.debug(
-                        `skipping ${elmntName} because it doesn't exist in the DOM`,
-                    );
-                }
-            } catch (err) {
-                console.debug(
-                    `error occurred while processing ${elmntName}: ${err}`,
-                );
-            }
-        }
-    } else {
-        console.debug("skipping movingUI state load");
-        return;
     }
 }
 
@@ -1073,108 +971,6 @@ function switchMaxContextSize() {
     }
 }
 
-function loadInstructMode() {
-    const controls = [
-        { id: "instruct_enabled", property: "enabled", isCheckbox: true },
-        { id: "instruct_wrap", property: "wrap", isCheckbox: true },
-        {
-            id: "instruct_system_prompt",
-            property: "system_prompt",
-            isCheckbox: false,
-        },
-        {
-            id: "instruct_system_sequence",
-            property: "system_sequence",
-            isCheckbox: false,
-        },
-        {
-            id: "instruct_separator_sequence",
-            property: "separator_sequence",
-            isCheckbox: false,
-        },
-        {
-            id: "instruct_input_sequence",
-            property: "input_sequence",
-            isCheckbox: false,
-        },
-        {
-            id: "instruct_output_sequence",
-            property: "output_sequence",
-            isCheckbox: false,
-        },
-        {
-            id: "instruct_stop_sequence",
-            property: "stop_sequence",
-            isCheckbox: false,
-        },
-        { id: "instruct_names", property: "names", isCheckbox: true },
-        { id: "instruct_macro", property: "macro", isCheckbox: true },
-        {
-            id: "instruct_names_force_groups",
-            property: "names_force_groups",
-            isCheckbox: true,
-        },
-    ];
-
-    if (power_user.instruct.names_force_groups === undefined) {
-        power_user.instruct.names_force_groups = true;
-    }
-
-    controls.forEach((control) => {
-        const $element = $(`#${control.id}`);
-
-        if (control.isCheckbox) {
-            $element.prop("checked", power_user.instruct[control.property]);
-        } else {
-            $element.val(power_user.instruct[control.property]);
-        }
-
-        $element.on("input", function () {
-            power_user.instruct[control.property] = control.isCheckbox
-                ? !!$(this).prop("checked")
-                : $(this).val();
-            saveSettingsDebounced();
-        });
-    });
-
-    instruct_presets.forEach((preset) => {
-        const name = preset.name;
-        const option = document.createElement("option");
-        option.value = name;
-        option.innerText = name;
-        option.selected = name === power_user.instruct.preset;
-        $("#instruct_presets").append(option);
-    });
-
-    $("#instruct_presets").on("change", function () {
-        const name = $(this).find(":selected").val();
-        const preset = instruct_presets.find((x) => x.name === name);
-
-        if (!preset) {
-            return;
-        }
-
-        power_user.instruct.preset = name;
-        controls.forEach((control) => {
-            if (preset[control.property] !== undefined) {
-                power_user.instruct[control.property] =
-                    preset[control.property];
-                const $element = $(`#${control.id}`);
-
-                if (control.isCheckbox) {
-                    $element
-                        .prop("checked", power_user.instruct[control.property])
-                        .trigger("input");
-                } else {
-                    $element
-                        .val(power_user.instruct[control.property])
-                        .trigger("input");
-                }
-            }
-        });
-    });
-}
-
 export function fuzzySearchCharacters(searchValue) {
     const fuse = new Fuse(characters, {
         keys: [
@@ -1198,98 +994,6 @@ export function fuzzySearchCharacters(searchValue) {
     console.debug("Fuzzy search results for " + searchValue, results);
     const indices = results.map((x) => x.refIndex);
     return indices;
-}
-
-export function formatInstructModeChat(
-    name,
-    mes,
-    isUser,
-    isNarrator,
-    forceAvatar,
-    name1,
-    name2,
-) {
-    let includeNames = isNarrator ? false : power_user.instruct.names;
-
-    if (
-        !isNarrator &&
-        power_user.instruct.names_force_groups &&
-        (selected_group || forceAvatar)
-    ) {
-        includeNames = true;
-    }
-
-    let sequence =
-        isUser || isNarrator
-            ? power_user.instruct.input_sequence
-            : power_user.instruct.output_sequence;
-
-    if (power_user.instruct.macro) {
-        sequence = substituteParams(sequence, name1, name2);
-    }
-
-    const separator = power_user.instruct.wrap ? "\n" : "";
-    const separatorSequence =
-        power_user.instruct.separator_sequence && !isUser
-            ? power_user.instruct.separator_sequence
-            : power_user.instruct.wrap
-            ? "\n"
-            : "";
-    const textArray = includeNames
-        ? [sequence, `${name}: ${mes}`, separatorSequence]
-        : [sequence, mes, separatorSequence];
-    const text = textArray.filter((x) => x).join(separator);
-    return text;
-}
-
-export function formatInstructStoryString(story, systemPrompt) {
-    // If the character has a custom system prompt AND user has it preferred, use that instead of the default
-    systemPrompt =
-        power_user.prefer_character_prompt && systemPrompt
-            ? systemPrompt
-            : power_user.instruct.system_prompt;
-    const sequence = power_user.instruct.system_sequence || "";
-    const prompt =
-        substituteParams(
-            systemPrompt,
-            name1,
-            name2,
-            power_user.instruct.system_prompt,
-        ) || "";
-    const separator = power_user.instruct.wrap ? "\n" : "";
-    const textArray = [sequence, prompt + "\n" + story];
-    const text = textArray.filter((x) => x).join(separator);
-    return text;
-}
-
-export function formatInstructModePrompt(
-    name,
-    isImpersonate,
-    promptBias,
-    name1,
-    name2,
-) {
-    const includeNames =
-        power_user.instruct.names ||
-        (!!selected_group && power_user.instruct.names_force_groups);
-    let sequence = isImpersonate
-        ? power_user.instruct.input_sequence
-        : power_user.instruct.output_sequence;
-
-    if (power_user.instruct.macro) {
-        sequence = substituteParams(sequence, name1, name2);
-    }
-
-    const separator = power_user.instruct.wrap ? "\n" : "";
-    let text = includeNames
-        ? separator + sequence + separator + `${name}:`
-        : separator + sequence;
-
-    if (!isImpersonate && promptBias) {
-        text += includeNames ? promptBias : separator + promptBias;
-    }
-
-    return text.trimEnd();
 }
 
 const sortFunc = (a, b) =>
@@ -1420,126 +1124,6 @@ async function saveTheme() {
     }
 }
 
-async function saveMovingUI() {
-    const name = await callPopup(
-        "Enter a name for the MovingUI Preset:",
-        "input",
-    );
-
-    if (!name) {
-        return;
-    }
-
-    const movingUIPreset = {
-        name,
-        movingUIState: power_user.movingUIState,
-    };
-    console.log(movingUIPreset);
-
-    const response = await fetch("/savemovingui", {
-        method: "POST",
-        headers: getRequestHeaders(),
-        body: JSON.stringify(movingUIPreset),
-    });
-
-    if (response.ok) {
-        const movingUIPresetIndex = movingUIPresets.findIndex(
-            (x) => x.name == name,
-        );
-
-        if (movingUIPresetIndex == -1) {
-            movingUIPresets.push(movingUIPreset);
-            const option = document.createElement("option");
-            option.selected = true;
-            option.value = name;
-            option.innerText = name;
-            $("#movingUIPresets").append(option);
-        } else {
-            movingUIPresets[movingUIPresetIndex] = movingUIPreset;
-            $(`#movingUIPresets option[value="${name}"]`).attr(
-                "selected",
-                true,
-            );
-        }
-
-        power_user.movingUIPreset = name;
-        saveSettingsDebounced();
-    } else {
-        toastr.warning("failed to save MovingUI state.");
-    }
-}
-
-async function resetMovablePanels(type) {
-    const panelIds = [
-        "sheld",
-        "left-nav-panel",
-        "right-nav-panel",
-        "WorldInfo",
-        "floatingPrompt",
-        "expression-holder",
-        "groupMemberListPopout",
-    ];
-
-    const panelStyles = [
-        "top",
-        "left",
-        "right",
-        "bottom",
-        "height",
-        "width",
-        "margin",
-    ];
-
-    panelIds.forEach((id) => {
-        const panel = document.getElementById(id);
-
-        if (panel) {
-            $(panel).addClass("resizing");
-            panelStyles.forEach((style) => {
-                panel.style[style] = "";
-            });
-        }
-    });
-
-    const zoomedAvatars = document.querySelectorAll(".zoomed_avatar");
-    if (zoomedAvatars.length > 0) {
-        zoomedAvatars.forEach((avatar) => {
-            avatar.classList.add("resizing");
-            panelStyles.forEach((style) => {
-                avatar.style[style] = "";
-            });
-        });
-    }
-
-    $('[data-dragged="true"]').removeAttr("data-dragged");
-    await delay(50);
-
-    power_user.movingUIState = {};
-
-    //if user manually resets panels, deselect the current preset
-    if (type !== "quiet" && type !== "resize") {
-        power_user.movingUIPreset = "Default";
-        $(`#movingUIPresets option[value="Default"]`).prop("selected", true);
-    }
-
-    saveSettingsDebounced();
-    eventSource.emit(event_types.MOVABLE_PANELS_RESET);
-
-    eventSource.once(event_types.SETTINGS_UPDATED, () => {
-        $(".resizing").removeClass("resizing");
-        //if happening as part of preset application, do it quietly.
-        if (type === "quiet") {
-            return;
-            //if happening due to resize, tell user.
-        } else if (type === "resize") {
-            toastr.warning("Panel positions reset due to zoom/resize");
-            //if happening due to manual button press
-        } else {
-            toastr.success("Panel positions reset");
-        }
-    });
-}
-
 function doNewChat() {
     setTimeout(() => {
         $("#option_start_new_chat").trigger("click");
@@ -1621,10 +1205,6 @@ async function doDelMode(_, text) {
         toastr.success(`Deleted ${trueNumberOfDeletedMessage} messages.`);
         return;
     }
-}
-
-function doResetPanels() {
-    $("#movingUIreset").trigger("click");
 }
 
 function setAvgBG() {
@@ -1893,9 +1473,7 @@ $(document).ready(() => {
         const winWidth = window.innerWidth;
         const winHeight = window.innerHeight;
         console.debug(`Zoom: ${zoomLevel}, X:${winWidth}, Y:${winHeight}`);
-        if (Object.keys(power_user.movingUIState).length > 0) {
-            resetMovablePanels("resize");
-        }
+
         // Adjust layout and styling here
     });
 
@@ -2013,19 +1591,11 @@ $(document).ready(() => {
         switchWaifuMode();
     });
 
-    $("#movingUImode").change(function () {
-        power_user.movingUI = $(this).prop("checked");
-        localStorage.setItem(storage_keys.movingUI, power_user.movingUI);
-        switchMovingUI();
-    });
-
     $("#noShadowsmode").change(function () {
         power_user.noShadows = $(this).prop("checked");
         localStorage.setItem(storage_keys.noShadows, power_user.noShadows);
         noShadows();
     });
-
-    $("#movingUIreset").on("click", resetMovablePanels);
 
     $(`input[name="avatar_style"]`).on("input", function (e) {
         power_user.avatar_style = Number(e.target.value);
@@ -2126,16 +1696,7 @@ $(document).ready(() => {
         saveSettingsDebounced();
     });
 
-    $("#movingUIPresets").on("change", async function () {
-        console.log("saw MUI preset change");
-        const movingUIPresetSelected = $(this).find(":selected").val();
-        power_user.movingUIPreset = movingUIPresetSelected;
-        applyMovingUIPreset(movingUIPresetSelected);
-        saveSettingsDebounced();
-    });
-
     $("#ui-preset-save-button").on("click", saveTheme);
-    $("#movingui-preset-save-button").on("click", saveMovingUI);
 
     $("#never_resize_avatars").on("input", function () {
         power_user.never_resize_avatars = !!$(this).prop("checked");
@@ -2451,14 +2012,6 @@ $(document).ready(() => {
         doMesCut,
         [],
         ' <span class="monospace">(requred number)</span> – cuts the specified message from the chat',
-        true,
-        true,
-    );
-    registerSlashCommand(
-        "resetpanels",
-        doResetPanels,
-        ["resetui"],
-        " – resets UI panels to original state.",
         true,
         true,
     );
