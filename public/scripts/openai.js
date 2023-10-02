@@ -177,6 +177,7 @@ const oai_settings = {
     show_external_models: false,
     proxy_password: "",
     assistant_prefill: "",
+    exclude_assistant: false,
 };
 
 let openai_setting_names;

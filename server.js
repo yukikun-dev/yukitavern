@@ -3403,10 +3403,10 @@ async function sendClaudeRequest(request, response) {
         let requestPrompt = convertClaudePrompt(
             request.body.messages,
             true,
-            true,
+            !request.body.exclude_assistant,
         );
 
-        if (request.body.assistant_prefill) {
+        if (request.body.assistant_prefill && !request.body.exclude_assistant) {
             requestPrompt += request.body.assistant_prefill;
         }
 
