@@ -183,6 +183,7 @@ async function writeStatsToFileAndExit(charStats) {
     } catch (err) {
         console.error("Failed to write stats to file:", err);
     } finally {
+        const process = require("process");
         process.exit();
     }
 }

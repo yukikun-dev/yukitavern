@@ -7,10 +7,11 @@
 //const appDir = dirname(require.main.filename);
 //const config = require(appDir + '/config.conf');
 const path = require("path");
+const process = require("process");
 const config = require(path.join(process.cwd(), "./config.conf"));
 
 const unauthorizedResponse = (res) => {
-    res.set("WWW-Authenticate", "Basic realm=\"SillyTavern\", charset=\"UTF-8\"");
+    res.set("WWW-Authenticate", 'Basic realm="SillyTavern", charset="UTF-8"');
     return res.status(401).send("Authentication required");
 };
 
@@ -27,6 +28,7 @@ const basicAuthMiddleware = function (request, response, callback) {
         return unauthorizedResponse(response);
     }
 
+    const Buffer = require("buffer").Buffer;
     const [username, password] = Buffer.from(credentials, "base64")
         .toString("utf8")
         .split(":");

@@ -9,9 +9,9 @@
         "ecmaVersion": "latest"
     },
     "rules": {
-        "indent": ["error", 4],
+        // "indent": ["error", 4, { "SwitchCase": 4 }],
         "linebreak-style": ["error", "unix"],
-        "quotes": ["error", "double"],
+        "quotes": ["error", "double", { "avoidEscape": true }],
         "semi": ["error", "always"],
         "no-unused-vars": ["warn"]
     }

@@ -79,6 +79,8 @@
     },
     "devDependencies": {
         "eslint": "^8.50.0",
+        "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-prettier": "^5.0.0",
         "pkg": "^5.8.1",
         "pkg-fetch": "^3.5.2",
         "toastr": "^2.1.4"
