@@ -7,16 +7,8 @@ import {
     createThumbnail,
     extractAllWords,
 } from "./utils.js";
-import {
-    RA_CountCharTokens,
-    humanizedDateTime,
-    dragElement,
-} from "./RossAscends-mods.js";
-import {
-    sortCharactersList,
-    sortGroupMembers,
-    loadMovingUIState,
-} from "./power-user.js";
+import { RA_CountCharTokens, humanizedDateTime } from "./RossAscends-mods.js";
+import { sortCharactersList, sortGroupMembers } from "./power-user.js";
 
 import {
     chat,
@@ -1624,9 +1616,7 @@ function doCurMemberListPopout() {
 
         newElement.append(controlBarHtml).append(memberListClone);
         $("body").append(newElement);
-        loadMovingUIState();
         $("#groupMemberListPopout").fadeIn(250);
-        dragElement(newElement);
         $("#groupMemberListPopoutClose")
             .off("click")
             .on("click", function () {

@@ -325,7 +325,6 @@ const directories = {
     thumbnailsBg: "thumbnails/bg/",
     thumbnailsAvatar: "thumbnails/avatar/",
     themes: "public/themes",
-    movingUI: "public/movingUI",
     extensions: "public/scripts/extensions",
     context: "public/context",
     backups: "backups/",
@@ -1895,7 +1894,6 @@ app.post("/getsettings", jsonParser, (request, response) => {
     const world_names = worldFiles.map((item) => path.parse(item).name);
 
     const themes = readAndParseFromDirectory(directories.themes);
-    const movingUIPresets = readAndParseFromDirectory(directories.movingUI);
     const quickReplyPresets = readAndParseFromDirectory(
         directories.quickreplies,
     );
@@ -1912,7 +1910,6 @@ app.post("/getsettings", jsonParser, (request, response) => {
         textgenerationwebui_presets,
         textgenerationwebui_preset_names,
         themes,
-        movingUIPresets,
         quickReplyPresets,
         context,
         enable_extensions: enableExtensions,
@@ -1954,20 +1951,6 @@ app.post("/savetheme", jsonParser, (request, response) => {
 
     const filename = path.join(
         directories.themes,
-        sanitize(request.body.name) + ".json",
-    );
-    fs.writeFileSync(filename, JSON.stringify(request.body, null, 4), "utf8");
-
-    return response.sendStatus(200);
-});
-
-app.post("/savemovingui", jsonParser, (request, response) => {
-    if (!request.body || !request.body.name) {
-        return response.sendStatus(400);
-    }
-
-    const filename = path.join(
-        directories.movingUI,
         sanitize(request.body.name) + ".json",
     );
     fs.writeFileSync(filename, JSON.stringify(request.body, null, 4), "utf8");

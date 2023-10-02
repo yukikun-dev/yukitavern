@@ -5,7 +5,7 @@ import {
     getRequestHeaders,
     saveSettingsDebounced,
 } from "../../../script.js";
-import { dragElement, isMobile } from "../../RossAscends-mods.js";
+import { isMobile } from "../../RossAscends-mods.js";
 import {
     getContext,
     getApiUrl,
@@ -14,7 +14,7 @@ import {
     ModuleWorkerWrapper,
     doExtrasFetch,
 } from "../../extensions.js";
-import { loadMovingUIState, power_user } from "../../power-user.js";
+import { power_user } from "../../power-user.js";
 import { onlyUnique, debounce, getCharaFilename } from "../../utils.js";
 export { MODULE_NAME };
 
@@ -162,8 +162,9 @@ async function visualNovelSetCharacterSprites(container, name, expression) {
 
         // download images if not downloaded yet
         if (spriteCache[spriteFolderName] === undefined) {
-            spriteCache[spriteFolderName] =
-                await getSpritesList(spriteFolderName);
+            spriteCache[spriteFolderName] = await getSpritesList(
+                spriteFolderName,
+            );
         }
 
         const sprites = spriteCache[spriteFolderName];
@@ -196,7 +197,6 @@ async function visualNovelSetCharacterSprites(container, name, expression) {
                 .find(".drag-grabber")
                 .attr("id", `expression-${avatar}header`);
             $("#visual-novel-wrapper").append(template);
-            dragElement($(template[0]));
             template.toggleClass("hidden", noSprites);
             await setImage(template.find("img"), defaultSpritePath || "");
             const fadeInPromise = new Promise((resolve) => {
@@ -282,19 +282,6 @@ async function visualNovelUpdateLayers(container) {
 
     images.sort(sortFunction).each((index, current) => {
         const element = $(current);
-        const elementID = element.attr("id");
-
-        // skip repositioning of dragged elements
-        if (
-            element.data("dragged") ||
-            (power_user.movingUIState[elementID] &&
-                typeof power_user.movingUIState[elementID] === "object" &&
-                Object.keys(power_user.movingUIState[elementID]).length > 0)
-        ) {
-            loadMovingUIState();
-            //currentPosition += imagesWidth[index];
-            return;
-        }
 
         const avatar = element.data("avatar");
         const layerIndex = layerIndices.indexOf(avatar);
@@ -1391,7 +1378,6 @@ function setExpressionOverrideHtml(forceClear = false) {
             </div>
         </div>`;
         $("body").append(html);
-        loadMovingUIState();
     }
     function addVisualNovelMode() {
         const html = `
@@ -1503,7 +1489,6 @@ function setExpressionOverrideHtml(forceClear = false) {
     const updateFunction = wrapper.update.bind(wrapper);
     setInterval(updateFunction, UPDATE_INTERVAL);
     moduleWorker();
-    dragElement($("#expression-holder"));
     eventSource.on(event_types.CHAT_CHANGED, () => {
         setExpressionOverrideHtml();
 

@@ -2,7 +2,6 @@ import {
     humanizedDateTime,
     favsToHotswap,
     getMessageTimeStamp,
-    dragElement,
     isMobile,
 } from "./scripts/RossAscends-mods.js";
 import { userStatsHandler, statMesProcess } from "./scripts/stats.js";
@@ -73,7 +72,6 @@ import {
     pygmalion_options,
     tokenizers,
     persona_description_positions,
-    loadMovingUIState,
     getCustomStoppingStrings,
     fuzzySearchCharacters,
     MAX_CONTEXT_DEFAULT,
@@ -8031,9 +8029,8 @@ function doTogglePanels() {
 
 $(document).ready(function () {
     if (isMobile() === true) {
-        console.debug("hiding movingUI and sheldWidth toggles for mobile");
+        console.debug("hiding sheldWidth toggles for mobile");
         $("#sheldWidthToggleBlock").hide();
-        $("#movingUIModeCheckBlock").hide();
     }
 
     registerSlashCommand(
@@ -9840,9 +9837,7 @@ $(document).ready(function () {
                     avatarSrc,
                 );
             }
-            loadMovingUIState();
             $(`.zoomed_avatar[forChar="${charname}"]`).css("display", "block");
-            dragElement(newElement);
 
             $(`.zoomed_avatar[forChar="${charname}"] img`).on(
                 "dragstart",
