@@ -900,9 +900,10 @@ async function sendOpenAIRequest(type, openai_msgs_tosend, signal) {
     if (isClaude) {
         generate_data["use_claude"] = true;
         generate_data["top_k"] = parseFloat(oai_settings.top_k_openai);
+        generate_data["exclude_assistant"] = oai_settings.exclude_assistant;
 
         // Don't add a prefill on quiet gens (summarization)
-        if (!isQuiet) {
+        if (!isQuiet && !oai_settings.exclude_assistant) {
             generate_data["assistant_prefill"] = substituteParams(
                 oai_settings.assistant_prefill,
             );
@@ -1269,6 +1270,8 @@ function loadOpenAISettings(data, settings) {
         oai_settings.openai_model = settings.openai_model;
     if (settings.jailbreak_system !== undefined)
         oai_settings.jailbreak_system = !!settings.jailbreak_system;
+    if (settings.exclude_assistant !== undefined)
+        oai_settings.exclude_assistant = !!settings.exclude_assistant;
 
     $("#stream_toggle").prop("checked", oai_settings.stream_openai);
     $("#api_url_scale").val(oai_settings.api_url_scale);
@@ -1306,6 +1309,8 @@ function loadOpenAISettings(data, settings) {
         oai_settings.show_external_models,
     );
     $("#openai_external_category").toggle(oai_settings.show_external_models);
+
+    $("#exclude_assistant").prop("checked", oai_settings.exclude_assistant);
 
     if (settings.main_prompt !== undefined)
         oai_settings.main_prompt = settings.main_prompt;
@@ -1490,6 +1495,7 @@ async function saveOpenAIPreset(name, settings) {
         api_url_scale: settings.api_url_scale,
         show_external_models: settings.show_external_models,
         assistant_prefill: settings.assistant_prefill,
+        exclude_assistant: settings.exclude_assistant,
     };
 
     const savePresetSettings = await fetch(`/savepreset_openai?name=${name}`, {
@@ -1930,6 +1936,7 @@ function onSettingsPresetChange() {
             "assistant_prefill",
             false,
         ],
+        exclude_assistant: ["#exclude_assistant", "exclude_assistant", false],
     };
 
     for (const [key, [selector, setting, isCheckbox]] of Object.entries(
@@ -2292,6 +2299,19 @@ $(document).ready(function () {
         oai_settings.enhance_definitions = !!$("#enhance_definitions").prop(
             "checked",
         );
+        saveSettingsDebounced();
+    });
+
+    $("#exclude_assistant").on("change", function () {
+        oai_settings.exclude_assistant =
+            !!$("#exclude_assistant").prop("checked");
+        if (oai_settings.exclude_assistant) {
+            $("#claude_assistant_prefill").css("display", "none");
+            $("#claude_assistant_prefill_text").css("display", "none");
+        } else {
+            $("#claude_assistant_prefill").css("display", "");
+            $("#claude_assistant_prefill_text").css("display", "");
+        }
         saveSettingsDebounced();
     });
 
