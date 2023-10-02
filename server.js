@@ -542,7 +542,7 @@ app.post(
                 sampler_order: sampler_order,
                 singleline: !!request.body.singleline,
             };
-            if (!!request.body.stop_sequence) {
+            if (request.body.stop_sequence) {
                 this_settings["stop_sequence"] = request.body.stop_sequence;
             }
         }
@@ -608,23 +608,23 @@ app.post(
             } catch (error) {
                 // response
                 switch (error?.status) {
-                    case 403:
-                    case 503: // retry in case of temporary service issue, possibly caused by a queue failure?
-                        console.debug(
-                            `KoboldAI is busy. Retry attempt ${
-                                i + 1
-                            } of ${MAX_RETRIES}...`,
+                case 403:
+                case 503: // retry in case of temporary service issue, possibly caused by a queue failure?
+                    console.debug(
+                        `KoboldAI is busy. Retry attempt ${
+                            i + 1
+                        } of ${MAX_RETRIES}...`,
+                    );
+                    await delay(delayAmount);
+                    break;
+                default:
+                    if ("status" in error) {
+                        console.log(
+                            "Status Code from Kobold:",
+                            error.status,
                         );
-                        await delay(delayAmount);
-                        break;
-                    default:
-                        if ("status" in error) {
-                            console.log(
-                                "Status Code from Kobold:",
-                                error.status,
-                            );
-                        }
-                        return response_generate.send({ error: true });
+                    }
+                    return response_generate.send({ error: true });
                 }
             }
         }
@@ -692,12 +692,12 @@ app.post(
                     const message = json5.parse(rawMessage);
 
                     switch (message.event) {
-                        case "text_stream":
-                            yield message.text;
-                            break;
-                        case "stream_end":
-                            websocket.close();
-                            return;
+                    case "text_stream":
+                        yield message.text;
+                        break;
+                    case "stream_end":
+                        websocket.close();
+                        return;
                     }
                 }
             }
@@ -1065,9 +1065,9 @@ function charaFormatData(data) {
         "data.tags",
         typeof data.tags == "string"
             ? data.tags
-                  .split(",")
-                  .map((x) => x.trim())
-                  .filter((x) => x)
+                .split(",")
+                .map((x) => x.trim())
+                .filter((x) => x)
             : data.tags || [],
     );
     _.set(char, "data.creator", data.creator || "");
@@ -1143,9 +1143,9 @@ app.post("/renamechat", jsonParser, async function (request, response) {
     const pathToFolder = request.body.is_group
         ? directories.groupChats
         : path.join(
-              directories.chats,
-              String(request.body.avatar_url).replace(".png", ""),
-          );
+            directories.chats,
+            String(request.body.avatar_url).replace(".png", ""),
+        );
     const pathToOriginalFile = path.join(
         pathToFolder,
         request.body.original_file,
@@ -1491,9 +1491,9 @@ const calculateChatSize = (charDir) => {
 const calculateDataSize = (data) => {
     return typeof data === "object"
         ? Object.values(data).reduce(
-              (acc, val) => acc + new String(val).length,
-              0,
-          )
+            (acc, val) => acc + new String(val).length,
+            0,
+        )
         : 0;
 };
 
@@ -2375,9 +2375,9 @@ app.post("/exportchat", jsonParser, async function (request, response) {
     const pathToFolder = request.body.is_group
         ? directories.groupChats
         : path.join(
-              directories.chats,
-              String(request.body.avatar_url).replace(".png", ""),
-          );
+            directories.chats,
+            String(request.body.avatar_url).replace(".png", ""),
+        );
     let filename = path.join(pathToFolder, request.body.file);
     let exportfilename = request.body.exportfilename;
     if (!fs.existsSync(filename)) {
@@ -2457,56 +2457,56 @@ app.post("/exportcharacter", jsonParser, async function (request, response) {
     }
 
     switch (request.body.format) {
-        case "png":
-            return response.sendFile(filename, { root: process.cwd() });
-        case "json": {
-            try {
-                let json = await charaRead(filename);
-                let jsonObject = getCharaCardV2(json5.parse(json));
-                return response.type("json").send(jsonObject);
-            } catch {
-                return response.sendStatus(400);
-            }
+    case "png":
+        return response.sendFile(filename, { root: process.cwd() });
+    case "json": {
+        try {
+            let json = await charaRead(filename);
+            let jsonObject = getCharaCardV2(json5.parse(json));
+            return response.type("json").send(jsonObject);
+        } catch {
+            return response.sendStatus(400);
         }
-        case "webp": {
-            try {
-                let json = await charaRead(filename);
-                let stringByteArray = utf8Encode.encode(json).toString();
-                let inputWebpPath = `./uploads/${Date.now()}_input.webp`;
-                let outputWebpPath = `./uploads/${Date.now()}_output.webp`;
-                let metadataPath = `./uploads/${Date.now()}_metadata.exif`;
-                let metadata = {
-                    Exif: {
-                        [exif.ExifIFD.UserComment]: stringByteArray,
-                    },
-                };
-                const exifString = exif.dump(metadata);
-                fs.writeFileSync(metadataPath, exifString, "binary");
+    }
+    case "webp": {
+        try {
+            let json = await charaRead(filename);
+            let stringByteArray = utf8Encode.encode(json).toString();
+            let inputWebpPath = `./uploads/${Date.now()}_input.webp`;
+            let outputWebpPath = `./uploads/${Date.now()}_output.webp`;
+            let metadataPath = `./uploads/${Date.now()}_metadata.exif`;
+            let metadata = {
+                Exif: {
+                    [exif.ExifIFD.UserComment]: stringByteArray,
+                },
+            };
+            const exifString = exif.dump(metadata);
+            fs.writeFileSync(metadataPath, exifString, "binary");
 
-                await webp.cwebp(filename, inputWebpPath, "-q 95");
-                await webp.webpmux_add(
-                    inputWebpPath,
-                    outputWebpPath,
-                    metadataPath,
-                    "exif",
-                );
+            await webp.cwebp(filename, inputWebpPath, "-q 95");
+            await webp.webpmux_add(
+                inputWebpPath,
+                outputWebpPath,
+                metadataPath,
+                "exif",
+            );
 
-                response.sendFile(
-                    outputWebpPath,
-                    { root: process.cwd() },
-                    () => {
-                        fs.rmSync(inputWebpPath);
-                        fs.rmSync(metadataPath);
-                        fs.rmSync(outputWebpPath);
-                    },
-                );
+            response.sendFile(
+                outputWebpPath,
+                { root: process.cwd() },
+                () => {
+                    fs.rmSync(inputWebpPath);
+                    fs.rmSync(metadataPath);
+                    fs.rmSync(outputWebpPath);
+                },
+            );
 
-                return;
-            } catch (err) {
-                console.log(err);
-                return response.sendStatus(400);
-            }
+            return;
+        } catch (err) {
+            console.log(err);
+            return response.sendStatus(400);
         }
+    }
     }
 
     return response.sendStatus(400);
@@ -3035,12 +3035,12 @@ function getThumbnailFolder(type) {
     let thumbnailFolder;
 
     switch (type) {
-        case "bg":
-            thumbnailFolder = directories.thumbnailsBg;
-            break;
-        case "avatar":
-            thumbnailFolder = directories.thumbnailsAvatar;
-            break;
+    case "bg":
+        thumbnailFolder = directories.thumbnailsBg;
+        break;
+    case "avatar":
+        thumbnailFolder = directories.thumbnailsAvatar;
+        break;
     }
 
     return thumbnailFolder;
@@ -3050,12 +3050,12 @@ function getOriginalFolder(type) {
     let originalFolder;
 
     switch (type) {
-        case "bg":
-            originalFolder = directories.backgrounds;
-            break;
-        case "avatar":
-            originalFolder = directories.characters;
-            break;
+    case "bg":
+        originalFolder = directories.backgrounds;
+        break;
+    case "avatar":
+        originalFolder = directories.characters;
+        break;
     }
 
     return originalFolder;
@@ -3346,22 +3346,22 @@ function convertClaudePrompt(messages, addHumanPrefix, addAssistantPostfix) {
         .map((v) => {
             let prefix = "";
             switch (v.role) {
-                case "assistant":
-                    prefix = "\n\nAssistant: ";
-                    break;
-                case "user":
-                    prefix = "\n\nHuman: ";
-                    break;
-                case "system":
-                    // According to the Claude docs, H: and A: should be used for example conversations.
-                    if (v.name === "example_assistant") {
-                        prefix = "\n\nA: ";
-                    } else if (v.name === "example_user") {
-                        prefix = "\n\nH: ";
-                    } else {
-                        prefix = "\n\n";
-                    }
-                    break;
+            case "assistant":
+                prefix = "\n\nAssistant: ";
+                break;
+            case "user":
+                prefix = "\n\nHuman: ";
+                break;
+            case "system":
+                // According to the Claude docs, H: and A: should be used for example conversations.
+                if (v.name === "example_assistant") {
+                    prefix = "\n\nA: ";
+                } else if (v.name === "example_user") {
+                    prefix = "\n\nH: ";
+                } else {
+                    prefix = "\n\n";
+                }
+                break;
             }
             return prefix + v.content;
         })
@@ -3838,11 +3838,11 @@ app.post("/savepreset_openai", jsonParser, function (request, response) {
 
 function getPresetFolderByApiId(apiId) {
     switch (apiId) {
-        case "kobold":
-        case "textgenerationwebui":
-            return directories.textGen_Settings;
-        default:
-            return null;
+    case "kobold":
+    case "textgenerationwebui":
+        return directories.textGen_Settings;
+    default:
+        return null;
     }
 }
 
