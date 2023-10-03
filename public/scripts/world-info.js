@@ -18,7 +18,6 @@ import {
     parseJsonFile,
     extractDataFromPng,
     getFileBuffer,
-    delay,
     getCharaFilename,
     deepClone,
 } from "./utils.js";
@@ -1606,7 +1605,6 @@ export async function importEmbeddedWorldInfo() {
 }
 
 function onWorldInfoChange(_, text) {
-    let selectedWorlds;
     if (_ !== "__notSlashCommand__") {
         // if it's a slash command
         if (text !== undefined) {
@@ -1730,7 +1728,7 @@ export async function importWorldInfo(file) {
                 toastr.info(`World Info "${data.name}" imported successfully!`);
             }
         },
-        error: (jqXHR, exception) => {},
+        error: () => {},
     });
 }
 

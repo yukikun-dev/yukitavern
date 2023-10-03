@@ -93,14 +93,12 @@ let groups = [];
 let selected_group = null;
 let group_generation_id = null;
 let fav_grp_checked = false;
-let fav_filter_on = false;
 
 export const group_activation_strategy = {
     NATURAL: 0,
     LIST: 1,
 };
 
-const groupAutoModeInterval = setInterval(groupChatAutoModeWorker, 5000);
 const saveGroupDebounced = debounce(async (group) => await _save(group), 500);
 
 async function _save(group, reload = true) {

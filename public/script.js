@@ -802,7 +802,6 @@ var max_context = 2048;
 
 var tokens_already_generated = 0;
 var message_already_generated = "";
-var cycle_count_generation = 0;
 
 var swipes = true;
 let extension_prompts = {};

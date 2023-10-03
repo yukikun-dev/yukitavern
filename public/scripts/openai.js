@@ -57,7 +57,6 @@ let openai_messages_count = 0;
 let openai_narrator_messages_count = 0;
 
 let is_get_status_openai = false;
-let is_api_button_press_openai = false;
 
 const default_main_prompt =
     "Write {{char}}'s next reply in a fictional chat between {{char}} and {{user}}. Write 1 reply only in internet RP style, italicize actions, and avoid quotation marks. Use markdown. Be proactive, creative, and drive the plot and conversation forward. Write at least 1 paragraph, up to 4. Always stay in character and avoid repetition.";
@@ -88,7 +87,6 @@ const max_8k = 8191;
 const max_16k = 16383;
 const max_32k = 32767;
 const claude_max = 8000; // We have a proper tokenizer, so theoretically could be larger (up to 9k)
-const palm2_max = 7500; // The real context window is 8192, spare some for padding due to using turbo tokenizer
 const claude_100k_max = 99000;
 const unlocked_max = 100 * 1024;
 const oai_max_temp = 2.0;
@@ -1430,7 +1428,6 @@ async function getStatusOpen() {
 }
 
 function resultCheckStatusOpen() {
-    is_api_button_press_openai = false;
     checkOnlineStatus();
     $("#api_loading_openai").css("display", "none");
     $("#api_button_openai").css("display", "inline-block");
@@ -2180,7 +2177,6 @@ async function onConnectButtonClick(e) {
     $("#api_button_openai").css("display", "none");
     saveSettingsDebounced();
     is_get_status_openai = true;
-    is_api_button_press_openai = true;
     await getStatusOpen();
 }
 

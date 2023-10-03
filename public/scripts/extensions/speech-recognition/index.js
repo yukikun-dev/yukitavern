@@ -6,11 +6,8 @@ TODO:
 import { saveSettingsDebounced } from "../../../script.js";
 import {
     getContext,
-    getApiUrl,
-    modules,
     extension_settings,
     ModuleWorkerWrapper,
-    doExtrasFetch,
 } from "../../extensions.js";
 import { VoskSttProvider } from "./vosk.js";
 import { WhisperSttProvider } from "./whisper.js";

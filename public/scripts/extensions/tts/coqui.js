@@ -5,10 +5,8 @@ TODO:
  - handle apply/available voices button
 */
 
-import { eventSource, event_types } from "../../../script.js";
 import {
     doExtrasFetch,
-    extension_settings,
     getApiUrl,
     getContext,
     modules,
@@ -300,7 +298,6 @@ class CoquiTtsProvider {
         throwIfModuleMissing();
         resetModelSettings();
         $("#coqui_api_model_settings").hide();
-        const model_origin = $("#coqui_model_origin").val();
         const model_language = $("#coqui_api_language").val();
         console.debug(model_language);
 

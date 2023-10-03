@@ -3,23 +3,17 @@ import {
     scrollChatToBottom,
     characters,
     callPopup,
-    getStatus,
     reloadMarkdownProcessor,
     reloadCurrentChat,
     getRequestHeaders,
-    substituteParams,
     updateVisibleDivs,
-    eventSource,
-    event_types,
     getCurrentChatId,
     printCharacters,
-    name1,
-    name2,
     setCharacterId,
     setEditedMessageId,
 } from "../script.js";
 import { favsToHotswap, isMobile } from "./RossAscends-mods.js";
-import { groups, resetSelectedGroup, selected_group } from "./group-chats.js";
+import { groups, resetSelectedGroup } from "./group-chats.js";
 
 import { registerSlashCommand } from "./slash-commands.js";
 
@@ -1321,67 +1315,6 @@ function setAvgBG() {
 
         return [r * 255, g * 255, b * 255];
     }
-
-    function rgbToLuminance(r, g, b) {
-        console.log(r, g, b);
-        const gammaCorrect = (color) => {
-            return color <= 0.03928
-                ? color / 12.92
-                : Math.pow((color + 0.055) / 1.055, 2.4);
-        };
-
-        const rsRGB = r / 255;
-        const gsRGB = g / 255;
-        const bsRGB = b / 255;
-
-        const rLuminance = gammaCorrect(rsRGB).toFixed(2);
-        const gLuminance = gammaCorrect(gsRGB).toFixed(2);
-        const bLuminance = gammaCorrect(bsRGB).toFixed(2);
-
-        console.log(
-            `rLum ${rLuminance}, gLum ${gLuminance}, bLum ${bLuminance}`,
-        );
-
-        return 0.2126 * rLuminance + 0.7152 * gLuminance + 0.0722 * bLuminance;
-    }
-
-    //this version keeps BG and main text in same hue
-    /* function getReadableTextColor(rgb) {
-         const [r, g, b] = rgb;
-
-         // Convert RGB to HSL
-         const rgbToHsl = (r, g, b) => {
-             const max = Math.max(r, g, b);
-             const min = Math.min(r, g, b);
-             const d = max - min;
-             const l = (max + min) / 2;
-
-             if (d === 0) return [0, 0, l];
-
-             const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-             const h = (() => {
-                 switch (max) {
-                     case r:
-                         return (g - b) / d + (g < b ? 6 : 0);
-                     case g:
-                         return (b - r) / d + 2;
-                     case b:
-                         return (r - g) / d + 4;
-                 }
-             })() / 6;
-
-             return [h, s, l];
-         };
-         const [h, s, l] = rgbToHsl(r / 255, g / 255, b / 255);
-
-         // Calculate appropriate text color based on background color
-         const targetLuminance = l > 0.5 ? 0.2 : 0.8;
-         const targetSaturation = s > 0.5 ? s - 0.2 : s + 0.2;
-         const [rNew, gNew, bNew] = hslToRgb(h, targetSaturation, targetLuminance);
-
-         // Return the text color in RGBA format
-         return `rgba(${rNew.toFixed(0)}, ${gNew.toFixed(0)}, ${bNew.toFixed(0)}, 1)`;
-     }*/
 
     //this version makes main text complimentary color to BG color
     function getReadableTextColor(rgb) {

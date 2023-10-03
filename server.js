@@ -578,7 +578,7 @@ app.post(
                 console.log(data);
                 return response_generate.send(data);
             } catch (error) {
-                retval = {
+                var retval = {
                     error: true,
                     status: error.status,
                     response: error.statusText,
@@ -587,7 +587,9 @@ app.post(
                 try {
                     retval.response = await error.json();
                     retval.response = retval.response.result;
-                } catch {}
+                } catch {
+                    _.noop();
+                }
                 return response_generate.send(retval);
             }
         }
@@ -655,7 +657,7 @@ app.post(
     async function (request, response_getstatus = response) {
         if (!request.body) return response_getstatus.sendStatus(400);
         api_server = request.body.api_server;
-        main_api = request.body.main_api;
+        const main_api = request.body.main_api;
         if (api_server.indexOf("localhost") != -1) {
             api_server = api_server.replace("localhost", "127.0.0.1");
         }
@@ -3628,6 +3630,7 @@ app.post("/tokenize_via_api", jsonParser, async function (request, response) {
             headers: { "Content-Type": "application/json" },
         };
 
+        const main_api = request.body.main_api;
         if (main_api == "textgenerationwebui" && request.body.use_mancer) {
             args.headers = Object.assign(args.headers, get_mancer_headers());
         }
@@ -3654,20 +3657,6 @@ async function postAsync(url, args) {
 
     throw response;
 }
-
-function getAsync(url, args) {
-    return new Promise((resolve, reject) => {
-        client
-            .get(url, args, (data, response) => {
-                if (response.statusCode >= 400) {
-                    reject(data);
-                }
-                resolve(data);
-            })
-            .on("error", (e) => reject(e));
-    });
-}
-// ** END **
 
 const tavernUrl = new URL(
     (cliArguments.ssl ? "https://" : "http://") +
