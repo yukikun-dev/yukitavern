@@ -2962,7 +2962,6 @@ async function Generate(
                 summarizeString: extension_prompts["1_memory"]?.value || "",
                 authorsNoteString:
                     extension_prompts["2_floating_prompt"]?.value || "",
-                smartContextString: extension_prompts["chromadb"]?.value || "",
                 worldInfoString: worldInfoString,
                 storyString: storyString,
                 afterScenarioAnchor: afterScenarioAnchor,

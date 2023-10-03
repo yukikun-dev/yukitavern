@@ -193,7 +193,6 @@
             "ElevenLabs": {},
             "System": {}
         },
-        "chromadb": {},
         "objective": {
             "customPrompts": {
                 "default": {

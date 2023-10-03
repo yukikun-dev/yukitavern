@@ -68,11 +68,6 @@ const extension_settings = {
     expressions: {},
     regex: [],
     tts: {},
-    sd: {
-        prompts: {},
-        character_prompts: {},
-    },
-    chromadb: {},
     translate: {},
     objective: {},
     quickReply: {},
