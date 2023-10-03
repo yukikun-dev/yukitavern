@@ -22,7 +22,6 @@ import { SileroTtsProvider } from "./silerotts.js";
 import { CoquiTtsProvider } from "./coqui.js"; // TODO: rename once done
 import { SystemTtsProvider } from "./system.js";
 import { power_user } from "../../power-user.js";
-import { rvcVoiceConversion } from "../rvc/index.js";
 export { talkingAnimation };
 
 const UPDATE_INTERVAL = 1000;
@@ -434,10 +433,6 @@ function saveLastValues() {
 
 async function tts(text, voiceId, char) {
     let response = await ttsProvider.generateTts(text, voiceId);
-
-    // RVC injection
-    if (extension_settings.rvc.enabled)
-        response = await rvcVoiceConversion(response, char);
 
     addAudioJob(response);
     completeTtsJob();
