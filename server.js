@@ -153,7 +153,6 @@ client.on("error", (err) => {
 let api_server = "http://0.0.0.0:5000";
 let api_openai = "https://api.openai.com/v1";
 let api_claude = "https://api.anthropic.com/v1";
-let main_api = "kobold";
 
 let characters = {};
 let response_dw_bg;
@@ -319,7 +318,6 @@ const directories = {
     chats: "public/chats/",
     characters: "public/characters/",
     backgrounds: "public/backgrounds",
-    koboldAI_Settings: "public/KoboldAI Settings",
     openAI_Settings: "public/OpenAI Settings",
     textGen_Settings: "public/TextGen Settings",
     thumbnails: "thumbnails/",
@@ -470,173 +468,6 @@ app.get("/version", function (_, response) {
     const data = getVersion();
     response.send(data);
 });
-
-//**************Kobold api
-app.post(
-    "/generate",
-    jsonParser,
-    async function (request, response_generate = response) {
-        if (!request.body) return response_generate.sendStatus(400);
-
-        const request_prompt = request.body.prompt;
-        const controller = new AbortController();
-        request.socket.removeAllListeners("close");
-        request.socket.on("close", async function () {
-            if (request.body.can_abort && !response_generate.writableEnded) {
-                try {
-                    console.log("Aborting Kobold generation...");
-                    // send abort signal to koboldcpp
-                    const abortResponse = await fetch(
-                        `${api_server}/extra/abort`,
-                        {
-                            method: "POST",
-                        },
-                    );
-
-                    if (!abortResponse.ok) {
-                        console.log(
-                            "Error sending abort request to Kobold:",
-                            abortResponse.status,
-                        );
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-            controller.abort();
-        });
-
-        let this_settings = {
-            prompt: request_prompt,
-            use_story: false,
-            use_memory: false,
-            use_authors_note: false,
-            use_world_info: false,
-            max_context_length: request.body.max_context_length,
-            singleline: !!request.body.singleline,
-        };
-
-        if (request.body.gui_settings == false) {
-            const sampler_order = [
-                request.body.s1,
-                request.body.s2,
-                request.body.s3,
-                request.body.s4,
-                request.body.s5,
-                request.body.s6,
-                request.body.s7,
-            ];
-            this_settings = {
-                prompt: request_prompt,
-                use_story: false,
-                use_memory: false,
-                use_authors_note: false,
-                use_world_info: false,
-                max_context_length: request.body.max_context_length,
-                max_length: request.body.max_length,
-                rep_pen: request.body.rep_pen,
-                rep_pen_range: request.body.rep_pen_range,
-                rep_pen_slope: request.body.rep_pen_slope,
-                temperature: request.body.temperature,
-                tfs: request.body.tfs,
-                top_a: request.body.top_a,
-                top_k: request.body.top_k,
-                top_p: request.body.top_p,
-                typical: request.body.typical,
-                sampler_order: sampler_order,
-                singleline: !!request.body.singleline,
-            };
-            if (request.body.stop_sequence) {
-                this_settings["stop_sequence"] = request.body.stop_sequence;
-            }
-        }
-
-        console.log(this_settings);
-        const args = {
-            body: JSON.stringify(this_settings),
-            headers: { "Content-Type": "application/json" },
-            signal: controller.signal,
-        };
-
-        const MAX_RETRIES = 50;
-        const delayAmount = 2500;
-        let fetch, url, response;
-        for (let i = 0; i < MAX_RETRIES; i++) {
-            try {
-                fetch = require("node-fetch").default;
-                url = request.body.streaming
-                    ? `${api_server}/extra/generate/stream`
-                    : `${api_server}/v1/generate`;
-                response = await fetch(url, {
-                    method: "POST",
-                    timeout: 0,
-                    ...args,
-                });
-
-                if (request.body.streaming) {
-                    request.socket.on("close", function () {
-                        response.body.destroy(); // Close the remote stream
-                        response_generate.end(); // End the Express response
-                    });
-
-                    response.body.on("end", function () {
-                        console.log("Streaming request finished");
-                        response_generate.end();
-                    });
-
-                    // Pipe remote SSE stream to Express response
-                    return response.body.pipe(response_generate);
-                } else {
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.log(
-                            `Kobold returned error: ${response.status} ${response.statusText} ${errorText}`,
-                        );
-
-                        try {
-                            const errorJson = JSON.parse(errorText);
-                            const message = errorJson?.detail?.msg || errorText;
-                            return response_generate
-                                .status(400)
-                                .send({ error: { message } });
-                        } catch {
-                            return response_generate
-                                .status(400)
-                                .send({ error: { message: errorText } });
-                        }
-                    }
-
-                    const data = await response.json();
-                    return response_generate.send(data);
-                }
-            } catch (error) {
-                // response
-                switch (error?.status) {
-                    case 403:
-                    case 503: // retry in case of temporary service issue, possibly caused by a queue failure?
-                        console.debug(
-                            `KoboldAI is busy. Retry attempt ${
-                                i + 1
-                            } of ${MAX_RETRIES}...`,
-                        );
-                        await delay(delayAmount);
-                        break;
-                    default:
-                        if ("status" in error) {
-                            console.log(
-                                "Status Code from Kobold:",
-                                error.status,
-                            );
-                        }
-                        return response_generate.send({ error: true });
-                }
-            }
-        }
-
-        console.log("Max retries exceeded. Giving up.");
-        return response_generate.send({ error: true });
-    },
-);
 
 //************** Text generation web UI
 app.post(
@@ -838,23 +669,6 @@ app.post(
 
         var url = api_server + "/v1/model";
         let version = "";
-        let koboldVersion = {};
-        if (main_api == "kobold") {
-            try {
-                version = (await getAsync(api_server + "/v1/info/version"))
-                    .result;
-            } catch {
-                version = "0.0.0";
-            }
-            try {
-                koboldVersion = await getAsync(api_server + "/extra/version");
-            } catch {
-                koboldVersion = {
-                    result: "Kobold",
-                    version: "0.0",
-                };
-            }
-        }
         client
             .get(url, args, async function (data, response) {
                 if (typeof data !== "object") {
@@ -862,7 +676,6 @@ app.post(
                 }
                 if (response.statusCode == 200) {
                     data.version = version;
-                    data.koboldVersion = koboldVersion;
                     if (data.result == "ReadOnly") {
                         data.result = "no_connection";
                     }
@@ -1873,15 +1686,6 @@ app.post("/getsettings", jsonParser, (request, response) => {
         removeFileExtension: true,
     });
 
-    //Kobold
-    const {
-        fileContents: koboldai_settings,
-        fileNames: koboldai_setting_names,
-    } = readPresetsFromDirectory(directories.koboldAI_Settings, {
-        sortFunction: sortByName(directories.koboldAI_Settings),
-        removeFileExtension: true,
-    });
-
     const worldFiles = fs
         .readdirSync(directories.worlds)
         .filter((file) => path.extname(file).toLowerCase() === ".json")
@@ -1897,8 +1701,6 @@ app.post("/getsettings", jsonParser, (request, response) => {
 
     response.send({
         settings,
-        koboldai_settings,
-        koboldai_setting_names,
         world_names,
         openai_settings,
         openai_setting_names,
@@ -3779,7 +3581,6 @@ app.post("/savepreset_openai", jsonParser, function (request, response) {
 
 function getPresetFolderByApiId(apiId) {
     switch (apiId) {
-        case "kobold":
         case "textgenerationwebui":
             return directories.textGen_Settings;
         default:

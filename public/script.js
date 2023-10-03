@@ -7,15 +7,6 @@ import {
 import { userStatsHandler, statMesProcess } from "./scripts/stats.js";
 import { encode } from "../scripts/gpt-2-3-tokenizer/mod.js";
 import { GPT3BrowserTokenizer } from "../scripts/gpt-3-tokenizer/gpt3-tokenizer.js";
-import {
-    generateKoboldWithStreaming,
-    kai_settings,
-    loadKoboldSettings,
-    formatKoboldUrl,
-    getKoboldGenerationData,
-    canUseKoboldStopSequence,
-    canUseKoboldStreaming,
-} from "./scripts/kai-settings.js";
 
 import {
     textgenerationwebui_settings,
@@ -592,7 +583,7 @@ async function getClientVersion() {
 }
 
 function getTokenizerBestMatch() {
-    if (main_api === "kobold" || main_api === "textgenerationwebui") {
+    if (main_api === "textgenerationwebui") {
         return tokenizers.LLAMA;
     }
 
@@ -804,8 +795,6 @@ var is_use_scroll_holder = false;
 
 //settings
 var settings;
-export let koboldai_settings;
-export let koboldai_setting_names;
 var preset_settings = "gui";
 var user_avatar = "you.png";
 export var amount_gen = 80; //default max length of AI generated responses
@@ -818,7 +807,7 @@ var cycle_count_generation = 0;
 var swipes = true;
 let extension_prompts = {};
 
-var main_api; // = "kobold";
+var main_api;
 let abortController;
 
 //css
@@ -860,14 +849,12 @@ $.get("/csrf-token").then(async (data) => {
 function checkOnlineStatus() {
     ///////// REMOVED LINES THAT DUPLICATE RA_CHeckOnlineStatus FEATURES
     if (online_status == "no_connection") {
-        $("#online_status_indicator2").css("background-color", "red"); //Kobold
         $("#online_status_text2").html("No connection...");
         $(".online_status_indicator4").css("background-color", "red"); //OAI / ooba
         $(".online_status_text4").html("No connection...");
         is_get_status = false;
         setOpenAIOnlineStatus(false);
     } else {
-        $("#online_status_indicator2").css("background-color", "green"); //kobold
         $("#online_status_text2").html(online_status);
         $(".online_status_indicator4").css("background-color", "green"); //OAI / ooba
         $(".online_status_text4").html(online_status);
@@ -888,10 +875,7 @@ async function getStatus() {
             type: "POST", //
             url: "/getstatus", //
             data: JSON.stringify({
-                api_server:
-                    main_api == "kobold"
-                        ? api_server
-                        : api_server_textgenerationwebui,
+                api_server: api_server_textgenerationwebui,
                 main_api: main_api,
                 use_mancer:
                     main_api == "textgenerationwebui"
@@ -908,16 +892,6 @@ async function getStatus() {
                 online_status = data.result;
                 if (online_status == undefined) {
                     online_status = "no_connection";
-                }
-
-                // determine if we can use stop sequence and streaming
-                if (main_api === "kobold") {
-                    kai_settings.use_stop_sequence = canUseKoboldStopSequence(
-                        data.version,
-                    );
-                    kai_settings.can_use_streaming = canUseKoboldStreaming(
-                        data.koboldVersion,
-                    );
                 }
 
                 // We didn't get a 200 status code, but the endpoint has an explanation. Which means it DID connect, but I digress.
@@ -2012,9 +1986,6 @@ function appendToStoryString(value, prefix) {
 function isStreamingEnabled() {
     return (
         ((main_api == "openai" && oai_settings.stream_openai) ||
-            (main_api == "kobold" &&
-                kai_settings.streaming_kobold &&
-                kai_settings.can_use_streaming) ||
             (main_api == "textgenerationwebui" &&
                 textgenerationwebui_settings.streaming)) &&
         !isMultigenEnabled()
@@ -2352,34 +2323,6 @@ async function Generate(
     ) {
         toastr.error(
             "Streaming URL is not set. Look it up in the console window when starting TextGen Web UI",
-        );
-        is_send_press = false;
-        return;
-    }
-
-    if (
-        main_api == "kobold" &&
-        kai_settings.streaming_kobold &&
-        !kai_settings.can_use_streaming
-    ) {
-        toastr.error(
-            "Streaming is enabled, but the version of Kobold used does not support token streaming.",
-            undefined,
-            { timeOut: 10000, preventDuplicates: true },
-        );
-        is_send_press = false;
-        return;
-    }
-
-    if (
-        main_api == "kobold" &&
-        kai_settings.streaming_kobold &&
-        power_user.multigen
-    ) {
-        toastr.error(
-            'Multigen is not supported with Kobold streaming enabled. Disable streaming in "AI Response Configuration" or multigen in "Advanced Formatting" to proceed.',
-            undefined,
-            { timeOut: 10000, preventDuplicates: true },
         );
         is_send_press = false;
         return;
@@ -2961,8 +2904,6 @@ async function Generate(
                 finalPromt = collapseNewlines(finalPromt);
             }
             let this_amount_gen = parseInt(amount_gen); // how many tokens the AI will be requested to generate
-            let this_settings =
-                koboldai_settings[koboldai_setting_names[preset_settings]];
 
             if (isMultigenEnabled() && type !== "quiet") {
                 // if nothing has been generated yet..
@@ -2972,28 +2913,7 @@ async function Generate(
             let thisPromptBits = [];
 
             let generate_data;
-            if (main_api == "kobold") {
-                generate_data = {
-                    prompt: finalPromt,
-                    gui_settings: true,
-                    max_length: amount_gen,
-                    temperature: kai_settings.temp,
-                    max_context_length: max_context,
-                    singleline: kai_settings.single_line,
-                };
-
-                if (preset_settings != "gui") {
-                    const maxContext = adjustedParams && max_context;
-                    generate_data = getKoboldGenerationData(
-                        finalPromt,
-                        this_settings,
-                        this_amount_gen,
-                        maxContext,
-                        isImpersonate,
-                        type,
-                    );
-                }
-            } else if (main_api == "textgenerationwebui") {
+            if (main_api == "textgenerationwebui") {
                 generate_data = getTextGenGenerationData(
                     finalPromt,
                     this_amount_gen,
@@ -3093,16 +3013,6 @@ async function Generate(
             ) {
                 streamingProcessor.generator =
                     await generateTextGenWithStreaming(
-                        generate_data,
-                        streamingProcessor.abortController.signal,
-                    );
-            } else if (
-                main_api == "kobold" &&
-                isStreamingEnabled() &&
-                type !== "quiet"
-            ) {
-                streamingProcessor.generator =
-                    await generateKoboldWithStreaming(
                         generate_data,
                         streamingProcessor.abortController.signal,
                     );
@@ -3508,7 +3418,7 @@ export async function sendMessageAsUser(textareaText, messageBias) {
 
 function getMaxContextSize() {
     let this_max_context = 1487;
-    if (main_api == "kobold" || main_api == "textgenerationwebui") {
+    if (main_api == "textgenerationwebui") {
         this_max_context = max_context - amount_gen;
     }
     if (main_api == "openai") {
@@ -4095,9 +4005,7 @@ function setInContextMessages(lastmsg, type) {
 
 function getGenerateUrl() {
     let generate_url = "";
-    if (main_api == "kobold") {
-        generate_url = "/generate";
-    } else if (main_api == "textgenerationwebui") {
+    if (main_api == "textgenerationwebui") {
         generate_url = "/generate_textgenerationwebui";
     }
     return generate_url;
@@ -4157,8 +4065,6 @@ function extractTitleFromData(data) {
 
 function extractMessageFromData(data) {
     switch (main_api) {
-        case "kobold":
-            return data.results[0].text;
         case "textgenerationwebui":
             return data.results[0].text;
         case "openai":
@@ -4404,9 +4310,6 @@ function saveImageToMessage(img, mes) {
 function getGeneratingModel(mes) {
     let model = "";
     switch (main_api) {
-        case "kobold":
-            model = online_status;
-            break;
         case "openai":
             model = getChatCompletionModel();
             break;
@@ -4427,10 +4330,7 @@ function extractImageFromMessage(getMessage) {
 }
 
 export function isMultigenEnabled() {
-    return (
-        power_user.multigen &&
-        (main_api == "textgenerationwebui" || main_api == "kobold")
-    );
+    return power_user.multigen && main_api == "textgenerationwebui";
 }
 
 export function activateSendButtons() {
@@ -4846,14 +4746,6 @@ function changeMainAPI() {
     const selectedVal = $("#main_api").val();
     //console.log(selectedVal);
     const apiElements = {
-        kobold: {
-            apiSettings: $("#kobold_api-settings"),
-            apiConnector: $("#kobold_api"),
-            apiPresets: $("#kobold_api-presets"),
-            apiRanges: $("#range_block"),
-            maxContextElem: $("#max_context_block"),
-            amountGenElem: $("#amount_gen_block"),
-        },
         textgenerationwebui: {
             apiSettings: $("#textgenerationwebui_api-settings"),
             apiConnector: $("#textgenerationwebui_api"),
@@ -5516,43 +5408,12 @@ async function getSettings(type) {
             $("#your_name").val(name1);
         }
 
-        //Load KoboldAI settings
-        koboldai_setting_names = data.koboldai_setting_names;
-        koboldai_settings = data.koboldai_settings;
-        koboldai_settings.forEach(function (item, i, arr) {
-            koboldai_settings[i] = JSON.parse(item);
-        });
-
         let arr_holder = {};
 
         $("#settings_perset").empty(); //RossAscends: uncommented this to prevent settings selector from doubling preset list on refresh
-        $("#settings_perset").append(
-            '<option value="gui">GUI KoboldAI Settings</option>',
-        ); //adding in the GUI settings, since it is not loaded dynamically
 
-        koboldai_setting_names.forEach(function (item, i, arr) {
-            arr_holder[item] = i;
-            $("#settings_perset").append(`<option value=${i}>${item}</option>`);
-            //console.log('loading preset #'+i+' -- '+item);
-        });
-        koboldai_setting_names = {};
-        koboldai_setting_names = arr_holder;
         preset_settings = settings.preset_settings;
 
-        if (preset_settings == "gui") {
-            selectKoboldGuiPreset();
-        } else {
-            if (
-                typeof koboldai_setting_names[preset_settings] !== "undefined"
-            ) {
-                $(
-                    `#settings_perset option[value=${koboldai_setting_names[preset_settings]}]`,
-                ).attr("selected", "true");
-            } else {
-                preset_settings = "gui";
-                selectKoboldGuiPreset();
-            }
-        }
         arr_holder = {};
 
         //Load AI model config settings
@@ -5565,9 +5426,6 @@ async function getSettings(type) {
         $("#swipes-checkbox").prop("checked", swipes); /// swipecode
         hideSwipeButtons();
         showSwipeButtons();
-
-        // Kobold
-        loadKoboldSettings(settings.kai_settings ?? settings);
 
         // TextGen
         loadTextGenSettings(data, settings);
@@ -5593,7 +5451,7 @@ async function getSettings(type) {
 
         //Load which API we are using
         if (settings.main_api == undefined) {
-            settings.main_api = "kobold";
+            settings.main_api = "openai";
         }
 
         if (settings.main_api == "poe") {
@@ -5649,12 +5507,6 @@ async function getSettings(type) {
     eventSource.emit(event_types.SETTINGS_LOADED);
 }
 
-function selectKoboldGuiPreset() {
-    $("#settings_perset option[value=gui]")
-        .attr("selected", "true")
-        .trigger("change");
-}
-
 async function saveSettings(type) {
     //console.log('Entering settings with name1 = '+name1);
 
@@ -5683,7 +5535,6 @@ async function saveSettings(type) {
                 context_settings: context_settings,
                 tags: tags,
                 tag_map: tag_map,
-                kai_settings: kai_settings,
                 ...oai_settings,
             },
             null,
@@ -7674,10 +7525,6 @@ function connectAPISlash(_, text) {
     if (!text) return;
 
     const apiMap = {
-        kobold: {
-            button: "#api_button",
-        },
-
         ooba: {
             button: "#api_button_textgenerationwebui",
         },
@@ -7964,7 +7811,7 @@ $(document).ready(function () {
         "api",
         connectAPISlash,
         [],
-        "(kobold, ooba, oai, claude) – connect to an API",
+        "(ooba, oai, claude) – connect to an API",
         true,
         true,
     );
@@ -8704,8 +8551,6 @@ $(document).ready(function () {
     $("#api_button").click(function (e) {
         e.stopPropagation();
         if ($("#api_url_text").val() != "") {
-            let value = formatKoboldUrl($.trim($("#api_url_text").val()));
-
             if (!value) {
                 toastr.error("Please enter a valid URL.");
                 return;
@@ -8716,7 +8561,6 @@ $(document).ready(function () {
             $("#api_loading").css("display", "inline-block");
             $("#api_button").css("display", "none");
 
-            main_api = "kobold";
             saveSettingsDebounced();
             is_get_status = true;
             is_api_button_press = true;
@@ -8962,33 +8806,24 @@ $(document).ready(function () {
     $("#settings_perset").change(function () {
         if ($("#settings_perset").find(":selected").val() != "gui") {
             preset_settings = $("#settings_perset").find(":selected").text();
-            const preset =
-                koboldai_settings[koboldai_setting_names[preset_settings]];
-            loadKoboldSettings(preset);
 
             setGenerationParamsFromPreset(preset);
 
             $("#range_block").find("input").prop("disabled", false);
-            $("#kobold-advanced-config").find("input").prop("disabled", false);
-            $("#kobold-advanced-config").css("opacity", 1.0);
 
             $("#range_block").css("opacity", 1.0);
             $("#amount_gen_block").find("input").prop("disabled", false);
 
             $("#amount_gen_block").css("opacity", 1.0);
-            $("#kobold_order").sortable("enable");
         } else {
             //$('.button').disableSelection();
             preset_settings = "gui";
             $("#range_block").find("input").prop("disabled", true);
-            $("#kobold-advanced-config").find("input").prop("disabled", true);
-            $("#kobold-advanced-config").css("opacity", 0.5);
 
             $("#range_block").css("opacity", 0.5);
             $("#amount_gen_block").find("input").prop("disabled", true);
 
             $("#amount_gen_block").css("opacity", 0.45);
-            $("#kobold_order").sortable("disable");
         }
         saveSettingsDebounced();
     });

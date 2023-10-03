@@ -5,15 +5,12 @@ import {
     eventSource,
     event_types,
     getRequestHeaders,
-    koboldai_setting_names,
-    koboldai_settings,
     main_api,
     max_context,
     saveSettingsDebounced,
     this_chid,
 } from "../script.js";
 import { groups, selected_group } from "./group-chats.js";
-import { kai_settings } from "./kai-settings.js";
 import {
     textgenerationwebui_preset_names,
     textgenerationwebui_presets,
@@ -144,11 +141,6 @@ class PresetManager {
         let preset_names = {};
 
         switch (this.apiId) {
-            case "kobold":
-                presets = koboldai_settings;
-                preset_names = koboldai_setting_names;
-                break;
-
             case "textgenerationwebui":
                 presets = textgenerationwebui_presets;
                 preset_names = textgenerationwebui_preset_names;
@@ -211,8 +203,6 @@ class PresetManager {
     getPresetSettings() {
         function getSettingsByApiId(apiId) {
             switch (apiId) {
-                case "kobold":
-                    return kai_settings;
                 case "textgenerationwebui":
                     return textgenerationwebui_settings;
                 default:

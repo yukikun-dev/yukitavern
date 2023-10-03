@@ -542,16 +542,6 @@ function RA_autoconnect(PrevApi) {
         LoadLocalBool("AutoConnectEnabled")
     ) {
         switch (main_api) {
-            case "kobold":
-                if (api_server && isUrlOrAPIKey(api_server)) {
-                    $("#api_button").click();
-                }
-                break;
-            case "novel":
-                if (secret_state[SECRET_KEYS.NOVEL]) {
-                    $("#api_button_novel").click();
-                }
-                break;
             case "textgenerationwebui":
                 if (
                     api_server_textgenerationwebui &&

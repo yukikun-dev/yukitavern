@@ -290,21 +290,6 @@
         }
     ],
     "tag_map": {},
-    "kai_settings": {
-        "temp": 1,
-        "rep_pen": 1.1,
-        "rep_pen_range": 600,
-        "top_p": 0.95,
-        "top_a": 0,
-        "top_k": 0,
-        "typical": 1,
-        "tfs": 1,
-        "rep_pen_slope": 0,
-        "single_line": false,
-        "use_stop_sequence": false,
-        "streaming_kobold": false,
-        "sampler_order": [6, 0, 1, 2, 3, 4, 5]
-    },
     "preset_settings_openai": "Default",
     "temp_openai": "0.9",
     "freq_pen_openai": 0.7,

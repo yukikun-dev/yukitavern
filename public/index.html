@@ -49,7 +49,6 @@
 
     <script type="module" src="scripts/world-info.js"></script>
     <script type="module" src="scripts/group-chats.js"></script>
-    <script type="module" src="scripts/kai-settings.js"></script>
     <script type="module" src="scripts/textgen-settings.js"></script>
     <script type="module" src="scripts/bookmarks.js"></script>
     <script type="module" src="scripts/RossAscends-mods.js"></script>
@@ -97,24 +96,6 @@
                     <div class="flex-container" id="ai_response_configuration">
                         <div id="respective-presets-block" class="width100p">
                             <input type="file" hidden data-preset-manager-file="" accept=".json, .settings">
-                            <div id="kobold_api-presets">
-                                <h3><span >Kobold Presets</span>
-                                    <a href="https://docs.yukitavern.app/usage/api-connections/koboldai/" class="notes-link" target="_blank">
-                                        <span class="note-link-span">?</span>
-                                    </a>
-                                </h3>
-
-                                <div class="preset_buttons">
-                                    <select id="settings_perset" data-preset-manager-for="kobold">
-                                        <option value="gui" >GUI KoboldAI Settings</option>
-                                    </select>
-                                    <i data-preset-manager-update="kobold" class="menu_button fa-solid fa-save" title="Update current preset" ></i>
-                                    <i data-preset-manager-new="kobold" class="menu_button fa-solid fa-plus" title="Create new preset" ></i>
-                                    <i data-preset-manager-import="kobold" class="menu_button fa-solid fa-upload" title="Import preset" ></i>
-                                    <i data-preset-manager-export="kobold" class="menu_button fa-solid fa-download" title="Export preset" ></i>
-                                    <i data-preset-manager-delete="kobold" class="menu_button fa-solid fa-trash-can" title="Delete the preset" ></i>
-                                </div>
-                            </div>
                             <div id="openai_api-presets">
                                 <div>
                                     <h4><span >Chat Completion Presets</span></h4>
@@ -246,21 +227,6 @@
                                     </div>
                                 </div>
                                 <hr>
-                                <div id="range_block">
-                                    <div class="range-block">
-                                        <label class="checkbox_label widthFreeExpand">
-                                            <input id="streaming_kobold" type="checkbox" />
-                                            <span >Streaming</span>
-                                        </label>
-                                        <div class="toggle-description justifyLeft">
-                                            <span >
-                                                Display the response bit by bit as it is generated.</span><br>
-                                            <span >
-                                                When this is off, responses will be displayed all at once when they are complete.
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                     
                             <div id="range_block_textgenerationwebui">
@@ -528,149 +494,6 @@
                         </div>
 
                         <div id="advanced-ai-config-block" class="width100p">
-                            <div id="kobold_api-settings">
-                                <div id="kobold-advanced-config">
-                                    <div class="range-block">
-                                        <div class="range-block-title" >
-                                            Top P
-                                        </div>
-                                        <div class="range-block-range-and-counter">
-                                            <div class="range-block-range">
-                                                <input type="range" id="top_p" name="volume" min="0" max="1" step="0.01">
-                                            </div>
-                                            <div class="range-block-counter">
-                                                <div contenteditable="true" data-for="top_p" id="top_p_counter">
-                                                    select
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="range-block">
-                                        <div class="range-block-title" >
-                                            Top A
-                                        </div>
-                                        <div class="range-block-range-and-counter">
-                                            <div class="range-block-range">
-                                                <input type="range" id="top_a" name="volume" min="0" max="1" step="0.01">
-                                            </div>
-                                            <div class="range-block-counter">
-                                                <div contenteditable="true" data-for="top_a" id="top_a_counter">
-                                                    select
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="range-block">
-                                        <div class="range-block-title" >
-                                            Top K
-                                        </div>
-                                        <div class="range-block-range-and-counter">
-                                            <div class="range-block-range">
-                                                <input type="range" id="top_k" name="volume" min="0" max="100" step="1">
-                                            </div>
-                                            <div class="range-block-counter">
-                                                <div contenteditable="true" data-for="top_k" id="top_k_counter">
-                                                    select
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="range-block">
-                                        <div class="range-block-title" >
-                                            Typical Sampling
-                                        </div>
-                                        <div class="range-block-range-and-counter">
-                                            <div class="range-block-range">
-                                                <input type="range" id="typical" name="volume" min="0" max="1" step="0.01">
-                                            </div>
-                                            <div class="range-block-counter">
-                                                <div contenteditable="true" data-for="typical" id="typical_counter">
-                                                    select
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="range-block">
-                                        <div class="range-block-title" >
-                                            Tail Free Sampling
-                                        </div>
-                                        <div class="range-block-range-and-counter">
-                                            <div class="range-block-range">
-                                                <input type="range" id="tfs" name="volume" min="0" max="1" step="0.01">
-                                            </div>
-                                            <div class="range-block-counter">
-                                                <div contenteditable="true" data-for="tfs" id="tfs_counter">
-                                                    select
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="range-block">
-                                        <div class="range-block-title" >
-                                            Rep. Pen. Slope
-                                        </div>
-                                        <div class="range-block-range-and-counter">
-                                            <div class="range-block-range">
-                                                <input type="range" id="rep_pen_slope" name="volume" min="0" max="10" step="0.1">
-                                            </div>
-                                            <div class="range-block-counter">
-                                                <div contenteditable="true" data-for="rep_pen_slope" id="rep_pen_slope_counter">
-                                                    select
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="range-block">
-                                        <label class="checkbox_label" for="single_line">
-                                            <input id="single_line" type="checkbox" /><span >
-                                                Single-line mode</span>
-                                        </label>
-                                    </div>
-                                    <div class="range-block flexFlowColumn">
-                                        <div class="range-block-title">
-                                            <span >Samplers Order</span>
-                                        </div>
-                                        <div class="toggle-description" >
-                                            Samplers will be applied in a top-down order.
-                                            Use with caution.
-                                        </div>
-                                        <div id="kobold_order">
-                                            <div data-id="0">
-                                                <span >Top K</span>
-                                                <small>0</small>
-                                            </div>
-                                            <div data-id="1">
-                                                <span >Top A</span>
-                                                <small>1</small>
-                                            </div>
-                                            <div data-id="2">
-                                                <span >Top P</span>
-                                                <small>2</small>
-                                            </div>
-                                            <div data-id="3">
-                                                <span >Tail Free Sampling</span>
-                                                <small>3</small>
-                                            </div>
-                                            <div data-id="4">
-                                                <span >Typical Sampling</span>
-                                                <small>4</small>
-                                            </div>
-                                            <div data-id="5">
-                                                <span >Temperature</span>
-                                                <small>5</small>
-                                            </div>
-                                            <div data-id="6">
-                                                <span >Repetition Penalty</span>
-                                                <small>6</small>
-                                            </div>
-                                        </div>
-                                        <div id="samplers_order_recommended" class="menu_button menu_button_icon">
-                                            <span >Load koboldcpp order</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <div id="textgenerationwebui_api-settings">
                                 <div class="range-block">
                                     <div class="range-block-title" >
@@ -1175,25 +998,9 @@
                 <div class="flex-container flexFlowColumn">
                     <div id="main-API-selector-block">
                         <select id="main_api">
-                            <option value="kobold"><span >KoboldAI</span></option>
                             <option value="textgenerationwebui"><span >Text Gen WebUI (ooba)</span></option>
                             <option value="openai"><span >Chat Completion (OpenAI, Claude, Window, OpenRouter)</span></option>
                         </select>
-                    </div>
-                    <div id="kobold_api" style="position: relative;"> <!-- shows the kobold settings -->
-                        <form action="javascript:void(null);" method="post" enctype="multipart/form-data">
-                            <div id="kobold_api_block">
-                                <h4 >API url</h4>
-                                <small >Example: http://127.0.0.1:5000/api </small>
-                                <input id="api_url_text" name="api_url" class="text_pole" placeholder="http://127.0.0.1:5000/api" maxlength="500" value="" autocomplete="off">
-                                <input id="api_button" class="menu_button" type="submit" value="Connect">
-                                <div id="api_loading" class="api-load-icon fa-solid fa-hourglass fa-spin"></div>
-                            </div>
-                            <div id="online_status2">
-                                <div id="online_status_indicator2"></div>
-                                <div id="online_status_text2" >Not connected</div>
-                            </div>
-                        </form>
                     </div>
                     
                     <div id="textgenerationwebui_api" style="display: none;position: relative;">
