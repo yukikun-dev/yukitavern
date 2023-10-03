@@ -5,7 +5,6 @@ export const SECRET_KEYS = {
     OPENAI: "api_key_openai",
     CLAUDE: "api_key_claude",
     OPENROUTER: "api_key_openrouter",
-    SCALE: "api_key_scale",
 };
 
 const INPUT_MAP = {
@@ -13,7 +12,6 @@ const INPUT_MAP = {
     [SECRET_KEYS.OPENAI]: "#api_key_openai",
     [SECRET_KEYS.CLAUDE]: "#api_key_claude",
     [SECRET_KEYS.OPENROUTER]: "#api_key_openrouter",
-    [SECRET_KEYS.SCALE]: "#api_key_scale",
 };
 
 async function clearSecret() {
@@ -41,7 +39,7 @@ async function viewSecrets() {
 
     if (response.status == 403) {
         callPopup(
-            "<h3>Forbidden</h3><p>To view your API keys here, set the value of allowKeysExposure to true in config.conf file and restart the SillyTavern server.</p>",
+            "<h3>Forbidden</h3><p>To view your API keys here, set the value of allowKeysExposure to true in config.conf file and restart the yukitavern server.</p>",
             "text",
         );
         return;

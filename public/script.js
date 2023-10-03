@@ -7,15 +7,6 @@ import {
 import { userStatsHandler, statMesProcess } from "./scripts/stats.js";
 import { encode } from "../scripts/gpt-2-3-tokenizer/mod.js";
 import { GPT3BrowserTokenizer } from "../scripts/gpt-3-tokenizer/gpt3-tokenizer.js";
-import {
-    generateKoboldWithStreaming,
-    kai_settings,
-    loadKoboldSettings,
-    formatKoboldUrl,
-    getKoboldGenerationData,
-    canUseKoboldStopSequence,
-    canUseKoboldStreaming,
-} from "./scripts/kai-settings.js";
 
 import {
     textgenerationwebui_settings,
@@ -69,7 +60,6 @@ import {
     sortCharactersList,
     fixMarkdown,
     power_user,
-    pygmalion_options,
     tokenizers,
     persona_description_positions,
     getCustomStoppingStrings,
@@ -235,7 +225,7 @@ export {
 };
 
 // API OBJECT FOR EXTERNAL WIRING
-window["SillyTavern"] = {};
+window["yukitavern"] = {};
 
 // Event source init
 export const event_types = {
@@ -274,10 +264,10 @@ console.debug("initializing Prompt Itemization Array on Startup");
 let itemizedPrompts = [];
 
 /* let bg_menu_toggle = false; */
-export const systemUserName = "SillyTavern System";
+export const systemUserName = "yukitavern System";
 let default_user_name = "User";
 let name1 = default_user_name;
-let name2 = "SillyTavern System";
+let name2 = "yukitavern System";
 let chat = [];
 let safetychat = [
     {
@@ -382,7 +372,7 @@ const system_messages = {
             <li><a href="#" data-displayHelp="3">Hotkeys</a> (or <tt>/help hotkeys</tt>)</li>
             <li><a href="#" data-displayHelp="4">{{Macros}}</a> (or <tt>/help macros</tt>)</li>
             </ul>
-            <br><b>Still got questions left? The <a target="_blank" href="https://docs.sillytavern.app/">Official SillyTavern Documentation Website</a> has much more information!</b>`,
+            <br><b>Still got questions left? The <a target="_blank" href="https://docs.yukitavern.app/">Official yukitavern Documentation Website</a> has much more information!</b>`,
     },
     slash_commands: {
         name: systemUserName,
@@ -488,37 +478,37 @@ this
         is_system: true,
         is_name: true,
         mes: [
-            '<h3><span id="version_display_welcome">SillyTavern</span><div id="version_display_welcome"></div></h3>',
-            "<a href='https://docs.sillytavern.app/usage/update/' target='_blank'>Want to update?</a>",
+            '<h3><span id="version_display_welcome">yukitavern</span><div id="version_display_welcome"></div></h3>',
+            "<a href='https://www.youtube.com/watch?v=LJ9vkt7BHYI' target='_blank'>Want to update?</a>",
             "<hr>",
             "<h3>How to start chatting?</h3>",
             "<ol>",
-            '<li>Click <code><i class="fa-solid fa-plug"></i></code> and select a <a href="https://docs.sillytavern.app/usage/api-connections/" target_"blank">Chat API</a>.</li>',
+            '<li>Click <code><i class="fa-solid fa-plug"></i></code> and select a <a href="https://www.youtube.com/watch?v=LJ9vkt7BHYI" target_"blank">Chat API</a>.</li>',
             '<li>Click <code><i class="fa-solid fa-address-card"></i></code> and pick a character</li>',
             "</ol>",
             "<hr>",
             "<h3>Want more characters?</h3>",
-            "<i>Not controlled by SillyTavern team.</i>",
+            "<i>Not controlled by yukitavern team.</i>",
             "<ul>",
-            '<li><a target="_blank" href="https://discord.gg/pygmalionai">Pygmalion AI Discord</a></li>',
-            '<li><a target="_blank" href="https://chub.ai/">Chub (NSFW)</a></li>',
+            '<li><a target="_blank" href="https://www.youtube.com/watch?v=LJ9vkt7BHYI">Pygmalion AI Discord</a></li>',
+            '<li><a target="_blank" href="https://www.youtube.com/watch?v=LJ9vkt7BHYI">Chub (NSFW)</a></li>',
             "</ul>",
             "<hr>",
             "<h3>Confused or lost?</h3>",
             "<ul>",
             '<li><span class="note-link-span">?</span> - click these icons!</li>',
             "<li>Enter <code>/?</code> in the chat bar</li>",
-            '<li><a target="_blank" href="https://docs.sillytavern.app/">SillyTavern Documentation Site</a></li>',
-            '<li><a target="_blank" href="https://docs.sillytavern.app/extras/installation/">Extras Installation Guide</a></li>',
+            '<li><a target="_blank" href="https://www.youtube.com/watch?v=LJ9vkt7BHYI">yukitavern Documentation Site</a></li>',
+            '<li><a target="_blank" href="https://www.youtube.com/watch?v=LJ9vkt7BHYI">Extras Installation Guide</a></li>',
 
             "</ul>",
 
             "<hr>",
             "<h3>Still have questions?</h3 > ",
             "<ul>",
-            '<li><a target="_blank" href="https://discord.gg/RZdyAEUPvj">Join the SillyTavern Discord</a></li>',
-            '<li><a target="_blank" href="https://github.com/SillyTavern/SillyTavern/issues">Post a GitHub issue</a></li>',
-            '<li><a target="_blank" href="https://github.com/SillyTavern/SillyTavern#questions-or-suggestions">Contact the developers</a></li>',
+            '<li><a target="_blank" href="https://www.youtube.com/watch?v=LJ9vkt7BHYI">Join the yukitavern Discord</a></li>',
+            '<li><a target="_blank" href="https://www.youtube.com/watch?v=LJ9vkt7BHYI">Post a GitHub issue</a></li>',
+            '<li><a target="_blank" href="https://www.youtube.com/watch?v=LJ9vkt7BHYI">Contact the developers</a></li>',
         ].join(""),
     },
     group: {
@@ -568,7 +558,7 @@ $(document).ajaxError(function myErrorHandler(_, xhr) {
     if (xhr.status == 403) {
         toastr.warning(
             "doubleCsrf errors in console are NORMAL in this case. If you want to run ST in multiple tabs, start the server with --disableCsrf option.",
-            "Looks like you've opened SillyTavern in another browser tab",
+            "Looks like you've opened yukitavern in another browser tab",
             { timeOut: 0, extendedTimeOut: 0, preventDuplicates: true },
         );
     }
@@ -579,7 +569,7 @@ async function getClientVersion() {
         const response = await fetch("/version");
         const data = await response.json();
         CLIENT_VERSION = data.agent;
-        let displayVersion = `SillyTavern ${data.pkgVersion}`;
+        let displayVersion = `yukitavern ${data.pkgVersion}`;
 
         if (data.gitRevision && data.gitBranch) {
             displayVersion += ` '${data.gitBranch}'(${data.gitRevision})`;
@@ -593,7 +583,7 @@ async function getClientVersion() {
 }
 
 function getTokenizerBestMatch() {
-    if (main_api === "kobold" || main_api === "textgenerationwebui") {
+    if (main_api === "textgenerationwebui") {
         return tokenizers.LLAMA;
     }
 
@@ -805,22 +795,18 @@ var is_use_scroll_holder = false;
 
 //settings
 var settings;
-export let koboldai_settings;
-export let koboldai_setting_names;
 var preset_settings = "gui";
 var user_avatar = "you.png";
 export var amount_gen = 80; //default max length of AI generated responses
 var max_context = 2048;
 
-var is_pygmalion = false;
 var tokens_already_generated = 0;
 var message_already_generated = "";
-var cycle_count_generation = 0;
 
 var swipes = true;
 let extension_prompts = {};
 
-var main_api; // = "kobold";
+var main_api;
 let abortController;
 
 //css
@@ -862,14 +848,12 @@ $.get("/csrf-token").then(async (data) => {
 function checkOnlineStatus() {
     ///////// REMOVED LINES THAT DUPLICATE RA_CHeckOnlineStatus FEATURES
     if (online_status == "no_connection") {
-        $("#online_status_indicator2").css("background-color", "red"); //Kobold
         $("#online_status_text2").html("No connection...");
         $(".online_status_indicator4").css("background-color", "red"); //OAI / ooba
         $(".online_status_text4").html("No connection...");
         is_get_status = false;
         setOpenAIOnlineStatus(false);
     } else {
-        $("#online_status_indicator2").css("background-color", "green"); //kobold
         $("#online_status_text2").html(online_status);
         $(".online_status_indicator4").css("background-color", "green"); //OAI / ooba
         $(".online_status_text4").html(online_status);
@@ -890,10 +874,7 @@ async function getStatus() {
             type: "POST", //
             url: "/getstatus", //
             data: JSON.stringify({
-                api_server:
-                    main_api == "kobold"
-                        ? api_server
-                        : api_server_textgenerationwebui,
+                api_server: api_server_textgenerationwebui,
                 main_api: main_api,
                 use_mancer:
                     main_api == "textgenerationwebui"
@@ -910,29 +891,6 @@ async function getStatus() {
                 online_status = data.result;
                 if (online_status == undefined) {
                     online_status = "no_connection";
-                }
-                if (
-                    (online_status.toLowerCase().indexOf("pygmalion") != -1 &&
-                        power_user.pygmalion_formatting ==
-                            pygmalion_options.AUTO) ||
-                    (online_status !== "no_connection" &&
-                        power_user.pygmalion_formatting ==
-                            pygmalion_options.ENABLED)
-                ) {
-                    is_pygmalion = true;
-                    online_status += " (Pyg. formatting on)";
-                } else {
-                    is_pygmalion = false;
-                }
-
-                // determine if we can use stop sequence and streaming
-                if (main_api === "kobold") {
-                    kai_settings.use_stop_sequence = canUseKoboldStopSequence(
-                        data.version,
-                    );
-                    kai_settings.can_use_streaming = canUseKoboldStreaming(
-                        data.koboldVersion,
-                    );
                 }
 
                 // We didn't get a 200 status code, but the endpoint has an explanation. Which means it DID connect, but I digress.
@@ -1776,7 +1734,7 @@ function getStoppingStrings(isImpersonate, addSpace) {
 
     result.push(userString);
 
-    if (!is_pygmalion && result.includes(youString)) {
+    if (result.includes(youString)) {
         result.splice(result.indexOf(youString), 1);
     }
 
@@ -2008,11 +1966,6 @@ function getExtensionPrompt(position = 0, depth = undefined, separator = "\n") {
 
 function baseChatReplace(value, name1, name2) {
     if (value !== undefined && value.length > 0) {
-        if (is_pygmalion) {
-            value = value.replace(/{{user}}:/gi, "You:");
-            value = value.replace(/<USER>:/gi, "You:");
-        }
-
         value = substituteParams(value, name1, name2);
 
         if (power_user.collapse_newlines) {
@@ -2031,13 +1984,7 @@ function appendToStoryString(value, prefix) {
 
 function isStreamingEnabled() {
     return (
-        ((main_api == "openai" &&
-            oai_settings.stream_openai &&
-            oai_settings.chat_completion_source !==
-                chat_completion_sources.SCALE) ||
-            (main_api == "kobold" &&
-                kai_settings.streaming_kobold &&
-                kai_settings.can_use_streaming) ||
+        ((main_api == "openai" && oai_settings.stream_openai) ||
             (main_api == "textgenerationwebui" &&
                 textgenerationwebui_settings.streaming)) &&
         !isMultigenEnabled()
@@ -2350,7 +2297,7 @@ async function Generate(
 
     message_already_generated = isImpersonate ? `${name1}: ` : `${name2}: `;
     // Name for the multigen prefix
-    const magName = isImpersonate ? (is_pygmalion ? "You" : name1) : name2;
+    const magName = isImpersonate ? name1 : name2;
 
     message_already_generated = `${magName}: `;
 
@@ -2375,34 +2322,6 @@ async function Generate(
     ) {
         toastr.error(
             "Streaming URL is not set. Look it up in the console window when starting TextGen Web UI",
-        );
-        is_send_press = false;
-        return;
-    }
-
-    if (
-        main_api == "kobold" &&
-        kai_settings.streaming_kobold &&
-        !kai_settings.can_use_streaming
-    ) {
-        toastr.error(
-            "Streaming is enabled, but the version of Kobold used does not support token streaming.",
-            undefined,
-            { timeOut: 10000, preventDuplicates: true },
-        );
-        is_send_press = false;
-        return;
-    }
-
-    if (
-        main_api == "kobold" &&
-        kai_settings.streaming_kobold &&
-        power_user.multigen
-    ) {
-        toastr.error(
-            'Multigen is not supported with Kobold streaming enabled. Disable streaming in "AI Response Configuration" or multigen in "Advanced Formatting" to proceed.',
-            undefined,
-            { timeOut: 10000, preventDuplicates: true },
         );
         is_send_press = false;
         return;
@@ -2561,8 +2480,6 @@ async function Generate(
                 ? power_user.custom_chat_separator
                 : power_user.disable_examples_formatting
                 ? ""
-                : is_pygmalion
-                ? "<START>"
                 : `This is how ${name2} should talk`;
         let mesExamplesArray = mesExamples
             .split(/<START>/gi)
@@ -2589,44 +2506,24 @@ async function Generate(
 
         let storyString = "";
 
-        if (is_pygmalion) {
-            storyString += appendToStoryString(
-                charDescription,
-                power_user.disable_description_formatting
-                    ? ""
-                    : name2 + "'s Persona: ",
-            );
-            storyString += appendToStoryString(
-                charPersonality,
-                power_user.disable_personality_formatting
-                    ? ""
-                    : "Personality: ",
-            );
-            storyString += appendToStoryString(
-                Scenario,
-                power_user.disable_scenario_formatting ? "" : "Scenario: ",
-            );
-        } else {
-            storyString += appendToStoryString(charDescription, "");
-            storyString += appendToStoryString(
-                charPersonality,
-                power_user.disable_personality_formatting
-                    ? ""
-                    : name2 + "'s personality: ",
-            );
-            storyString += appendToStoryString(
-                Scenario,
-                power_user.disable_scenario_formatting
-                    ? ""
-                    : "Circumstances and context of the dialogue: ",
-            );
-        }
+        storyString += appendToStoryString(charDescription, "");
+        storyString += appendToStoryString(
+            charPersonality,
+            power_user.disable_personality_formatting
+                ? ""
+                : name2 + "'s personality: ",
+        );
+        storyString += appendToStoryString(
+            Scenario,
+            power_user.disable_scenario_formatting
+                ? ""
+                : "Circumstances and context of the dialogue: ",
+        );
 
         // kingbri MARK: - Make sure the prompt bias isn't the same as the user bias
         if (
             (promptBias && !isUserPromptBias) ||
-            power_user.always_force_name2 ||
-            is_pygmalion
+            power_user.always_force_name2
         ) {
             force_name2 = true;
         }
@@ -2821,11 +2718,6 @@ async function Generate(
                         //item = item.substr(0, item.length - 1);
                         //}
                     }
-                    if (is_pygmalion) {
-                        if (item.trim().startsWith(name1)) {
-                            item = item.replace(name1 + ":", "You:");
-                        }
-                    }
 
                     if (i === 0) {
                         // Process those that couldn't get that far
@@ -2888,7 +2780,7 @@ async function Generate(
             function modifyLastPromptLine(mesSendString) {
                 // Add quiet generation prompt at depth 0
                 if (quiet_prompt && quiet_prompt.length) {
-                    const name = is_pygmalion ? "You" : name1;
+                    const name = name1;
                     const quietAppend = `\n${name}: ${quiet_prompt}`;
                     mesSendString += quietAppend;
                     // Bail out early
@@ -2896,7 +2788,7 @@ async function Generate(
                 }
 
                 if (isImpersonate && tokens_already_generated === 0) {
-                    const name = is_pygmalion ? "You" : name1;
+                    const name = name1;
                     if (!mesSendString.endsWith("\n")) {
                         mesSendString += "\n";
                     }
@@ -3011,8 +2903,6 @@ async function Generate(
                 finalPromt = collapseNewlines(finalPromt);
             }
             let this_amount_gen = parseInt(amount_gen); // how many tokens the AI will be requested to generate
-            let this_settings =
-                koboldai_settings[koboldai_setting_names[preset_settings]];
 
             if (isMultigenEnabled() && type !== "quiet") {
                 // if nothing has been generated yet..
@@ -3022,28 +2912,7 @@ async function Generate(
             let thisPromptBits = [];
 
             let generate_data;
-            if (main_api == "kobold") {
-                generate_data = {
-                    prompt: finalPromt,
-                    gui_settings: true,
-                    max_length: amount_gen,
-                    temperature: kai_settings.temp,
-                    max_context_length: max_context,
-                    singleline: kai_settings.single_line,
-                };
-
-                if (preset_settings != "gui") {
-                    const maxContext = adjustedParams && max_context;
-                    generate_data = getKoboldGenerationData(
-                        finalPromt,
-                        this_settings,
-                        this_amount_gen,
-                        maxContext,
-                        isImpersonate,
-                        type,
-                    );
-                }
-            } else if (main_api == "textgenerationwebui") {
+            if (main_api == "textgenerationwebui") {
                 generate_data = getTextGenGenerationData(
                     finalPromt,
                     this_amount_gen,
@@ -3093,7 +2962,6 @@ async function Generate(
                 summarizeString: extension_prompts["1_memory"]?.value || "",
                 authorsNoteString:
                     extension_prompts["2_floating_prompt"]?.value || "",
-                smartContextString: extension_prompts["chromadb"]?.value || "",
                 worldInfoString: worldInfoString,
                 storyString: storyString,
                 afterScenarioAnchor: afterScenarioAnchor,
@@ -3143,16 +3011,6 @@ async function Generate(
             ) {
                 streamingProcessor.generator =
                     await generateTextGenWithStreaming(
-                        generate_data,
-                        streamingProcessor.abortController.signal,
-                    );
-            } else if (
-                main_api == "kobold" &&
-                isStreamingEnabled() &&
-                type !== "quiet"
-            ) {
-                streamingProcessor.generator =
-                    await generateKoboldWithStreaming(
                         generate_data,
                         streamingProcessor.abortController.signal,
                     );
@@ -3558,7 +3416,7 @@ export async function sendMessageAsUser(textareaText, messageBias) {
 
 function getMaxContextSize() {
     let this_max_context = 1487;
-    if (main_api == "kobold" || main_api == "textgenerationwebui") {
+    if (main_api == "textgenerationwebui") {
         this_max_context = max_context - amount_gen;
     }
     if (main_api == "openai") {
@@ -3603,7 +3461,7 @@ function addChatsSeparator(mesSendString) {
     }
 
     // add non-pygma dingus
-    else if (!is_pygmalion) {
+    else {
         mesSendString =
             "\nThen the roleplay chat between " +
             name1 +
@@ -3613,17 +3471,11 @@ function addChatsSeparator(mesSendString) {
             mesSendString;
     }
 
-    // add pygma <START>
-    else {
-        mesSendString = "<START>\n" + mesSendString;
-        //mesSendString = mesSendString; //This edit simply removes the first "<START>" that is prepended to all context prompts
-    }
-
     return mesSendString;
 }
 
 function appendZeroDepthAnchor(force_name2, zeroDepthAnchor, finalPromt) {
-    const trimBothEnds = !force_name2 && !is_pygmalion;
+    const trimBothEnds = !force_name2;
     let trimmedPrompt = trimBothEnds
         ? zeroDepthAnchor.trim()
         : zeroDepthAnchor.trimEnd();
@@ -3633,10 +3485,6 @@ function appendZeroDepthAnchor(force_name2, zeroDepthAnchor, finalPromt) {
     }
 
     finalPromt += trimmedPrompt;
-
-    if (force_name2 || is_pygmalion) {
-        finalPromt += " ";
-    }
 
     return finalPromt;
 }
@@ -4155,9 +4003,7 @@ function setInContextMessages(lastmsg, type) {
 
 function getGenerateUrl() {
     let generate_url = "";
-    if (main_api == "kobold") {
-        generate_url = "/generate";
-    } else if (main_api == "textgenerationwebui") {
+    if (main_api == "textgenerationwebui") {
         generate_url = "/generate_textgenerationwebui";
     }
     return generate_url;
@@ -4165,11 +4011,7 @@ function getGenerateUrl() {
 
 function shouldContinueMultigen(getMessage, isImpersonate) {
     // stopping name string
-    const nameString = isImpersonate
-        ? `${name2}:`
-        : is_pygmalion
-        ? "You:"
-        : `${name1}:`;
+    const nameString = isImpersonate ? `${name2}:` : `${name1}:`;
     // if there is no 'You:' in the response msg
     const doesNotContainName =
         message_already_generated.indexOf(nameString) === -1;
@@ -4221,8 +4063,6 @@ function extractTitleFromData(data) {
 
 function extractMessageFromData(data) {
     switch (main_api) {
-        case "kobold":
-            return data.results[0].text;
         case "textgenerationwebui":
             return data.results[0].text;
         case "openai":
@@ -4272,11 +4112,6 @@ function cleanUpMessage(
     // "trailing whitespace on newlines       \nevery line of the string    \n?sample text" ->
     // "trailing whitespace on newlines\nevery line of the string\nsample text"
     getMessage = getMessage.replace(/[^\S\r\n]+$/gm, "");
-    if (is_pygmalion) {
-        getMessage = getMessage.replace(/<USER>/g, name1);
-        getMessage = getMessage.replace(/<BOT>/g, name2);
-        getMessage = getMessage.replace(/You:/g, name1 + ":");
-    }
 
     let nameToTrim = isImpersonate ? name2 : name1;
 
@@ -4473,9 +4308,6 @@ function saveImageToMessage(img, mes) {
 function getGeneratingModel(mes) {
     let model = "";
     switch (main_api) {
-        case "kobold":
-            model = online_status;
-            break;
         case "openai":
             model = getChatCompletionModel();
             break;
@@ -4496,10 +4328,7 @@ function extractImageFromMessage(getMessage) {
 }
 
 export function isMultigenEnabled() {
-    return (
-        power_user.multigen &&
-        (main_api == "textgenerationwebui" || main_api == "kobold")
-    );
+    return power_user.multigen && main_api == "textgenerationwebui";
 }
 
 export function activateSendButtons() {
@@ -4915,14 +4744,6 @@ function changeMainAPI() {
     const selectedVal = $("#main_api").val();
     //console.log(selectedVal);
     const apiElements = {
-        kobold: {
-            apiSettings: $("#kobold_api-settings"),
-            apiConnector: $("#kobold_api"),
-            apiPresets: $("#kobold_api-presets"),
-            apiRanges: $("#range_block"),
-            maxContextElem: $("#max_context_block"),
-            amountGenElem: $("#amount_gen_block"),
-        },
         textgenerationwebui: {
             apiSettings: $("#textgenerationwebui_api-settings"),
             apiConnector: $("#textgenerationwebui_api"),
@@ -4986,13 +4807,6 @@ function changeMainAPI() {
 
     main_api = selectedVal;
     online_status = "no_connection";
-
-    if (
-        main_api == "openai" &&
-        oai_settings.chat_completion_source == chat_completion_sources.WINDOWAI
-    ) {
-        $("#api_button_openai").trigger("click");
-    }
 }
 
 ////////////////////////////////////////////////////
@@ -5592,43 +5406,12 @@ async function getSettings(type) {
             $("#your_name").val(name1);
         }
 
-        //Load KoboldAI settings
-        koboldai_setting_names = data.koboldai_setting_names;
-        koboldai_settings = data.koboldai_settings;
-        koboldai_settings.forEach(function (item, i, arr) {
-            koboldai_settings[i] = JSON.parse(item);
-        });
-
         let arr_holder = {};
 
         $("#settings_perset").empty(); //RossAscends: uncommented this to prevent settings selector from doubling preset list on refresh
-        $("#settings_perset").append(
-            '<option value="gui">GUI KoboldAI Settings</option>',
-        ); //adding in the GUI settings, since it is not loaded dynamically
 
-        koboldai_setting_names.forEach(function (item, i, arr) {
-            arr_holder[item] = i;
-            $("#settings_perset").append(`<option value=${i}>${item}</option>`);
-            //console.log('loading preset #'+i+' -- '+item);
-        });
-        koboldai_setting_names = {};
-        koboldai_setting_names = arr_holder;
         preset_settings = settings.preset_settings;
 
-        if (preset_settings == "gui") {
-            selectKoboldGuiPreset();
-        } else {
-            if (
-                typeof koboldai_setting_names[preset_settings] !== "undefined"
-            ) {
-                $(
-                    `#settings_perset option[value=${koboldai_setting_names[preset_settings]}]`,
-                ).attr("selected", "true");
-            } else {
-                preset_settings = "gui";
-                selectKoboldGuiPreset();
-            }
-        }
         arr_holder = {};
 
         //Load AI model config settings
@@ -5641,9 +5424,6 @@ async function getSettings(type) {
         $("#swipes-checkbox").prop("checked", swipes); /// swipecode
         hideSwipeButtons();
         showSwipeButtons();
-
-        // Kobold
-        loadKoboldSettings(settings.kai_settings ?? settings);
 
         // TextGen
         loadTextGenSettings(data, settings);
@@ -5669,7 +5449,7 @@ async function getSettings(type) {
 
         //Load which API we are using
         if (settings.main_api == undefined) {
-            settings.main_api = "kobold";
+            settings.main_api = "openai";
         }
 
         if (settings.main_api == "poe") {
@@ -5725,12 +5505,6 @@ async function getSettings(type) {
     eventSource.emit(event_types.SETTINGS_LOADED);
 }
 
-function selectKoboldGuiPreset() {
-    $("#settings_perset option[value=gui]")
-        .attr("selected", "true")
-        .trigger("change");
-}
-
 async function saveSettings(type) {
     //console.log('Entering settings with name1 = '+name1);
 
@@ -5759,7 +5533,6 @@ async function saveSettings(type) {
                 context_settings: context_settings,
                 tags: tags,
                 tag_map: tag_map,
-                kai_settings: kai_settings,
                 ...oai_settings,
             },
             null,
@@ -7237,7 +7010,7 @@ async function createOrEditCharacter(e) {
     }
 }
 
-window["SillyTavern"].getContext = function () {
+window["yukitavern"].getContext = function () {
     return {
         chat: chat,
         characters: characters,
@@ -7750,10 +7523,6 @@ function connectAPISlash(_, text) {
     if (!text) return;
 
     const apiMap = {
-        kobold: {
-            button: "#api_button",
-        },
-
         ooba: {
             button: "#api_button_textgenerationwebui",
         },
@@ -7765,11 +7534,6 @@ function connectAPISlash(_, text) {
         claude: {
             selected: "openai",
             source: "claude",
-            button: "#api_button_openai",
-        },
-        windowai: {
-            selected: "openai",
-            source: "windowai",
             button: "#api_button_openai",
         },
         openrouter: {
@@ -8045,7 +7809,7 @@ $(document).ready(function () {
         "api",
         connectAPISlash,
         [],
-        "(kobold, ooba, oai, claude, windowai) – connect to an API",
+        "(ooba, oai, claude) – connect to an API",
         true,
         true,
     );
@@ -8785,8 +8549,6 @@ $(document).ready(function () {
     $("#api_button").click(function (e) {
         e.stopPropagation();
         if ($("#api_url_text").val() != "") {
-            let value = formatKoboldUrl($.trim($("#api_url_text").val()));
-
             if (!value) {
                 toastr.error("Please enter a valid URL.");
                 return;
@@ -8797,7 +8559,6 @@ $(document).ready(function () {
             $("#api_loading").css("display", "inline-block");
             $("#api_button").css("display", "none");
 
-            main_api = "kobold";
             saveSettingsDebounced();
             is_get_status = true;
             is_api_button_press = true;
@@ -9043,39 +8804,29 @@ $(document).ready(function () {
     $("#settings_perset").change(function () {
         if ($("#settings_perset").find(":selected").val() != "gui") {
             preset_settings = $("#settings_perset").find(":selected").text();
-            const preset =
-                koboldai_settings[koboldai_setting_names[preset_settings]];
-            loadKoboldSettings(preset);
 
             setGenerationParamsFromPreset(preset);
 
             $("#range_block").find("input").prop("disabled", false);
-            $("#kobold-advanced-config").find("input").prop("disabled", false);
-            $("#kobold-advanced-config").css("opacity", 1.0);
 
             $("#range_block").css("opacity", 1.0);
             $("#amount_gen_block").find("input").prop("disabled", false);
 
             $("#amount_gen_block").css("opacity", 1.0);
-            $("#kobold_order").sortable("enable");
         } else {
             //$('.button').disableSelection();
             preset_settings = "gui";
             $("#range_block").find("input").prop("disabled", true);
-            $("#kobold-advanced-config").find("input").prop("disabled", true);
-            $("#kobold-advanced-config").css("opacity", 0.5);
 
             $("#range_block").css("opacity", 0.5);
             $("#amount_gen_block").find("input").prop("disabled", true);
 
             $("#amount_gen_block").css("opacity", 0.45);
-            $("#kobold_order").sortable("disable");
         }
         saveSettingsDebounced();
     });
 
     $("#main_api").change(function () {
-        is_pygmalion = false;
         is_get_status = false;
         setOpenAIOnlineStatus(false);
         online_status = "no_connection";
@@ -9553,7 +9304,7 @@ $(document).ready(function () {
 
         if (selected_group && file.name.endsWith(".json")) {
             toastr.warning(
-                "Only SillyTavern's own format is supported for group chat imports. Sorry!",
+                "Only yukitavern's own format is supported for group chat imports. Sorry!",
             );
             return;
         }

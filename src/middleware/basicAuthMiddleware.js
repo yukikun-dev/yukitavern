@@ -11,7 +11,7 @@ const process = require("process");
 const config = require(path.join(process.cwd(), "./config.conf"));
 
 const unauthorizedResponse = (res) => {
-    res.set("WWW-Authenticate", 'Basic realm="SillyTavern", charset="UTF-8"');
+    res.set("WWW-Authenticate", 'Basic realm="yukitavern", charset="UTF-8"');
     return res.status(401).send("Authentication required");
 };
 

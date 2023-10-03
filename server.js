@@ -153,7 +153,6 @@ client.on("error", (err) => {
 let api_server = "http://0.0.0.0:5000";
 let api_openai = "https://api.openai.com/v1";
 let api_claude = "https://api.anthropic.com/v1";
-let main_api = "kobold";
 
 let characters = {};
 let response_dw_bg;
@@ -319,7 +318,6 @@ const directories = {
     chats: "public/chats/",
     characters: "public/characters/",
     backgrounds: "public/backgrounds",
-    koboldAI_Settings: "public/KoboldAI Settings",
     openAI_Settings: "public/OpenAI Settings",
     textGen_Settings: "public/TextGen Settings",
     thumbnails: "thumbnails/",
@@ -404,14 +402,14 @@ app.use(function (req, res, next) {
         console.log(
             "Forbidden: Connection attempt from " +
                 clientIp +
-                ". If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of SillyTavern folder.\n",
+                ". If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of yukitavern folder.\n",
         );
         return res
             .status(403)
             .send(
                 "<b>Forbidden</b>: Connection attempt from <b>" +
                     clientIp +
-                    "</b>. If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of SillyTavern folder.",
+                    "</b>. If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.conf in root of yukitavern folder.",
             );
     }
     next();
@@ -470,173 +468,6 @@ app.get("/version", function (_, response) {
     const data = getVersion();
     response.send(data);
 });
-
-//**************Kobold api
-app.post(
-    "/generate",
-    jsonParser,
-    async function (request, response_generate = response) {
-        if (!request.body) return response_generate.sendStatus(400);
-
-        const request_prompt = request.body.prompt;
-        const controller = new AbortController();
-        request.socket.removeAllListeners("close");
-        request.socket.on("close", async function () {
-            if (request.body.can_abort && !response_generate.writableEnded) {
-                try {
-                    console.log("Aborting Kobold generation...");
-                    // send abort signal to koboldcpp
-                    const abortResponse = await fetch(
-                        `${api_server}/extra/abort`,
-                        {
-                            method: "POST",
-                        },
-                    );
-
-                    if (!abortResponse.ok) {
-                        console.log(
-                            "Error sending abort request to Kobold:",
-                            abortResponse.status,
-                        );
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-            controller.abort();
-        });
-
-        let this_settings = {
-            prompt: request_prompt,
-            use_story: false,
-            use_memory: false,
-            use_authors_note: false,
-            use_world_info: false,
-            max_context_length: request.body.max_context_length,
-            singleline: !!request.body.singleline,
-        };
-
-        if (request.body.gui_settings == false) {
-            const sampler_order = [
-                request.body.s1,
-                request.body.s2,
-                request.body.s3,
-                request.body.s4,
-                request.body.s5,
-                request.body.s6,
-                request.body.s7,
-            ];
-            this_settings = {
-                prompt: request_prompt,
-                use_story: false,
-                use_memory: false,
-                use_authors_note: false,
-                use_world_info: false,
-                max_context_length: request.body.max_context_length,
-                max_length: request.body.max_length,
-                rep_pen: request.body.rep_pen,
-                rep_pen_range: request.body.rep_pen_range,
-                rep_pen_slope: request.body.rep_pen_slope,
-                temperature: request.body.temperature,
-                tfs: request.body.tfs,
-                top_a: request.body.top_a,
-                top_k: request.body.top_k,
-                top_p: request.body.top_p,
-                typical: request.body.typical,
-                sampler_order: sampler_order,
-                singleline: !!request.body.singleline,
-            };
-            if (request.body.stop_sequence) {
-                this_settings["stop_sequence"] = request.body.stop_sequence;
-            }
-        }
-
-        console.log(this_settings);
-        const args = {
-            body: JSON.stringify(this_settings),
-            headers: { "Content-Type": "application/json" },
-            signal: controller.signal,
-        };
-
-        const MAX_RETRIES = 50;
-        const delayAmount = 2500;
-        let fetch, url, response;
-        for (let i = 0; i < MAX_RETRIES; i++) {
-            try {
-                fetch = require("node-fetch").default;
-                url = request.body.streaming
-                    ? `${api_server}/extra/generate/stream`
-                    : `${api_server}/v1/generate`;
-                response = await fetch(url, {
-                    method: "POST",
-                    timeout: 0,
-                    ...args,
-                });
-
-                if (request.body.streaming) {
-                    request.socket.on("close", function () {
-                        response.body.destroy(); // Close the remote stream
-                        response_generate.end(); // End the Express response
-                    });
-
-                    response.body.on("end", function () {
-                        console.log("Streaming request finished");
-                        response_generate.end();
-                    });
-
-                    // Pipe remote SSE stream to Express response
-                    return response.body.pipe(response_generate);
-                } else {
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.log(
-                            `Kobold returned error: ${response.status} ${response.statusText} ${errorText}`,
-                        );
-
-                        try {
-                            const errorJson = JSON.parse(errorText);
-                            const message = errorJson?.detail?.msg || errorText;
-                            return response_generate
-                                .status(400)
-                                .send({ error: { message } });
-                        } catch {
-                            return response_generate
-                                .status(400)
-                                .send({ error: { message: errorText } });
-                        }
-                    }
-
-                    const data = await response.json();
-                    return response_generate.send(data);
-                }
-            } catch (error) {
-                // response
-                switch (error?.status) {
-                    case 403:
-                    case 503: // retry in case of temporary service issue, possibly caused by a queue failure?
-                        console.debug(
-                            `KoboldAI is busy. Retry attempt ${
-                                i + 1
-                            } of ${MAX_RETRIES}...`,
-                        );
-                        await delay(delayAmount);
-                        break;
-                    default:
-                        if ("status" in error) {
-                            console.log(
-                                "Status Code from Kobold:",
-                                error.status,
-                            );
-                        }
-                        return response_generate.send({ error: true });
-                }
-            }
-        }
-
-        console.log("Max retries exceeded. Giving up.");
-        return response_generate.send({ error: true });
-    },
-);
 
 //************** Text generation web UI
 app.post(
@@ -747,7 +578,7 @@ app.post(
                 console.log(data);
                 return response_generate.send(data);
             } catch (error) {
-                retval = {
+                var retval = {
                     error: true,
                     status: error.status,
                     response: error.statusText,
@@ -756,7 +587,9 @@ app.post(
                 try {
                     retval.response = await error.json();
                     retval.response = retval.response.result;
-                } catch {}
+                } catch {
+                    _.noop();
+                }
                 return response_generate.send(retval);
             }
         }
@@ -824,7 +657,7 @@ app.post(
     async function (request, response_getstatus = response) {
         if (!request.body) return response_getstatus.sendStatus(400);
         api_server = request.body.api_server;
-        main_api = request.body.main_api;
+        const main_api = request.body.main_api;
         if (api_server.indexOf("localhost") != -1) {
             api_server = api_server.replace("localhost", "127.0.0.1");
         }
@@ -838,23 +671,6 @@ app.post(
 
         var url = api_server + "/v1/model";
         let version = "";
-        let koboldVersion = {};
-        if (main_api == "kobold") {
-            try {
-                version = (await getAsync(api_server + "/v1/info/version"))
-                    .result;
-            } catch {
-                version = "0.0.0";
-            }
-            try {
-                koboldVersion = await getAsync(api_server + "/extra/version");
-            } catch {
-                koboldVersion = {
-                    result: "Kobold",
-                    version: "0.0",
-                };
-            }
-        }
         client
             .get(url, args, async function (data, response) {
                 if (typeof data !== "object") {
@@ -862,7 +678,6 @@ app.post(
                 }
                 if (response.statusCode == 200) {
                     data.version = version;
-                    data.koboldVersion = koboldVersion;
                     if (data.result == "ReadOnly") {
                         data.result = "no_connection";
                     }
@@ -906,7 +721,7 @@ function getVersion() {
         // suppress exception
     }
 
-    const agent = `SillyTavern:${pkgVersion}:Cohee#1207`;
+    const agent = `yukitavern:${pkgVersion}:Cohee#1207`;
     return { agent, pkgVersion, gitRevision, gitBranch };
 }
 
@@ -1873,15 +1688,6 @@ app.post("/getsettings", jsonParser, (request, response) => {
         removeFileExtension: true,
     });
 
-    //Kobold
-    const {
-        fileContents: koboldai_settings,
-        fileNames: koboldai_setting_names,
-    } = readPresetsFromDirectory(directories.koboldAI_Settings, {
-        sortFunction: sortByName(directories.koboldAI_Settings),
-        removeFileExtension: true,
-    });
-
     const worldFiles = fs
         .readdirSync(directories.worlds)
         .filter((file) => path.extname(file).toLowerCase() === ".json")
@@ -1897,8 +1703,6 @@ app.post("/getsettings", jsonParser, (request, response) => {
 
     response.send({
         settings,
-        koboldai_settings,
-        koboldai_setting_names,
         world_names,
         openai_settings,
         openai_setting_names,
@@ -2146,7 +1950,6 @@ app.post(
 
                     if (jsonData.spec !== undefined) {
                         console.log("importing from v2 json");
-                        importRisuSprites(jsonData);
                         unsetFavFlag(jsonData);
                         jsonData = readFromV2(jsonData);
                         png_name = getPngName(
@@ -2276,7 +2079,6 @@ app.post(
 
                     if (jsonData.spec !== undefined) {
                         console.log("Found a v2 character file.");
-                        importRisuSprites(jsonData);
                         unsetFavFlag(jsonData);
                         jsonData = readFromV2(jsonData);
                         let char = JSON.stringify(jsonData);
@@ -3405,10 +3207,10 @@ async function sendClaudeRequest(request, response) {
         let requestPrompt = convertClaudePrompt(
             request.body.messages,
             true,
-            true,
+            !request.body.exclude_assistant,
         );
 
-        if (request.body.assistant_prefill) {
+        if (request.body.assistant_prefill && !request.body.exclude_assistant) {
             requestPrompt += request.body.assistant_prefill;
         }
 
@@ -3781,7 +3583,6 @@ app.post("/savepreset_openai", jsonParser, function (request, response) {
 
 function getPresetFolderByApiId(apiId) {
     switch (apiId) {
-        case "kobold":
         case "textgenerationwebui":
             return directories.textGen_Settings;
         default:
@@ -3829,6 +3630,7 @@ app.post("/tokenize_via_api", jsonParser, async function (request, response) {
             headers: { "Content-Type": "application/json" },
         };
 
+        const main_api = request.body.main_api;
         if (main_api == "textgenerationwebui" && request.body.use_mancer) {
             args.headers = Object.assign(args.headers, get_mancer_headers());
         }
@@ -3856,20 +3658,6 @@ async function postAsync(url, args) {
     throw response;
 }
 
-function getAsync(url, args) {
-    return new Promise((resolve, reject) => {
-        client
-            .get(url, args, (data, response) => {
-                if (response.statusCode >= 400) {
-                    reject(data);
-                }
-                resolve(data);
-            })
-            .on("error", (e) => reject(e));
-    });
-}
-// ** END **
-
 const tavernUrl = new URL(
     (cliArguments.ssl ? "https://" : "http://") +
         (listen ? "0.0.0.0" : "127.0.0.1") +
@@ -3886,7 +3674,7 @@ const setupTasks = async function () {
     const version = getVersion();
 
     console.log(
-        `SillyTavern ${version.pkgVersion}` +
+        `yukitavern ${version.pkgVersion}` +
             (version.gitBranch
                 ? ` '${version.gitBranch}' (${version.gitRevision})`
                 : ""),
@@ -3920,11 +3708,11 @@ const setupTasks = async function () {
     console.log("Launching...");
 
     if (autorun) open(autorunUrl.toString());
-    console.log("SillyTavern is listening on: " + tavernUrl);
+    console.log("yukitavern is listening on: " + tavernUrl);
 
     if (listen) {
         console.log(
-            "\n0.0.0.0 means SillyTavern is listening on all network interfaces (Wi-Fi, LAN, localhost). If you want to limit it only to internal localhost (127.0.0.1), change the setting in config.conf to “listen=false”\n",
+            "\n0.0.0.0 means yukitavern is listening on all network interfaces (Wi-Fi, LAN, localhost). If you want to limit it only to internal localhost (127.0.0.1), change the setting in config.conf to “listen=false”\n",
         );
     }
 };
@@ -3936,7 +3724,7 @@ if (listen && !config.whitelistMode && !config.basicAuthMode) {
         );
     else {
         console.error(
-            "Your SillyTavern is currently unsecurely open to the public. Enable whitelisting or basic authentication.",
+            "Your yukitavern is currently unsecurely open to the public. Enable whitelisting or basic authentication.",
         );
         process.exit(1);
     }
@@ -4268,7 +4056,7 @@ async function downloadChubLorebook(id) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             fullPath: id,
-            format: "SILLYTAVERN",
+            format: "yukitavern",
         }),
     });
 
@@ -4349,71 +4137,6 @@ function parseChubUrl(str) {
     }
 
     return null;
-}
-
-function importRisuSprites(data) {
-    try {
-        const name = data?.data?.name;
-        const risuData = data?.data?.extensions?.risuai;
-
-        // Not a Risu AI character
-        if (!risuData || !name) {
-            return;
-        }
-
-        let images = [];
-
-        if (Array.isArray(risuData.additionalAssets)) {
-            images = images.concat(risuData.additionalAssets);
-        }
-
-        if (Array.isArray(risuData.emotions)) {
-            images = images.concat(risuData.emotions);
-        }
-
-        // No sprites to import
-        if (images.length === 0) {
-            return;
-        }
-
-        // Create sprites folder if it doesn't exist
-        const spritesPath = path.join(directories.characters, name);
-        if (!fs.existsSync(spritesPath)) {
-            fs.mkdirSync(spritesPath);
-        }
-
-        // Path to sprites is not a directory. This should never happen.
-        if (!fs.statSync(spritesPath).isDirectory()) {
-            return;
-        }
-
-        console.log(
-            `RisuAI: Found ${images.length} sprites for ${name}. Writing to disk.`,
-        );
-        const files = fs.readdirSync(spritesPath);
-
-        outer: for (const [label, fileBase64] of images) {
-            // Remove existing sprite with the same label
-            for (const file of files) {
-                if (path.parse(file).name === label) {
-                    console.log(
-                        `RisuAI: The sprite ${label} for ${name} already exists. Skipping.`,
-                    );
-                    continue outer;
-                }
-            }
-
-            const filename = label + ".png";
-            const pathToFile = path.join(spritesPath, filename);
-            fs.writeFileSync(pathToFile, fileBase64, { encoding: "base64" });
-        }
-
-        // Remove additionalAssets and emotions from data (they are now in the sprites folder)
-        delete data.data.extensions.risuai.additionalAssets;
-        delete data.data.extensions.risuai.emotions;
-    } catch (error) {
-        console.error(error);
-    }
 }
 
 function writeSecret(key, value) {

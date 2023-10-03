@@ -68,11 +68,6 @@ const extension_settings = {
     expressions: {},
     regex: [],
     tts: {},
-    sd: {
-        prompts: {},
-        character_prompts: {},
-    },
-    chromadb: {},
     translate: {},
     objective: {},
     quickReply: {},
@@ -82,13 +77,12 @@ const extension_settings = {
         enabled: false,
     },
     speech_recognition: {},
-    rvc: {},
 };
 
 let modules = [];
 let activeExtensions = new Set();
 
-const getContext = () => window["SillyTavern"].getContext();
+const getContext = () => window["yukitavern"].getContext();
 const getApiUrl = () => extension_settings.apiUrl;
 let connectedToApi = false;
 

@@ -481,11 +481,6 @@ function isElementTagged(element, tagId) {
     return isTagged;
 }
 
-function clearTagsFilter(characterSelector) {
-    $(".rm_tag_filter .tag").removeClass("selected");
-    $(characterSelector).removeClass("hiddenByTag");
-}
-
 function printTagFilters(type = tag_filter_types.character) {
     const FILTER_SELECTOR =
         type === tag_filter_types.character

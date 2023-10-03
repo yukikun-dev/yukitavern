@@ -6,11 +6,8 @@ TODO:
 import { saveSettingsDebounced } from "../../../script.js";
 import {
     getContext,
-    getApiUrl,
-    modules,
     extension_settings,
     ModuleWorkerWrapper,
-    doExtrasFetch,
 } from "../../extensions.js";
 import { VoskSttProvider } from "./vosk.js";
 import { WhisperSttProvider } from "./whisper.js";
@@ -409,7 +406,7 @@ function onSttProviderChange() {
 function onSttProviderSettingsInput() {
     sttProvider.onSettingsChange();
 
-    // Persist changes to SillyTavern stt extension settings
+    // Persist changes to yukitavern stt extension settings
     extension_settings.speech_recognition[sttProviderName] =
         sttProvider.settings;
     saveSettingsDebounced();
