@@ -8807,18 +8807,13 @@ $(document).ready(function () {
 
             setGenerationParamsFromPreset(preset);
 
-            $("#range_block").find("input").prop("disabled", false);
-
-            $("#range_block").css("opacity", 1.0);
             $("#amount_gen_block").find("input").prop("disabled", false);
 
             $("#amount_gen_block").css("opacity", 1.0);
         } else {
             //$('.button').disableSelection();
             preset_settings = "gui";
-            $("#range_block").find("input").prop("disabled", true);
 
-            $("#range_block").css("opacity", 0.5);
             $("#amount_gen_block").find("input").prop("disabled", true);
 
             $("#amount_gen_block").css("opacity", 0.45);
