@@ -3690,7 +3690,7 @@ const setupTasks = async function () {
         loadSentencepieceTokenizer("src/sentencepiece/tokenizer.model"),
         loadSentencepieceTokenizer("src/sentencepiece/nerdstash.model"),
         loadSentencepieceTokenizer("src/sentencepiece/nerdstash_v2.model"),
-        loadClaudeTokenizer("src/claude.json"),
+        loadClaudeTokenizer("src/claude.min.json"),
     ]);
 
     await statsHelpers.loadStatsFile(directories.chats, directories.characters);
