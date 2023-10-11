@@ -1,10 +1,4 @@
-import {
-    callPopup,
-    eventSource,
-    event_types,
-    getRequestHeaders,
-    saveSettingsDebounced,
-} from "../../../script.js";
+import { callPopup, eventSource, event_types, getRequestHeaders, saveSettingsDebounced } from "../../../script.js";
 import { isMobile } from "../../RossAscends-mods.js";
 import {
     getContext,
@@ -69,21 +63,14 @@ async function forceUpdateVisualNovelMode() {
     }
 }
 
-const updateVisualNovelModeDebounced = debounce(
-    forceUpdateVisualNovelMode,
-    100,
-);
+const updateVisualNovelModeDebounced = debounce(forceUpdateVisualNovelMode, 100);
 
 async function updateVisualNovelMode(name, expression) {
     const container = $("#visual-novel-wrapper");
 
     await visualNovelRemoveInactive(container);
 
-    const setSpritePromises = await visualNovelSetCharacterSprites(
-        container,
-        name,
-        expression,
-    );
+    const setSpritePromises = await visualNovelSetCharacterSprites(container, name, expression);
 
     // calculate layer indices based on recent messages
     await visualNovelUpdateLayers(container);
@@ -107,10 +94,7 @@ async function visualNovelRemoveInactive(container) {
             const element = $(current);
             const avatar = element.data("avatar");
 
-            if (
-                !group.members.includes(avatar) ||
-                group.disabled_members.includes(avatar)
-            ) {
+            if (!group.members.includes(avatar) || group.disabled_members.includes(avatar)) {
                 element.fadeOut(250, () => {
                     element.remove();
                     resolve();
@@ -152,9 +136,7 @@ async function visualNovelSetCharacterSprites(container, name, expression) {
         const avatarFileName = getSpriteFolderName({
             original_avatar: character.avatar,
         });
-        const expressionOverride = extension_settings.expressionOverrides.find(
-            (e) => e.name == avatarFileName,
-        );
+        const expressionOverride = extension_settings.expressionOverrides.find((e) => e.name == avatarFileName);
 
         if (expressionOverride && expressionOverride.path) {
             spriteFolderName = expressionOverride.path;
@@ -162,18 +144,12 @@ async function visualNovelSetCharacterSprites(container, name, expression) {
 
         // download images if not downloaded yet
         if (spriteCache[spriteFolderName] === undefined) {
-            spriteCache[spriteFolderName] = await getSpritesList(
-                spriteFolderName,
-            );
+            spriteCache[spriteFolderName] = await getSpritesList(spriteFolderName);
         }
 
         const sprites = spriteCache[spriteFolderName];
-        const expressionImage = container.find(
-            `.expression-holder[data-avatar="${avatar}"]`,
-        );
-        const defaultSpritePath = sprites.find(
-            (x) => x.label === FALLBACK_EXPRESSION,
-        )?.path;
+        const expressionImage = container.find(`.expression-holder[data-avatar="${avatar}"]`);
+        const defaultSpritePath = sprites.find((x) => x.label === FALLBACK_EXPRESSION)?.path;
         const noSprites = sprites.length === 0;
 
         if (expressionImage.length > 0) {
@@ -193,9 +169,7 @@ async function visualNovelSetCharacterSprites(container, name, expression) {
             const template = $("#expression-holder").clone();
             template.attr("id", `expression-${avatar}`);
             template.attr("data-avatar", avatar);
-            template
-                .find(".drag-grabber")
-                .attr("id", `expression-${avatar}header`);
+            template.find(".drag-grabber").attr("id", `expression-${avatar}header`);
             $("#visual-novel-wrapper").append(template);
             template.toggleClass("hidden", noSprites);
             await setImage(template.find("img"), defaultSpritePath || "");
@@ -203,11 +177,7 @@ async function visualNovelSetCharacterSprites(container, name, expression) {
                 template.fadeIn(250, () => resolve());
             });
             createCharacterPromises.push(fadeInPromise);
-            const setSpritePromise = setLastMessageSprite(
-                template.find("img"),
-                avatar,
-                labels,
-            );
+            const setSpritePromise = setLastMessageSprite(template.find("img"), avatar, labels);
             setSpritePromises.push(setSpritePromise);
         }
     }
@@ -224,9 +194,7 @@ async function visualNovelUpdateLayers(container) {
         .filter((x) => x)
         .reverse()
         .filter(onlyUnique);
-    const filteredMembers = group.members.filter(
-        (x) => !group.disabled_members.includes(x),
-    );
+    const filteredMembers = group.members.filter((x) => !group.disabled_members.includes(x));
     const layerIndices = filteredMembers.slice().sort((a, b) => {
         const aRecentIndex = recentMessages.indexOf(a);
         const bRecentIndex = recentMessages.indexOf(b);
@@ -269,14 +237,9 @@ async function visualNovelUpdateLayers(container) {
 
     if (totalWidth > containerWidth) {
         let totalOverlap = totalWidth - containerWidth;
-        let totalWidthWithoutWidest =
-            imagesWidth.reduce((a, b) => a + b, 0) - Math.max(...imagesWidth);
-        let overlaps = imagesWidth.map(
-            (width) => (width / totalWidthWithoutWidest) * totalOverlap,
-        );
-        imagesWidth = imagesWidth.map(
-            (width, index) => width - overlaps[index],
-        );
+        let totalWidthWithoutWidest = imagesWidth.reduce((a, b) => a + b, 0) - Math.max(...imagesWidth);
+        let overlaps = imagesWidth.map((width) => (width / totalWidthWithoutWidest) * totalOverlap);
+        imagesWidth = imagesWidth.map((width, index) => width - overlaps[index]);
         currentPosition = 0; // Reset the initial position to 0
     }
 
@@ -309,18 +272,14 @@ async function setLastMessageSprite(img, avatar, labels) {
         .reverse()
         .find(
             (x) =>
-                x.original_avatar == avatar ||
-                (x.force_avatar &&
-                    x.force_avatar.includes(encodeURIComponent(avatar))),
+                x.original_avatar == avatar || (x.force_avatar && x.force_avatar.includes(encodeURIComponent(avatar))),
         );
 
     if (lastMessage) {
         const text = lastMessage.mes || "";
         let spriteFolderName = lastMessage.name;
         const avatarFileName = getSpriteFolderName(lastMessage);
-        const expressionOverride = extension_settings.expressionOverrides.find(
-            (e) => e.name == avatarFileName,
-        );
+        const expressionOverride = extension_settings.expressionOverrides.find((e) => e.name == avatarFileName);
 
         if (expressionOverride && expressionOverride.path) {
             spriteFolderName = expressionOverride.path;
@@ -328,9 +287,7 @@ async function setLastMessageSprite(img, avatar, labels) {
 
         const sprites = spriteCache[spriteFolderName] || [];
         const label = await getExpressionLabel(text);
-        const path = labels.includes(label)
-            ? sprites.find((x) => x.label === label)?.path
-            : "";
+        const path = labels.includes(label) ? sprites.find((x) => x.label === label)?.path : "";
 
         if (path) {
             setImage(img, path);
@@ -357,10 +314,7 @@ async function setImage(img, path) {
         const originalId = img.attr("id");
 
         //only swap expressions when necessary
-        if (
-            prevExpressionSrc !== path &&
-            !img.hasClass("expression-animating")
-        ) {
+        if (prevExpressionSrc !== path && !img.hasClass("expression-animating")) {
             //clone expression
             expressionClone.addClass("expression-clone");
             //make invisible and remove id to prevent double ids
@@ -382,10 +336,7 @@ async function setImage(img, path) {
             const imgHeight = img.height();
             const expressionHolder = img.parent();
             expressionHolder.css("min-width", imgWidth > 100 ? imgWidth : 100);
-            expressionHolder.css(
-                "min-height",
-                imgHeight > 100 ? imgHeight : 100,
-            );
+            expressionHolder.css("min-height", imgHeight > 100 ? imgHeight : 100);
 
             //position absolute prevent the original from jumping around during transition
             img.css("position", "absolute");
@@ -483,17 +434,13 @@ async function loadLiveChar() {
     let spriteFolderName = context.name2;
     const message = getLastCharacterMessage();
     const avatarFileName = getSpriteFolderName(message);
-    const expressionOverride = extension_settings.expressionOverrides.find(
-        (e) => e.name == avatarFileName,
-    );
+    const expressionOverride = extension_settings.expressionOverrides.find((e) => e.name == avatarFileName);
 
     if (expressionOverride && expressionOverride.path) {
         spriteFolderName = expressionOverride.path;
     }
 
-    const talkingheadPath = `/characters/${encodeURIComponent(
-        spriteFolderName,
-    )}/talkinghead.png`;
+    const talkingheadPath = `/characters/${encodeURIComponent(spriteFolderName)}/talkinghead.png`;
 
     try {
         const spriteResponse = await fetch(talkingheadPath);
@@ -524,16 +471,12 @@ async function loadLiveChar() {
         const loadResponseText = await loadResponse.text();
         console.log(`Load talkinghead response: ${loadResponseText}`);
     } catch (error) {
-        console.error(
-            `Error loading talkinghead image: ${talkingheadPath} - ${error}`,
-        );
+        console.error(`Error loading talkinghead image: ${talkingheadPath} - ${error}`);
     }
 }
 
 function handleImageChange() {
-    const imgElement = document.querySelector(
-        "img#expression-image.expression",
-    );
+    const imgElement = document.querySelector("img#expression-image.expression");
 
     if (!imgElement) {
         console.log("Cannot find addExpressionImage()");
@@ -545,9 +488,7 @@ function handleImageChange() {
         const talkingheadResultFeedSrc = `${getApiUrl()}/api/talkinghead/result_feed`;
         $("#expression-holder").css({ display: "" });
         if (imgElement.src !== talkingheadResultFeedSrc) {
-            const expressionImageElement = document.querySelector(
-                ".expression_list_image",
-            );
+            const expressionImageElement = document.querySelector(".expression_list_image");
 
             if (expressionImageElement) {
                 doExtrasFetch(expressionImageElement.src, {
@@ -579,10 +520,7 @@ async function moduleWorker() {
     }
 
     // character changed
-    if (
-        context.groupId !== lastCharacter &&
-        context.characterId !== lastCharacter
-    ) {
+    if (context.groupId !== lastCharacter && context.characterId !== lastCharacter) {
         removeExpression();
         spriteCache = {};
 
@@ -591,10 +529,7 @@ async function moduleWorker() {
         imgElement.src = "";
 
         //set checkbox to global var
-        $("#image_type_toggle").prop(
-            "checked",
-            extension_settings.expressions.talkinghead,
-        );
+        $("#image_type_toggle").prop("checked", extension_settings.expressions.talkinghead);
         if (extension_settings.expressions.talkinghead) {
             settalkingheadState(extension_settings.expressions.talkinghead);
         }
@@ -630,9 +565,7 @@ async function moduleWorker() {
     const currentLastMessage = getLastCharacterMessage();
     let spriteFolderName = currentLastMessage.name;
     const avatarFileName = getSpriteFolderName(currentLastMessage);
-    const expressionOverride = extension_settings.expressionOverrides.find(
-        (e) => e.name == avatarFileName,
-    );
+    const expressionOverride = extension_settings.expressionOverrides.find((e) => e.name == avatarFileName);
 
     if (expressionOverride && expressionOverride.path) {
         spriteFolderName = expressionOverride.path;
@@ -671,8 +604,7 @@ async function moduleWorker() {
 
     // check if last message changed
     if (
-        (lastCharacter === context.characterId ||
-            lastCharacter === context.groupId) &&
+        (lastCharacter === context.characterId || lastCharacter === context.groupId) &&
         lastMessage === currentLastMessage.mes
     ) {
         return;
@@ -695,10 +627,7 @@ async function moduleWorker() {
         const force = !!context.groupId;
 
         // Character won't be angry on you for swiping
-        if (
-            currentLastMessage.mes == "..." &&
-            expressionsList.includes(FALLBACK_EXPRESSION)
-        ) {
+        if (currentLastMessage.mes == "..." && expressionsList.includes(FALLBACK_EXPRESSION)) {
             expression = FALLBACK_EXPRESSION;
         }
 
@@ -717,9 +646,7 @@ async function talkingheadcheck() {
     let spriteFolderName = context.name2;
     const message = getLastCharacterMessage();
     const avatarFileName = getSpriteFolderName(message);
-    const expressionOverride = extension_settings.expressionOverrides.find(
-        (e) => e.name == avatarFileName,
-    );
+    const expressionOverride = extension_settings.expressionOverrides.find((e) => e.name == avatarFileName);
 
     if (expressionOverride && expressionOverride.path) {
         spriteFolderName = expressionOverride.path;
@@ -728,9 +655,7 @@ async function talkingheadcheck() {
     try {
         await validateImages(spriteFolderName);
 
-        let talkingheadObj = spriteCache[spriteFolderName].find(
-            (obj) => obj.label === "talkinghead",
-        );
+        let talkingheadObj = spriteCache[spriteFolderName].find((obj) => obj.label === "talkinghead");
         let talkingheadPath_f = talkingheadObj ? talkingheadObj.path : null;
 
         if (talkingheadPath_f != null) {
@@ -774,9 +699,7 @@ function getSpriteFolderName(message) {
         avatarPath =
             message.original_avatar ||
             context.characters.find(
-                (x) =>
-                    message.force_avatar &&
-                    message.force_avatar.includes(encodeURIComponent(x.avatar)),
+                (x) => message.force_avatar && message.force_avatar.includes(encodeURIComponent(x.avatar)),
             )?.avatar;
     } else if (context.characterId) {
         avatarPath = getCharaFilename();
@@ -892,9 +815,7 @@ function drawSpritesList(character, labels, sprites) {
             validExpressions.push(sprite);
             $("#image_list").append(getListItem(item, sprite.path, "success"));
         } else {
-            $("#image_list").append(
-                getListItem(item, "/img/No-Image-Placeholder.svg", "failure"),
-            );
+            $("#image_list").append(getListItem(item, "/img/No-Image-Placeholder.svg", "failure"));
         }
     });
     return validExpressions;
@@ -921,9 +842,7 @@ async function getSpritesList(name) {
     console.debug("getting sprites list");
 
     try {
-        const result = await fetch(
-            `/get_sprites?name=${encodeURIComponent(name)}`,
-        );
+        const result = await fetch(`/get_sprites?name=${encodeURIComponent(name)}`);
         let sprites = result.ok ? await result.json() : [];
         return sprites;
     } catch (err) {
@@ -970,44 +889,30 @@ async function setExpression(character, expression, force) {
         const prevExpressionSrc = img.attr("src");
         const expressionClone = img.clone();
 
-        const sprite =
-            spriteCache[character] &&
-            spriteCache[character].find((x) => x.label === expression);
+        const sprite = spriteCache[character] && spriteCache[character].find((x) => x.label === expression);
         console.debug("checking for expression images to show..");
         if (sprite) {
             console.debug("setting expression from character images folder");
 
             if (force && isVisualNovelMode()) {
                 const context = getContext();
-                const group = context.groups.find(
-                    (x) => x.id === context.groupId,
-                );
+                const group = context.groups.find((x) => x.id === context.groupId);
 
                 for (const member of group.members) {
-                    const groupMember = context.characters.find(
-                        (x) => x.avatar === member,
-                    );
+                    const groupMember = context.characters.find((x) => x.avatar === member);
 
                     if (!groupMember) {
                         continue;
                     }
 
                     if (groupMember.name == character) {
-                        await setImage(
-                            $(
-                                `.expression-holder[data-avatar="${member}"] img`,
-                            ),
-                            sprite.path,
-                        );
+                        await setImage($(`.expression-holder[data-avatar="${member}"] img`), sprite.path);
                         return;
                     }
                 }
             }
             //only swap expressions when necessary
-            if (
-                prevExpressionSrc !== sprite.path &&
-                !img.hasClass("expression-animating")
-            ) {
+            if (prevExpressionSrc !== sprite.path && !img.hasClass("expression-animating")) {
                 //clone expression
                 expressionClone.addClass("expression-clone");
                 //make invisible and remove id to prevent double ids
@@ -1028,14 +933,8 @@ async function setExpression(character, expression, force) {
                 const imgWidth = img.width();
                 const imgHeight = img.height();
                 const expressionHolder = img.parent();
-                expressionHolder.css(
-                    "min-width",
-                    imgWidth > 100 ? imgWidth : 100,
-                );
-                expressionHolder.css(
-                    "min-height",
-                    imgHeight > 100 ? imgHeight : 100,
-                );
+                expressionHolder.css("min-width", imgWidth > 100 ? imgWidth : 100);
+                expressionHolder.css("min-height", imgHeight > 100 ? imgHeight : 100);
 
                 //position absolute prevent the original from jumping around during transition
                 img.css("position", "absolute");
@@ -1102,14 +1001,11 @@ async function setExpression(character, expression, force) {
         talkingheadcheck().then((result) => {
             if (result) {
                 // Find the <img> element with id="expression-image" and class="expression"
-                const imgElement = document.querySelector(
-                    "img#expression-image.expression",
-                );
+                const imgElement = document.querySelector("img#expression-image.expression");
                 //console.log("searching");
                 if (imgElement) {
                     //console.log("setting value");
-                    imgElement.src =
-                        getApiUrl() + "/api/talkinghead/result_feed";
+                    imgElement.src = getApiUrl() + "/api/talkinghead/result_feed";
                 }
             } else {
                 //console.log("The fetch failed!");
@@ -1179,10 +1075,7 @@ async function onClickExpressionUpload(event) {
         e.target.form.reset();
     };
 
-    $("#expression_upload")
-        .off("change")
-        .on("change", handleExpressionUploadChange)
-        .trigger("click");
+    $("#expression_upload").off("change").on("change", handleExpressionUploadChange).trigger("click");
 }
 
 async function onClickExpressionOverrideButton() {
@@ -1200,10 +1093,7 @@ async function onClickExpressionOverrideButton() {
     }
 
     const overridePath = $("#expression_override").val();
-    const existingOverrideIndex =
-        extension_settings.expressionOverrides.findIndex(
-            (e) => e.name == avatarFileName,
-        );
+    const existingOverrideIndex = extension_settings.expressionOverrides.findIndex((e) => e.name == avatarFileName);
 
     // If the path is empty, delete the entry from overrides
     if (overridePath === undefined || overridePath.length === 0) {
@@ -1215,8 +1105,7 @@ async function onClickExpressionOverrideButton() {
         console.debug(`Removed existing override for ${avatarFileName}`);
     } else {
         // Properly override objects and clear the sprite cache of the previously set names
-        const existingOverride =
-            extension_settings.expressionOverrides[existingOverrideIndex];
+        const existingOverride = extension_settings.expressionOverrides[existingOverrideIndex];
         if (existingOverride) {
             Object.assign(existingOverride, { path: overridePath });
             delete spriteCache[existingOverride.name];
@@ -1239,21 +1128,12 @@ async function onClickExpressionOverrideButton() {
     // Refresh sprites list. Assume the override path has been properly handled.
     try {
         $("#visual-novel-wrapper").empty();
-        await validateImages(
-            overridePath.length === 0 ? currentLastMessage.name : overridePath,
-            true,
-        );
+        await validateImages(overridePath.length === 0 ? currentLastMessage.name : overridePath, true);
         const expression = await getExpressionLabel(currentLastMessage.mes);
-        await sendExpressionCall(
-            overridePath.length === 0 ? currentLastMessage.name : overridePath,
-            expression,
-            true,
-        );
+        await sendExpressionCall(overridePath.length === 0 ? currentLastMessage.name : overridePath, expression, true);
         forceUpdateVisualNovelMode();
     } catch (error) {
-        console.debug(
-            `Setting expression override for ${avatarFileName} failed with error: ${error}`,
-        );
+        console.debug(`Setting expression override for ${avatarFileName} failed with error: ${error}`);
     }
 }
 
@@ -1279,9 +1159,7 @@ async function onClickExpressionOverrideRemoveAllButton() {
 
         console.debug(extension_settings.expressionOverrides);
     } catch (error) {
-        console.debug(
-            `The current expression could not be set because of error: ${error}`,
-        );
+        console.debug(`The current expression could not be set because of error: ${error}`);
     }
 }
 
@@ -1299,30 +1177,21 @@ async function onClickExpressionUploadPackButton() {
         formData.append("name", name);
         formData.append("avatar", file);
 
-        const { count } = await handleFileUpload(
-            "/upload_sprite_pack",
-            formData,
-        );
+        const { count } = await handleFileUpload("/upload_sprite_pack", formData);
         toastr.success(`Uploaded ${count} image(s) for ${name}`);
 
         // Reset the input
         e.target.form.reset();
     };
 
-    $("#expression_upload_pack")
-        .off("change")
-        .on("change", handleFileUploadChange)
-        .trigger("click");
+    $("#expression_upload_pack").off("change").on("change", handleFileUploadChange).trigger("click");
 }
 
 async function onClickExpressionDelete(event) {
     // Prevents the expression from being set
     event.stopPropagation();
 
-    const confirmation = await callPopup(
-        "<h3>Are you sure?</h3>Once deleted, it's gone forever!",
-        "confirm",
-    );
+    const confirmation = await callPopup("<h3>Are you sure?</h3>Once deleted, it's gone forever!", "confirm");
 
     if (!confirmation) {
         return;
@@ -1353,9 +1222,7 @@ function setExpressionOverrideHtml(forceClear = false) {
         return;
     }
 
-    const expressionOverride = extension_settings.expressionOverrides.find(
-        (e) => e.name == avatarFileName,
-    );
+    const expressionOverride = extension_settings.expressionOverrides.find((e) => e.name == avatarFileName);
 
     if (expressionOverride && expressionOverride.path) {
         $("#expression_override").val(expressionOverride.path);
@@ -1436,44 +1303,18 @@ function setExpressionOverrideHtml(forceClear = false) {
         `;
 
         $("#extensions_settings").append(html);
-        $("#expression_override_button").on(
-            "click",
-            onClickExpressionOverrideButton,
-        );
-        $("#expressions_show_default").on(
-            "input",
-            onExpressionsShowDefaultInput,
-        );
-        $("#expression_upload_pack_button").on(
-            "click",
-            onClickExpressionUploadPackButton,
-        );
-        $("#expressions_show_default")
-            .prop("checked", extension_settings.expressions.showDefault)
-            .trigger("input");
-        $("#expression_override_cleanup_button").on(
-            "click",
-            onClickExpressionOverrideRemoveAllButton,
-        );
+        $("#expression_override_button").on("click", onClickExpressionOverrideButton);
+        $("#expressions_show_default").on("input", onExpressionsShowDefaultInput);
+        $("#expression_upload_pack_button").on("click", onClickExpressionUploadPackButton);
+        $("#expressions_show_default").prop("checked", extension_settings.expressions.showDefault).trigger("input");
+        $("#expression_override_cleanup_button").on("click", onClickExpressionOverrideRemoveAllButton);
         $(document).on("dragstart", ".expression", (e) => {
             e.preventDefault();
             return false;
         });
-        $(document).on(
-            "click",
-            ".expression_list_item",
-            onClickExpressionImage,
-        );
-        $(document).on(
-            "click",
-            ".expression_list_upload",
-            onClickExpressionUpload,
-        );
-        $(document).on(
-            "click",
-            ".expression_list_delete",
-            onClickExpressionDelete,
-        );
+        $(document).on("click", ".expression_list_item", onClickExpressionImage);
+        $(document).on("click", ".expression_list_upload", onClickExpressionUpload);
+        $(document).on("click", ".expression_list_delete", onClickExpressionDelete);
         $(window).on("resize", updateVisualNovelModeDebounced);
         $(".expression_settings").hide();
 
@@ -1496,9 +1337,6 @@ function setExpressionOverrideHtml(forceClear = false) {
             $("#visual-novel-wrapper").empty();
         }
     });
-    eventSource.on(
-        event_types.MOVABLE_PANELS_RESET,
-        updateVisualNovelModeDebounced,
-    );
+    eventSource.on(event_types.MOVABLE_PANELS_RESET, updateVisualNovelModeDebounced);
     eventSource.on(event_types.GROUP_UPDATED, updateVisualNovelModeDebounced);
 })();

@@ -33,10 +33,7 @@ const dictZip = (x, y) => {
 };
 
 function bytes_to_unicode() {
-    const bs = range(ord("!"), ord("~") + 1).concat(
-        range(ord("¡"), ord("¬") + 1),
-        range(ord("®"), ord("ÿ") + 1),
-    );
+    const bs = range(ord("!"), ord("~") + 1).concat(range(ord("¡"), ord("¬") + 1), range(ord("®"), ord("ÿ") + 1));
 
     let cs = bs.slice();
     let n = 0;
@@ -68,8 +65,7 @@ function get_pairs(word) {
     return pairs;
 }
 
-const pat =
-    /'s|'t|'re|'ve|'m|'l l|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+/gu;
+const pat = /'s|'t|'re|'ve|'m|'l l|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+/gu;
 
 const decoder = {};
 Object.keys(encoder).map((x) => {
@@ -141,11 +137,7 @@ function bpe(token) {
             new_word = new_word.concat(word.slice(i, j));
             i = j;
 
-            if (
-                word[i] === first &&
-                i < word.length - 1 &&
-                word[i + 1] === second
-            ) {
+            if (word[i] === first && i < word.length - 1 && word[i + 1] === second) {
                 new_word.push(first + second);
                 i = i + 2;
             } else {

@@ -5,10 +5,7 @@ GPT-2/3 byte pair encoder/decoder/tokenizer based on [@latitudegames/GPT-3-Encod
 See also: [JS byte pair encoder for OpenAI's CLIP model](https://github.com/josephrocca/clip-bpe-js).
 
 ```js
-import {
-    encode,
-    decode,
-} from "https://deno.land/x/gpt_2_3_tokenizer@v0.0.2/mod.js";
+import { encode, decode } from "https://deno.land/x/gpt_2_3_tokenizer@v0.0.2/mod.js";
 let text = "hello world";
 console.log(encode(text)); // [258, 18798, 995]
 console.log(decode(encode(text))); // "hello world"

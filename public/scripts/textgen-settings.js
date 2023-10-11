@@ -8,12 +8,7 @@ import {
 
 import { power_user } from "./power-user.js";
 
-export {
-    textgenerationwebui_settings,
-    loadTextGenSettings,
-    generateTextGenWithStreaming,
-    formatTextGenURL,
-};
+export { textgenerationwebui_settings, loadTextGenSettings, generateTextGenWithStreaming, formatTextGenURL };
 
 const textgenerationwebui_settings = {
     temp: 0.7,
@@ -82,10 +77,7 @@ const setting_names = [
 ];
 
 function selectPreset(name) {
-    const preset =
-        textgenerationwebui_presets[
-            textgenerationwebui_preset_names.indexOf(name)
-        ];
+    const preset = textgenerationwebui_presets[textgenerationwebui_preset_names.indexOf(name)];
 
     if (!preset) {
         return;
@@ -123,15 +115,9 @@ function convertPresets(presets) {
 }
 
 function loadTextGenSettings(data, settings) {
-    textgenerationwebui_presets = convertPresets(
-        data.textgenerationwebui_presets,
-    );
-    textgenerationwebui_preset_names =
-        data.textgenerationwebui_preset_names ?? [];
-    Object.assign(
-        textgenerationwebui_settings,
-        settings.textgenerationwebui_settings ?? {},
-    );
+    textgenerationwebui_presets = convertPresets(data.textgenerationwebui_presets);
+    textgenerationwebui_preset_names = data.textgenerationwebui_preset_names ?? [];
+    Object.assign(textgenerationwebui_settings, settings.textgenerationwebui_settings ?? {});
 
     for (const name of textgenerationwebui_preset_names) {
         const option = document.createElement("option");
@@ -141,9 +127,7 @@ function loadTextGenSettings(data, settings) {
     }
 
     if (textgenerationwebui_settings.preset) {
-        $("#settings_preset_textgenerationwebui").val(
-            textgenerationwebui_settings.preset,
-        );
+        $("#settings_preset_textgenerationwebui").val(textgenerationwebui_settings.preset);
     }
 
     for (const i of setting_names) {
@@ -187,8 +171,7 @@ function setSettingByName(i, value, trigger) {
         return;
     }
 
-    const isCheckbox =
-        $(`#${i}_textgenerationwebui`).attr("type") == "checkbox";
+    const isCheckbox = $(`#${i}_textgenerationwebui`).attr("type") == "checkbox";
     const isText = $(`#${i}_textgenerationwebui`).attr("type") == "text";
     if (isCheckbox) {
         const val = Boolean(value);
@@ -236,11 +219,7 @@ async function generateTextGenWithStreaming(generate_data, signal) {
     };
 }
 
-export function getTextGenGenerationData(
-    finalPromt,
-    this_amount_gen,
-    isImpersonate,
-) {
+export function getTextGenGenerationData(finalPromt, this_amount_gen, isImpersonate) {
     return {
         prompt: finalPromt,
         max_new_tokens: this_amount_gen,
@@ -250,8 +229,7 @@ export function getTextGenGenerationData(
         typical_p: textgenerationwebui_settings.typical_p,
         repetition_penalty: textgenerationwebui_settings.rep_pen,
         repetition_penalty_range: textgenerationwebui_settings.rep_pen_range,
-        encoder_repetition_penalty:
-            textgenerationwebui_settings.encoder_rep_pen,
+        encoder_repetition_penalty: textgenerationwebui_settings.encoder_rep_pen,
         top_k: textgenerationwebui_settings.top_k,
         min_length: textgenerationwebui_settings.min_length,
         no_repeat_ngram_size: textgenerationwebui_settings.no_repeat_ngram_size,

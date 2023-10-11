@@ -67,10 +67,7 @@ const sanitizeRange = (range, bound) => {
         return clamp(Math.abs(range[0]), ...bound);
     }
 
-    return [
-        Math.abs(clamp(range[0], ...bound)),
-        clamp(Math.abs(range[1]), ...bound),
-    ];
+    return [Math.abs(clamp(range[0], ...bound)), clamp(Math.abs(range[1]), ...bound)];
 };
 
 /**
@@ -141,8 +138,7 @@ const hslToRgb = (h, s, l) => {
  * @param  {number}  differencePoint
  * @return {boolean}
  */
-const rgbIsLight = (r, g, b, differencePoint) =>
-    (r * 299 + g * 587 + b * 114) / 1000 >= differencePoint; // eslint-disable-line max-len
+const rgbIsLight = (r, g, b, differencePoint) => (r * 299 + g * 587 + b * 114) / 1000 >= differencePoint; // eslint-disable-line max-len
 
 /**
  * Converts an HSL color to string format
@@ -167,9 +163,7 @@ const rgbFormat = (r, g, b, format) => {
             return `rgb(${r}, ${g}, ${b})`;
         case "hex":
         default:
-            return `#${pad2(r.toString(16))}${pad2(g.toString(16))}${pad2(
-                b.toString(16),
-            )}`;
+            return `#${pad2(r.toString(16))}${pad2(g.toString(16))}${pad2(b.toString(16))}`;
     }
 };
 
@@ -212,12 +206,7 @@ const rgbFormat = (r, g, b, format) => {
  */
 const uniqolor = (
     value,
-    {
-        format = "hex",
-        saturation = [50, 55],
-        lightness = [50, 60],
-        differencePoint = 130,
-    } = {},
+    { format = "hex", saturation = [50, 55], lightness = [50, 60], differencePoint = 130 } = {},
 ) => {
     const hash = Math.abs(hashCode(String(value)));
     const h = boundHashCode(hash, [0, 360]);
@@ -226,10 +215,7 @@ const uniqolor = (
     const [r, g, b] = hslToRgb(h, s, l);
 
     return {
-        color:
-            format === "hsl"
-                ? hslToString(h, s, l)
-                : rgbFormat(r, g, b, format),
+        color: format === "hsl" ? hslToString(h, s, l) : rgbFormat(r, g, b, format),
         isLight: rgbIsLight(r, g, b, differencePoint),
     };
 };
@@ -285,16 +271,12 @@ uniqolor.random = ({
     lightness = sanitizeRange(lightness, LIGHTNESS_BOUND);
 
     const h = excludeHue ? randomExclude(0, 359, excludeHue) : random(0, 359);
-    const s =
-        typeof saturation === "number" ? saturation : random(...saturation);
+    const s = typeof saturation === "number" ? saturation : random(...saturation);
     const l = typeof lightness === "number" ? lightness : random(...lightness);
     const [r, g, b] = hslToRgb(h, s, l);
 
     return {
-        color:
-            format === "hsl"
-                ? hslToString(h, s, l)
-                : rgbFormat(r, g, b, format),
+        color: format === "hsl" ? hslToString(h, s, l) : rgbFormat(r, g, b, format),
         isLight: rgbIsLight(r, g, b, differencePoint),
     };
 };

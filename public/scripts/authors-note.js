@@ -1,24 +1,8 @@
-import {
-    chat_metadata,
-    eventSource,
-    event_types,
-    getTokenCount,
-    saveSettingsDebounced,
-    this_chid,
-} from "../script.js";
+import { chat_metadata, eventSource, event_types, getTokenCount, saveSettingsDebounced, this_chid } from "../script.js";
 import { selected_group } from "./group-chats.js";
-import {
-    extension_settings,
-    getContext,
-    saveMetadataDebounced,
-} from "./extensions.js";
+import { extension_settings, getContext, saveMetadataDebounced } from "./extensions.js";
 import { registerSlashCommand } from "./slash-commands.js";
-import {
-    getCharaFilename,
-    debounce,
-    waitUntilCondition,
-    delay,
-} from "./utils.js";
+import { getCharaFilename, debounce, waitUntilCondition, delay } from "./utils.js";
 export { MODULE_NAME as NOTE_MODULE_NAME };
 
 const MODULE_NAME = "2_floating_prompt"; // <= Deliberate, for sorting lower than memory
@@ -80,9 +64,7 @@ function setNotePositionCommand(_, text) {
         return;
     }
 
-    $(`input[name="extension_floating_position"][value="${position}"]`)
-        .prop("checked", true)
-        .trigger("input");
+    $(`input[name="extension_floating_position"][value="${position}"]`).prop("checked", true).trigger("input");
     toastr.info("Author's Note position updated");
 }
 
@@ -93,22 +75,15 @@ function updateSettings() {
 }
 
 const setMainPromptTokenCounterDebounced = debounce(
-    (value) =>
-        $("#extension_floating_prompt_token_counter").text(
-            getTokenCount(value),
-        ),
+    (value) => $("#extension_floating_prompt_token_counter").text(getTokenCount(value)),
     1000,
 );
 const setCharaPromptTokenCounterDebounced = debounce(
-    (value) =>
-        $("#extension_floating_chara_token_counter").text(getTokenCount(value)),
+    (value) => $("#extension_floating_chara_token_counter").text(getTokenCount(value)),
     1000,
 );
 const setDefaultPromptTokenCounterDebounced = debounce(
-    (value) =>
-        $("#extension_floating_default_token_counter").text(
-            getTokenCount(value),
-        ),
+    (value) => $("#extension_floating_default_token_counter").text(getTokenCount(value)),
     1000,
 );
 
@@ -168,9 +143,7 @@ async function onDefaultIntervalInput() {
 
 async function onExtensionFloatingCharPositionInput(e) {
     const value = e.target.value;
-    const charaNote = extension_settings.note.chara.find(
-        (e) => e.name === getCharaFilename(),
-    );
+    const charaNote = extension_settings.note.chara.find((e) => e.name === getCharaFilename());
 
     if (charaNote) {
         charaNote.position = Number(value);
@@ -192,19 +165,11 @@ function onExtensionFloatingCharaPromptInput() {
     let existingCharaNote;
 
     if (extension_settings.note.chara) {
-        existingCharaNoteIndex = extension_settings.note.chara.findIndex(
-            (e) => e.name === avatarName,
-        );
-        existingCharaNote =
-            extension_settings.note.chara[existingCharaNoteIndex];
+        existingCharaNoteIndex = extension_settings.note.chara.findIndex((e) => e.name === avatarName);
+        existingCharaNote = extension_settings.note.chara[existingCharaNoteIndex];
     }
 
-    if (
-        tempPrompt.length === 0 &&
-        extension_settings.note.chara &&
-        existingCharaNote &&
-        !existingCharaNote.useChara
-    ) {
+    if (tempPrompt.length === 0 && extension_settings.note.chara && existingCharaNote && !existingCharaNote.useChara) {
         extension_settings.note.chara.splice(existingCharaNoteIndex, 1);
     } else if (extension_settings.note.chara && existingCharaNote) {
         Object.assign(existingCharaNote, tempCharaNote);
@@ -219,12 +184,8 @@ function onExtensionFloatingCharaPromptInput() {
 
         extension_settings.note.chara.push(tempCharaNote);
     } else {
-        console.log(
-            "Character author's note error: No avatar name key could be found.",
-        );
-        toastr.error(
-            "Something went wrong. Could not save character's author's note.",
-        );
+        console.log("Character author's note error: No avatar name key could be found.");
+        toastr.error("Something went wrong. Could not save character's author's note.");
 
         // Don't save settings if something went wrong
         return;
@@ -235,9 +196,7 @@ function onExtensionFloatingCharaPromptInput() {
 
 function onExtensionFloatingCharaCheckboxChanged() {
     const value = !!$(this).prop("checked");
-    const charaNote = extension_settings.note.chara.find(
-        (e) => e.name === getCharaFilename(),
-    );
+    const charaNote = extension_settings.note.chara.find((e) => e.name === getCharaFilename());
 
     if (charaNote) {
         charaNote.useChara = value;
@@ -269,43 +228,26 @@ function loadSettings() {
         extension_settings.note.defaultInterval = DEFAULT_INTERVAL;
     }
 
-    chat_metadata[metadata_keys.prompt] =
-        chat_metadata[metadata_keys.prompt] ??
-        extension_settings.note.default ??
-        "";
+    chat_metadata[metadata_keys.prompt] = chat_metadata[metadata_keys.prompt] ?? extension_settings.note.default ?? "";
     chat_metadata[metadata_keys.interval] =
-        chat_metadata[metadata_keys.interval] ??
-        extension_settings.note.defaultInterval ??
-        DEFAULT_INTERVAL;
+        chat_metadata[metadata_keys.interval] ?? extension_settings.note.defaultInterval ?? DEFAULT_INTERVAL;
     chat_metadata[metadata_keys.position] =
-        chat_metadata[metadata_keys.position] ??
-        extension_settings.note.defaultPosition ??
-        DEFAULT_POSITION;
+        chat_metadata[metadata_keys.position] ?? extension_settings.note.defaultPosition ?? DEFAULT_POSITION;
     chat_metadata[metadata_keys.depth] =
-        chat_metadata[metadata_keys.depth] ??
-        extension_settings.note.defaultDepth ??
-        DEFAULT_DEPTH;
+        chat_metadata[metadata_keys.depth] ?? extension_settings.note.defaultDepth ?? DEFAULT_DEPTH;
     $("#extension_floating_prompt").val(chat_metadata[metadata_keys.prompt]);
-    $("#extension_floating_interval").val(
-        chat_metadata[metadata_keys.interval],
-    );
+    $("#extension_floating_interval").val(chat_metadata[metadata_keys.interval]);
     $("#extension_floating_depth").val(chat_metadata[metadata_keys.depth]);
-    $(
-        `input[name="extension_floating_position"][value="${
-            chat_metadata[metadata_keys.position]
-        }"]`,
-    ).prop("checked", true);
+    $(`input[name="extension_floating_position"][value="${chat_metadata[metadata_keys.position]}"]`).prop(
+        "checked",
+        true,
+    );
 
     if (extension_settings.note.chara && getContext().characterId) {
-        const charaNote = extension_settings.note.chara.find(
-            (e) => e.name === getCharaFilename(),
-        );
+        const charaNote = extension_settings.note.chara.find((e) => e.name === getCharaFilename());
 
         $("#extension_floating_chara").val(charaNote ? charaNote.prompt : "");
-        $("#extension_use_floating_chara").prop(
-            "checked",
-            charaNote ? charaNote.useChara : false,
-        );
+        $("#extension_use_floating_chara").prop("checked", charaNote ? charaNote.useChara : false);
         $(
             `input[name="extension_floating_char_position"][value="${
                 charaNote?.position ?? chara_note_position.replace
@@ -314,19 +256,19 @@ function loadSettings() {
     } else {
         $("#extension_floating_chara").val("");
         $("#extension_use_floating_chara").prop("checked", false);
-        $(
-            `input[name="extension_floating_char_position"][value="${chara_note_position.replace}"]`,
-        ).prop("checked", true);
+        $(`input[name="extension_floating_char_position"][value="${chara_note_position.replace}"]`).prop(
+            "checked",
+            true,
+        );
     }
 
     $("#extension_floating_default").val(extension_settings.note.default);
     $("#extension_default_depth").val(extension_settings.note.defaultDepth);
-    $("#extension_default_interval").val(
-        extension_settings.note.defaultInterval,
+    $("#extension_default_interval").val(extension_settings.note.defaultInterval);
+    $(`input[name="extension_default_position"][value="${extension_settings.note.defaultPosition}"]`).prop(
+        "checked",
+        true,
     );
-    $(
-        `input[name="extension_default_position"][value="${extension_settings.note.defaultPosition}"]`,
-    ).prop("checked", true);
 }
 
 export function setFloatingPrompt() {
@@ -339,9 +281,7 @@ export function setFloatingPrompt() {
 
     // take the count of messages
     let lastMessageNumber =
-        Array.isArray(context.chat) && context.chat.length
-            ? context.chat.filter((m) => m.is_user).length
-            : 0;
+        Array.isArray(context.chat) && context.chat.length ? context.chat.filter((m) => m.is_user).length : 0;
 
     console.debug(`
     setFloatingPrompt entered
@@ -370,14 +310,8 @@ export function setFloatingPrompt() {
     shouldWIAddPrompt = shouldAddPrompt;
 
     let prompt = shouldAddPrompt ? $("#extension_floating_prompt").val() : "";
-    if (
-        shouldAddPrompt &&
-        extension_settings.note.chara &&
-        getContext().characterId
-    ) {
-        const charaNote = extension_settings.note.chara.find(
-            (e) => e.name === getCharaFilename(),
-        );
+    if (shouldAddPrompt && extension_settings.note.chara && getContext().characterId) {
+        const charaNote = extension_settings.note.chara.find((e) => e.name === getCharaFilename());
 
         // Only replace with the chara note if the user checked the box
         if (charaNote && charaNote.useChara) {
@@ -400,9 +334,7 @@ export function setFloatingPrompt() {
         chat_metadata[metadata_keys.position],
         chat_metadata[metadata_keys.depth],
     );
-    $("#extension_floating_counter").text(
-        shouldAddPrompt ? "0" : messagesTillInsertion,
-    );
+    $("#extension_floating_counter").text(shouldAddPrompt ? "0" : messagesTillInsertion);
 }
 
 function onANMenuItemClick() {
@@ -424,11 +356,7 @@ function onANMenuItemClick() {
             );
 
             //auto-open the main AN inline drawer
-            if (
-                $("#ANBlockToggle")
-                    .siblings(".inline-drawer-content")
-                    .css("display") !== "block"
-            ) {
+            if ($("#ANBlockToggle").siblings(".inline-drawer-content").css("display") !== "block") {
                 $("#floatingPrompt").addClass("resizing");
                 $("#ANBlockToggle").click();
             }
@@ -453,11 +381,7 @@ function onANMenuItemClick() {
         //because this listener takes priority
         $("#options").stop().fadeOut(250);
     } else {
-        toastr.warning(
-            `Select a character before trying to use Author's Note`,
-            "",
-            { timeOut: 2000 },
-        );
+        toastr.warning(`Select a character before trying to use Author's Note`, "", { timeOut: 2000 });
     }
 }
 
@@ -467,21 +391,14 @@ function onChatChanged() {
     const context = getContext();
 
     // Disable the chara note if in a group
-    $("#extension_floating_chara").prop(
-        "disabled",
-        context.groupId ? true : false,
-    );
+    $("#extension_floating_chara").prop("disabled", context.groupId ? true : false);
 
-    const tokenCounter1 = chat_metadata[metadata_keys.prompt]
-        ? getTokenCount(chat_metadata[metadata_keys.prompt])
-        : 0;
+    const tokenCounter1 = chat_metadata[metadata_keys.prompt] ? getTokenCount(chat_metadata[metadata_keys.prompt]) : 0;
     $("#extension_floating_prompt_token_counter").text(tokenCounter1);
 
     let tokenCounter2;
     if (extension_settings.note.chara && context.characterId) {
-        const charaNote = extension_settings.note.chara.find(
-            (e) => e.name === getCharaFilename(),
-        );
+        const charaNote = extension_settings.note.chara.find((e) => e.name === getCharaFilename());
 
         if (charaNote) {
             tokenCounter2 = getTokenCount(charaNote.prompt);
@@ -492,9 +409,7 @@ function onChatChanged() {
         $("#extension_floating_chara_token_counter").text(tokenCounter2);
     }
 
-    const tokenCounter3 = extension_settings.note.default
-        ? getTokenCount(extension_settings.note.default)
-        : 0;
+    const tokenCounter3 = extension_settings.note.default ? getTokenCount(extension_settings.note.default) : 0;
     $("#extension_floating_default_token_counter").text(tokenCounter3);
 }
 
@@ -503,37 +418,16 @@ function onChatChanged() {
 jQuery(async () => {
     await waitUntilCondition(() => eventSource !== undefined);
     $("#extension_floating_prompt").on("input", onExtensionFloatingPromptInput);
-    $("#extension_floating_interval").on(
-        "input",
-        onExtensionFloatingIntervalInput,
-    );
+    $("#extension_floating_interval").on("input", onExtensionFloatingIntervalInput);
     $("#extension_floating_depth").on("input", onExtensionFloatingDepthInput);
-    $("#extension_floating_chara").on(
-        "input",
-        onExtensionFloatingCharaPromptInput,
-    );
-    $("#extension_use_floating_chara").on(
-        "input",
-        onExtensionFloatingCharaCheckboxChanged,
-    );
-    $("#extension_floating_default").on(
-        "input",
-        onExtensionFloatingDefaultInput,
-    );
+    $("#extension_floating_chara").on("input", onExtensionFloatingCharaPromptInput);
+    $("#extension_use_floating_chara").on("input", onExtensionFloatingCharaCheckboxChanged);
+    $("#extension_floating_default").on("input", onExtensionFloatingDefaultInput);
     $("#extension_default_depth").on("input", onDefaultDepthInput);
     $("#extension_default_interval").on("input", onDefaultIntervalInput);
-    $('input[name="extension_floating_position"]').on(
-        "change",
-        onExtensionFloatingPositionInput,
-    );
-    $('input[name="extension_default_position"]').on(
-        "change",
-        onDefaultPositionInput,
-    );
-    $('input[name="extension_floating_char_position"]').on(
-        "change",
-        onExtensionFloatingCharPositionInput,
-    );
+    $('input[name="extension_floating_position"]').on("change", onExtensionFloatingPositionInput);
+    $('input[name="extension_default_position"]').on("change", onDefaultPositionInput);
+    $('input[name="extension_floating_char_position"]').on("change", onExtensionFloatingCharPositionInput);
     $("#ANClose").on("click", function () {
         $("#floatingPrompt").transition({
             opacity: 0,

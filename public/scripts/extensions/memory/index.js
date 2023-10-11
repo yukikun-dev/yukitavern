@@ -1,16 +1,5 @@
-import {
-    getStringHash,
-    debounce,
-    waitUntilCondition,
-    extractAllWords,
-} from "../../utils.js";
-import {
-    getContext,
-    getApiUrl,
-    extension_settings,
-    doExtrasFetch,
-    modules,
-} from "../../extensions.js";
+import { getStringHash, debounce, waitUntilCondition, extractAllWords } from "../../utils.js";
+import { getContext, getApiUrl, extension_settings, doExtrasFetch, modules } from "../../extensions.js";
 import {
     eventSource,
     event_types,
@@ -40,10 +29,7 @@ const formatMemoryValue = function (value) {
     value = value.trim();
 
     if (extension_settings.memory.template) {
-        let result = extension_settings.memory.template.replace(
-            /{{summary}}/i,
-            value,
-        );
+        let result = extension_settings.memory.template.replace(/{{summary}}/i, value);
         return substituteParams(result);
     } else {
         return `Summary: ${value}`;
@@ -113,46 +99,22 @@ function loadSettings() {
         }
     }
 
-    $("#summary_source")
-        .val(extension_settings.memory.source)
-        .trigger("change");
-    $("#memory_long_length")
-        .val(extension_settings.memory.longMemoryLength)
-        .trigger("input");
-    $("#memory_short_length")
-        .val(extension_settings.memory.shortMemoryLength)
-        .trigger("input");
-    $("#memory_repetition_penalty")
-        .val(extension_settings.memory.repetitionPenalty)
-        .trigger("input");
-    $("#memory_temperature")
-        .val(extension_settings.memory.temperature)
-        .trigger("input");
-    $("#memory_length_penalty")
-        .val(extension_settings.memory.lengthPenalty)
-        .trigger("input");
-    $("#memory_frozen")
-        .prop("checked", extension_settings.memory.memoryFrozen)
-        .trigger("input");
+    $("#summary_source").val(extension_settings.memory.source).trigger("change");
+    $("#memory_long_length").val(extension_settings.memory.longMemoryLength).trigger("input");
+    $("#memory_short_length").val(extension_settings.memory.shortMemoryLength).trigger("input");
+    $("#memory_repetition_penalty").val(extension_settings.memory.repetitionPenalty).trigger("input");
+    $("#memory_temperature").val(extension_settings.memory.temperature).trigger("input");
+    $("#memory_length_penalty").val(extension_settings.memory.lengthPenalty).trigger("input");
+    $("#memory_frozen").prop("checked", extension_settings.memory.memoryFrozen).trigger("input");
     $("#memory_prompt").val(extension_settings.memory.prompt).trigger("input");
-    $("#memory_prompt_words")
-        .val(extension_settings.memory.promptWords)
-        .trigger("input");
-    $("#memory_prompt_interval")
-        .val(extension_settings.memory.promptInterval)
-        .trigger("input");
-    $("#memory_template")
-        .val(extension_settings.memory.template)
-        .trigger("input");
+    $("#memory_prompt_words").val(extension_settings.memory.promptWords).trigger("input");
+    $("#memory_prompt_interval").val(extension_settings.memory.promptInterval).trigger("input");
+    $("#memory_template").val(extension_settings.memory.template).trigger("input");
     $("#memory_depth").val(extension_settings.memory.depth).trigger("input");
-    $(
-        `input[name="memory_position"][value="${extension_settings.memory.position}"]`,
-    )
+    $(`input[name="memory_position"][value="${extension_settings.memory.position}"]`)
         .prop("checked", true)
         .trigger("input");
-    $("#memory_prompt_words_force")
-        .val(extension_settings.memory.promptForceWords)
-        .trigger("input");
+    $("#memory_prompt_words_force").val(extension_settings.memory.promptForceWords).trigger("input");
 }
 
 function onSummarySourceChange(event) {
@@ -172,13 +134,8 @@ function onMemoryShortInput() {
     saveSettingsDebounced();
 
     // Don't let long buffer be bigger than short
-    if (
-        extension_settings.memory.longMemoryLength >
-        extension_settings.memory.shortMemoryLength
-    ) {
-        $("#memory_long_length")
-            .val(extension_settings.memory.shortMemoryLength)
-            .trigger("input");
+    if (extension_settings.memory.longMemoryLength > extension_settings.memory.shortMemoryLength) {
+        $("#memory_long_length").val(extension_settings.memory.shortMemoryLength).trigger("input");
     }
 }
 
@@ -189,40 +146,29 @@ function onMemoryLongInput() {
     saveSettingsDebounced();
 
     // Don't let long buffer be bigger than short
-    if (
-        extension_settings.memory.longMemoryLength >
-        extension_settings.memory.shortMemoryLength
-    ) {
-        $("#memory_short_length")
-            .val(extension_settings.memory.longMemoryLength)
-            .trigger("input");
+    if (extension_settings.memory.longMemoryLength > extension_settings.memory.shortMemoryLength) {
+        $("#memory_short_length").val(extension_settings.memory.longMemoryLength).trigger("input");
     }
 }
 
 function onMemoryRepetitionPenaltyInput() {
     const value = $(this).val();
     extension_settings.memory.repetitionPenalty = Number(value);
-    $("#memory_repetition_penalty_value").text(
-        extension_settings.memory.repetitionPenalty.toFixed(2),
-    );
+    $("#memory_repetition_penalty_value").text(extension_settings.memory.repetitionPenalty.toFixed(2));
     saveSettingsDebounced();
 }
 
 function onMemoryTemperatureInput() {
     const value = $(this).val();
     extension_settings.memory.temperature = Number(value);
-    $("#memory_temperature_value").text(
-        extension_settings.memory.temperature.toFixed(2),
-    );
+    $("#memory_temperature_value").text(extension_settings.memory.temperature.toFixed(2));
     saveSettingsDebounced();
 }
 
 function onMemoryLengthPenaltyInput() {
     const value = $(this).val();
     extension_settings.memory.lengthPenalty = Number(value);
-    $("#memory_length_penalty_value").text(
-        extension_settings.memory.lengthPenalty.toFixed(2),
-    );
+    $("#memory_length_penalty_value").text(extension_settings.memory.lengthPenalty.toFixed(2));
     saveSettingsDebounced();
 }
 
@@ -242,9 +188,7 @@ function onMemoryPromptWordsInput() {
 function onMemoryPromptIntervalInput() {
     const value = $(this).val();
     extension_settings.memory.promptInterval = Number(value);
-    $("#memory_prompt_interval_value").text(
-        extension_settings.memory.promptInterval,
-    );
+    $("#memory_prompt_interval_value").text(extension_settings.memory.promptInterval);
     saveSettingsDebounced();
 }
 
@@ -275,9 +219,7 @@ function onMemoryPositionChange(e) {
 function onMemoryPromptWordsForceInput() {
     const value = $(this).val();
     extension_settings.memory.promptForceWords = Number(value);
-    $("#memory_prompt_words_force_value").text(
-        extension_settings.memory.promptForceWords,
-    );
+    $("#memory_prompt_words_force_value").text(extension_settings.memory.promptForceWords);
     saveSettingsDebounced();
 }
 
@@ -287,10 +229,7 @@ function saveLastValues() {
     lastCharacterId = context.characterId;
     lastChatId = context.chatId;
     lastMessageId = context.chat?.length ?? null;
-    lastMessageHash = getStringHash(
-        (context.chat.length && context.chat[context.chat.length - 1]["mes"]) ??
-            "",
-    );
+    lastMessageHash = getStringHash((context.chat.length && context.chat[context.chat.length - 1]["mes"]) ?? "");
 }
 
 function getLatestMemoryFromChat(chat) {
@@ -350,8 +289,7 @@ async function onChatEvent() {
     // No new messages - do nothing
     if (
         chat.length === 0 ||
-        (lastMessageId === chat.length &&
-            getStringHash(chat[chat.length - 1].mes) === lastMessageHash)
+        (lastMessageId === chat.length && getStringHash(chat[chat.length - 1].mes) === lastMessageHash)
     ) {
         return;
     }
@@ -416,11 +354,7 @@ async function summarizeChatMain(context, force) {
     try {
         // Wait for group to finish generating
         if (selected_group) {
-            await waitUntilCondition(
-                () => is_group_generating === false,
-                1000,
-                10,
-            );
+            await waitUntilCondition(() => is_group_generating === false, 1000, 10);
         }
         // Wait for the send button to be released
         waitUntilCondition(() => is_send_press === false, 30000, 100);
@@ -434,10 +368,7 @@ async function summarizeChatMain(context, force) {
         return;
     }
 
-    if (
-        context.chat.length < extension_settings.memory.promptInterval &&
-        !force
-    ) {
+    if (context.chat.length < extension_settings.memory.promptInterval && !force) {
         console.debug(
             `Not enough messages in chat to summarize (chat: ${context.chat.length}, interval: ${extension_settings.memory.promptInterval})`,
         );
@@ -474,8 +405,7 @@ async function summarizeChatMain(context, force) {
     }
 
     console.log(
-        "Summarizing chat, messages since last summary: " +
-            messagesSinceLastSummary,
+        "Summarizing chat, messages since last summary: " + messagesSinceLastSummary,
         "words since last summary: " + wordsSinceLastSummary,
     );
     const prompt = substituteParams(extension_settings.memory.prompt).replace(
@@ -507,11 +437,7 @@ async function summarizeChatMain(context, force) {
 
 async function summarizeChatExtras(context) {
     function getMemoryString() {
-        return (
-            longMemory +
-            "\n\n" +
-            memoryBuffer.slice().reverse().join("\n\n")
-        ).trim();
+        return (longMemory + "\n\n" + memoryBuffer.slice().reverse().join("\n\n")).trim();
     }
 
     const chat = context.chat;
@@ -532,29 +458,19 @@ async function summarizeChatExtras(context) {
         }
 
         // determine the sender's name
-        const name = mes.is_user
-            ? context.name1 ?? "You"
-            : mes.force_avatar
-            ? mes.name
-            : context.name2;
+        const name = mes.is_user ? context.name1 ?? "You" : mes.force_avatar ? mes.name : context.name2;
         const entry = `${name}:\n${mes["mes"]}`;
         memoryBuffer.push(entry);
 
         // check if token limit was reached
-        if (
-            context.getTokenCount(getMemoryString()) >=
-            extension_settings.memory.shortMemoryLength
-        ) {
+        if (context.getTokenCount(getMemoryString()) >= extension_settings.memory.shortMemoryLength) {
             break;
         }
     }
 
     const resultingString = getMemoryString();
 
-    if (
-        context.getTokenCount(resultingString) <
-        extension_settings.memory.shortMemoryLength
-    ) {
+    if (context.getTokenCount(resultingString) < extension_settings.memory.shortMemoryLength) {
         return;
     }
 
@@ -575,8 +491,7 @@ async function summarizeChatExtras(context) {
                 params: {
                     min_length: extension_settings.memory.longMemoryLength * 0, // testing how it behaves 0 min length
                     max_length: extension_settings.memory.longMemoryLength,
-                    repetition_penalty:
-                        extension_settings.memory.repetitionPenalty,
+                    repetition_penalty: extension_settings.memory.repetitionPenalty,
                     temperature: extension_settings.memory.temperature,
                     length_penalty: extension_settings.memory.lengthPenalty,
                 },
@@ -593,8 +508,7 @@ async function summarizeChatExtras(context) {
             if (
                 newContext.groupId !== context.groupId ||
                 newContext.chatId !== context.chatId ||
-                (!newContext.groupId &&
-                    newContext.characterId !== context.characterId)
+                (!newContext.groupId && newContext.characterId !== context.characterId)
             ) {
                 console.log("Context changed, summary discarded");
                 return;
@@ -733,10 +647,7 @@ jQuery(function () {
         $("#memory_contents").on("input", onMemoryContentInput);
         $("#memory_long_length").on("input", onMemoryLongInput);
         $("#memory_short_length").on("input", onMemoryShortInput);
-        $("#memory_repetition_penalty").on(
-            "input",
-            onMemoryRepetitionPenaltyInput,
-        );
+        $("#memory_repetition_penalty").on("input", onMemoryRepetitionPenaltyInput);
         $("#memory_temperature").on("input", onMemoryTemperatureInput);
         $("#memory_length_penalty").on("input", onMemoryLengthPenaltyInput);
         $("#memory_frozen").on("input", onMemoryFrozenInput);
@@ -748,10 +659,7 @@ jQuery(function () {
         $("#memory_template").on("input", onMemoryTemplateInput);
         $("#memory_depth").on("input", onMemoryDepthInput);
         $('input[name="memory_position"]').on("change", onMemoryPositionChange);
-        $("#memory_prompt_words_force").on(
-            "input",
-            onMemoryPromptWordsForceInput,
-        );
+        $("#memory_prompt_words_force").on("input", onMemoryPromptWordsForceInput);
     }
 
     addExtensionControls();

@@ -28,9 +28,7 @@ const CHARACTER_FILTER_SELECTOR = "#rm_characters_block .rm_tag_filter";
 const GROUP_FILTER_SELECTOR = "#rm_group_chats_block .rm_tag_filter";
 
 function getFilterHelper(listSelector) {
-    return $(listSelector).is(GROUP_FILTER_SELECTOR)
-        ? groupCandidatesFilter
-        : entitiesFilter;
+    return $(listSelector).is(GROUP_FILTER_SELECTOR) ? groupCandidatesFilter : entitiesFilter;
 }
 
 export const tag_filter_types = {
@@ -105,8 +103,7 @@ function filterByGroups(filterHelper) {
 
 function loadTagsSettings(settings) {
     tags = settings.tags !== undefined ? settings.tags : DEFAULT_TAGS;
-    tag_map =
-        settings.tag_map !== undefined ? settings.tag_map : Object.create(null);
+    tag_map = settings.tag_map !== undefined ? settings.tag_map : Object.create(null);
 }
 
 function renameTagKey(oldKey, newKey) {
@@ -202,8 +199,7 @@ function findTag(request, resolve, listSelector) {
         .map((t) => t.name)
         .sort();
     const needle = request.term.toLowerCase();
-    const hasExactMatch =
-        haystack.findIndex((x) => x.toLowerCase() == needle) !== -1;
+    const hasExactMatch = haystack.findIndex((x) => x.toLowerCase() == needle) !== -1;
     const result = haystack.filter((x) => x.toLowerCase().includes(needle));
 
     if (request.term && !hasExactMatch) {
@@ -240,9 +236,7 @@ function selectTag(event, ui, listSelector) {
 function getExistingTags(new_tags) {
     let existing_tags = [];
     for (let tag of new_tags) {
-        let foundTag = tags.find(
-            (t) => t.name.toLowerCase() === tag.toLowerCase(),
-        );
+        let foundTag = tags.find((t) => t.name.toLowerCase() === tag.toLowerCase());
         if (foundTag) {
             existing_tags.push(foundTag.name);
         }
@@ -251,21 +245,14 @@ function getExistingTags(new_tags) {
 }
 
 async function importTags(imported_char) {
-    let imported_tags = imported_char.tags.filter(
-        (t) => t !== "ROOT" && t !== "TAVERN",
-    );
+    let imported_tags = imported_char.tags.filter((t) => t !== "ROOT" && t !== "TAVERN");
     let existingTags = await getExistingTags(imported_tags);
     //make this case insensitive
     let newTags = imported_tags.filter(
-        (t) =>
-            !existingTags.some(
-                (existingTag) => existingTag.toLowerCase() === t.toLowerCase(),
-            ),
+        (t) => !existingTags.some((existingTag) => existingTag.toLowerCase() === t.toLowerCase()),
     );
     let selected_tags = "";
-    const existingTagsString = existingTags.length
-        ? ": " + existingTags.join(", ")
-        : "";
+    const existingTagsString = existingTags.length ? ": " + existingTags.join(", ") : "";
     if (newTags.length === 0) {
         await callPopup(
             `<h3>Importing Tags For ${imported_char.name}</h3><p>${existingTags.length} existing tags have been found${existingTagsString}.</p>`,
@@ -315,11 +302,7 @@ function createNewTag(tagName) {
     return tag;
 }
 
-function appendTagToList(
-    listElement,
-    tag,
-    { removable, selectable, action, isGeneralList },
-) {
+function appendTagToList(listElement, tag, { removable, selectable, action, isGeneralList }) {
     if (!listElement) {
         return;
     }
@@ -339,25 +322,17 @@ function appendTagToList(
     }
 
     if (tag.icon) {
-        tagElement
-            .find(".tag_name")
-            .text("")
-            .attr("title", tag.name)
-            .addClass(tag.icon);
+        tagElement.find(".tag_name").text("").attr("title", tag.name).addClass(tag.icon);
     }
 
     if (tag.excluded) {
         isGeneralList
             ? $(tagElement).addClass("excluded")
-            : $(listElement)
-                  .closest(".character_select, .group_select")
-                  .addClass("hiddenByTag");
+            : $(listElement).closest(".character_select, .group_select").addClass("hiddenByTag");
     }
 
     if (selectable) {
-        tagElement.on("click", () =>
-            onTagFilterClick.bind(tagElement)(listElement, characterSelector),
-        );
+        tagElement.on("click", () => onTagFilterClick.bind(tagElement)(listElement, characterSelector));
     }
 
     if (action) {
@@ -414,10 +389,7 @@ function onTagFilterClick(listElement) {
 }
 
 function printTagFilters(type = tag_filter_types.character) {
-    const FILTER_SELECTOR =
-        type === tag_filter_types.character
-            ? CHARACTER_FILTER_SELECTOR
-            : GROUP_FILTER_SELECTOR;
+    const FILTER_SELECTOR = type === tag_filter_types.character ? CHARACTER_FILTER_SELECTOR : GROUP_FILTER_SELECTOR;
     const selectedTagIds = [
         ...$(FILTER_SELECTOR)
             .find(".tag.selected")
@@ -538,9 +510,7 @@ function onViewTagsListClick() {
     $(list).append("<h3>Tags</h3><i>Click on the tag name to edit it.</i><br>");
     $(list).append("<i>Click on color box to assign new color.</i><br><br>");
 
-    for (const tag of tags
-        .slice()
-        .sort((a, b) => a?.name?.localeCompare(b?.name))) {
+    for (const tag of tags.slice().sort((a, b) => a?.name?.localeCompare(b?.name))) {
         const count = everything.filter((x) => x == tag.id).length;
         const template = $("#tag_view_template .tag_view_item").clone();
         template.attr("id", tag.id);
@@ -559,11 +529,9 @@ function onViewTagsListClick() {
         list.appendChild(template.get(0));
 
         setTimeout(function () {
-            document
-                .querySelector(`.tag-color[id="${colorPickerId}"`)
-                .addEventListener("change", (evt) => {
-                    onTagColorize(evt);
-                });
+            document.querySelector(`.tag-color[id="${colorPickerId}"`).addEventListener("change", (evt) => {
+                onTagColorize(evt);
+            });
         }, 100);
 
         $(colorPickerId).color = tag.color;
@@ -600,11 +568,7 @@ function onTagColorize(evt) {
     console.debug(evt);
     const id = $(evt.target).closest(".tag_view_item").attr("id");
     const newColor = evt.detail.rgba;
-    $(evt.target)
-        .parent()
-        .parent()
-        .find(".tag_view_name")
-        .css("background-color", newColor);
+    $(evt.target).parent().parent().find(".tag_view_name").css("background-color", newColor);
     $(`.tag[id="${id}"]`).css("background-color", newColor);
     const tag = tags.find((x) => x.id === id);
     tag.color = newColor;

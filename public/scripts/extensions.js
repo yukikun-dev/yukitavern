@@ -21,10 +21,7 @@ export {
 let extensionNames = [];
 let manifests = [];
 const defaultUrl = "http://localhost:5100";
-export const saveMetadataDebounced = debounce(
-    async () => await getContext().saveMetadata(),
-    1000,
-);
+export const saveMetadataDebounced = debounce(async () => await getContext().saveMetadata(), 1000);
 
 // Disables parallel updates
 class ModuleWorkerWrapper {
@@ -91,8 +88,7 @@ function showHideExtensionsMenu() {
     const hasMenuItems =
         $("#extensionsMenu")
             .children()
-            .filter((_, child) => $(child).css("display") !== "none").length >
-        0;
+            .filter((_, child) => $(child).css("display") !== "none").length > 0;
 
     // We have menu items, so we can stop checking
     if (hasMenuItems) {
@@ -154,8 +150,7 @@ function onEnableExtensionClick() {
 }
 
 async function enableExtension(name) {
-    extension_settings.disabledExtensions =
-        extension_settings.disabledExtensions.filter((x) => x !== name);
+    extension_settings.disabledExtensions = extension_settings.disabledExtensions.filter((x) => x !== name);
     await saveSettings();
     location.reload();
 }
@@ -182,14 +177,7 @@ async function getManifests(names) {
                         reject();
                     }
                 })
-                .catch(
-                    (err) =>
-                        reject() &&
-                        console.log(
-                            "Could not load manifest.json for " + name,
-                            err,
-                        ),
-                );
+                .catch((err) => reject() && console.log("Could not load manifest.json for " + name, err));
         });
 
         promises.push(promise);
@@ -200,9 +188,7 @@ async function getManifests(names) {
 }
 
 async function activateExtensions() {
-    const extensions = Object.entries(manifests).sort(
-        (a, b) => a[1].loading_order - b[1].loading_order,
-    );
+    const extensions = Object.entries(manifests).sort((a, b) => a[1].loading_order - b[1].loading_order);
     const promises = [];
 
     for (let entry of extensions) {
@@ -217,8 +203,7 @@ async function activateExtensions() {
         // all required modules are active (offline extensions require none)
         if (isSubsetOf(modules, manifest.requires)) {
             try {
-                const isDisabled =
-                    extension_settings.disabledExtensions.includes(name);
+                const isDisabled = extension_settings.disabledExtensions.includes(name);
                 const li = document.createElement("li");
 
                 if (!isDisabled) {
@@ -228,12 +213,7 @@ async function activateExtensions() {
                     ]);
                     promise
                         .then(() => activeExtensions.add(name))
-                        .catch((err) =>
-                            console.log(
-                                "Could not activate extension: " + name,
-                                err,
-                            ),
-                        );
+                        .catch((err) => console.log("Could not activate extension: " + name, err));
                     promises.push(promise);
                 } else {
                     li.classList.add("disabled");
@@ -395,10 +375,7 @@ function addExtensionScript(name, manifest) {
                 };
                 script.onload = script.onreadystatechange = function () {
                     // console.log(this.readyState); // uncomment this line to see which ready states are called.
-                    if (
-                        !ready &&
-                        (!this.readyState || this.readyState == "complete")
-                    ) {
+                    if (!ready && (!this.readyState || this.readyState == "complete")) {
                         ready = true;
                         resolve();
                     }
@@ -422,14 +399,7 @@ function addExtensionScript(name, manifest) {
  * @param {string} checkboxClass - The class for the checkbox HTML element.
  * @return {string} - The HTML string that represents the extension.
  */
-async function generateExtensionHtml(
-    name,
-    manifest,
-    isActive,
-    isDisabled,
-    isExternal,
-    checkboxClass,
-) {
+async function generateExtensionHtml(name, manifest, isActive, isDisabled, isExternal, checkboxClass) {
     const displayName = manifest.display_name;
     let displayVersion = manifest.version ? ` v${manifest.version}` : "";
     let isUpToDate = true;
@@ -475,13 +445,7 @@ async function generateExtensionHtml(
             ${updateButton}
             ${deleteButton}
             ${originHtml}
-            <span class="${
-                isActive
-                    ? "extension_enabled"
-                    : isDisabled
-                    ? "extension_disabled"
-                    : "extension_missing"
-            }">
+            <span class="${isActive ? "extension_enabled" : isDisabled ? "extension_disabled" : "extension_missing"}">
                 ${DOMPurify.sanitize(displayName)}${displayVersion}
             </span>
             ${isExternal ? "</a>" : ""}
@@ -500,9 +464,7 @@ async function generateExtensionHtml(
         // Neither active nor disabled
         const requirements = new Set(manifest.requires);
         modules.forEach((x) => requirements.delete(x));
-        const requirementsString = DOMPurify.sanitize(
-            [...requirements].join(", "),
-        );
+        const requirementsString = DOMPurify.sanitize([...requirements].join(", "));
         extensionHtml += `<p>Missing modules: <span class="failure">${requirementsString}</span></p>`;
     }
 
@@ -524,14 +486,7 @@ async function getExtensionData(extension) {
 
     const checkboxClass = isDisabled ? "checkbox_disabled" : "";
 
-    const extensionHtml = await generateExtensionHtml(
-        name,
-        manifest,
-        isActive,
-        isDisabled,
-        isExternal,
-        checkboxClass,
-    );
+    const extensionHtml = await generateExtensionHtml(name, manifest, isActive, isDisabled, isExternal, checkboxClass);
 
     return { isExternal, extensionHtml };
 }
@@ -558,9 +513,7 @@ async function showExtensionsDetails() {
     let htmlDefault = "<h3>Default Extensions:</h3>";
     let htmlExternal = "<h3>External Extensions:</h3>";
 
-    const extensions = Object.entries(manifests).sort(
-        (a, b) => a[1].loading_order - b[1].loading_order,
-    );
+    const extensions = Object.entries(manifests).sort((a, b) => a[1].loading_order - b[1].loading_order);
 
     for (const extension of extensions) {
         const { isExternal, extensionHtml } = await getExtensionData(extension);
@@ -615,10 +568,7 @@ async function onUpdateClick() {
 async function onDeleteClick() {
     const extensionName = $(this).data("name");
     // use callPopup to create a popup for the user to confirm before delete
-    const confirmation = await callPopup(
-        `Are you sure you want to delete ${extensionName}?`,
-        "delete_extension",
-    );
+    const confirmation = await callPopup(`Are you sure you want to delete ${extensionName}?`, "delete_extension");
     if (confirmation) {
         try {
             const response = await fetch("/delete_extension", {
@@ -666,10 +616,7 @@ async function loadExtensionSettings(settings) {
 
     $("#extensions_url").val(extension_settings.apiUrl);
     $("#extensions_api_key").val(extension_settings.apiKey);
-    $("#extensions_autoconnect").prop(
-        "checked",
-        extension_settings.autoConnect,
-    );
+    $("#extensions_autoconnect").prop("checked", extension_settings.autoConnect);
 
     // Activate offline extensions
     eventSource.emit(event_types.EXTENSIONS_FIRST_LOAD);
@@ -688,10 +635,7 @@ async function runGenerationInterceptors(chat, contextSize) {
             try {
                 await window[interceptorKey](chat, contextSize);
             } catch (e) {
-                console.error(
-                    `Failed running interceptor for ${manifest.display_name}`,
-                    e,
-                );
+                console.error(`Failed running interceptor for ${manifest.display_name}`, e);
             }
         }
     }

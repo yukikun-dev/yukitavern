@@ -89,17 +89,11 @@ class EdgeTtsProvider {
         url.pathname = `/api/edge-tts/list`;
         const response = await doExtrasFetch(url);
         if (!response.ok) {
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         let responseJson = await response.json();
         responseJson = responseJson
-            .sort(
-                (a, b) =>
-                    a.Locale.localeCompare(b.Locale) ||
-                    a.ShortName.localeCompare(b.ShortName),
-            )
+            .sort((a, b) => a.Locale.localeCompare(b.Locale) || a.ShortName.localeCompare(b.ShortName))
             .map((x) => ({
                 name: x.ShortName,
                 voice_id: x.ShortName,
@@ -116,9 +110,7 @@ class EdgeTtsProvider {
         const text = getPreviewString(voice.lang);
         const response = await this.fetchTtsGeneration(text, id);
         if (!response.ok) {
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
 
         const audio = await response.blob();
@@ -144,18 +136,14 @@ class EdgeTtsProvider {
         });
         if (!response.ok) {
             toastr.error(response.statusText, "TTS Generation Failed");
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         return response;
     }
 }
 function throwIfModuleMissing() {
     if (!modules.includes("edge-tts")) {
-        toastr.error(
-            `Edge TTS module not loaded. Add edge-tts to enable-modules and restart the Extras API.`,
-        );
+        toastr.error(`Edge TTS module not loaded. Add edge-tts to enable-modules and restart the Extras API.`);
         throw new Error(`Edge TTS module not loaded.`);
     }
 }

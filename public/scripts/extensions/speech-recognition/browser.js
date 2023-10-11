@@ -87,26 +87,18 @@ class BrowserSttProvider {
 
     onSettingsChange() {
         // Used when provider settings are updated from UI
-        this.settings.language = $(
-            "#speech_recognition_browser_provider_language",
-        ).val();
-        console.debug(
-            DEBUG_PREFIX + "Change language to",
-            this.settings.language,
-        );
+        this.settings.language = $("#speech_recognition_browser_provider_language").val();
+        console.debug(DEBUG_PREFIX + "Change language to", this.settings.language);
         this.loadSettings(this.settings);
     }
 
     static capitalizeInterim(interimTranscript) {
         let capitalizeIndex = -1;
-        if (interimTranscript.length > 2 && interimTranscript[0] === " ")
-            capitalizeIndex = 1;
+        if (interimTranscript.length > 2 && interimTranscript[0] === " ") capitalizeIndex = 1;
         else if (interimTranscript.length > 1) capitalizeIndex = 0;
         if (capitalizeIndex > -1) {
-            const spacing =
-                capitalizeIndex > 0 ? " ".repeat(capitalizeIndex - 1) : "";
-            const capitalized =
-                interimTranscript[capitalizeIndex].toLocaleUpperCase();
+            const spacing = capitalizeIndex > 0 ? " ".repeat(capitalizeIndex - 1) : "";
+            const capitalized = interimTranscript[capitalizeIndex].toLocaleUpperCase();
             const rest = interimTranscript.substring(capitalizeIndex + 1);
             interimTranscript = spacing + capitalized + rest;
         }
@@ -138,9 +130,7 @@ class BrowserSttProvider {
             }
         }
 
-        $("#speech_recognition_browser_provider_language").val(
-            this.settings.language,
-        );
+        $("#speech_recognition_browser_provider_language").val(this.settings.language);
 
         const speechRecognitionSettings = $.extend(
             {
@@ -149,16 +139,11 @@ class BrowserSttProvider {
             options,
         );
 
-        const speechRecognition =
-            window.SpeechRecognition || window.webkitSpeechRecognition;
-        const speechRecognitionList =
-            window.SpeechGrammarList || window.webkitSpeechGrammarList;
+        const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const speechRecognitionList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
 
         if (!speechRecognition) {
-            console.warn(
-                DEBUG_PREFIX +
-                    "Speech recognition is not supported in this browser.",
-            );
+            console.warn(DEBUG_PREFIX + "Speech recognition is not supported in this browser.");
             $("#microphone_button").hide();
             toastr.error(
                 "Speech recognition is not supported in this browser, use another browser or another provider of yukitavern-extras Speech recognition extension.",
@@ -175,10 +160,7 @@ class BrowserSttProvider {
         const recognition = new speechRecognition();
 
         if (speechRecognitionSettings.grammar && speechRecognitionList) {
-            speechRecognitionList.addFromString(
-                speechRecognitionSettings.grammar,
-                1,
-            );
+            speechRecognitionList.addFromString(speechRecognitionSettings.grammar, 1);
             recognition.grammars = speechRecognitionList;
         }
 
@@ -205,24 +187,15 @@ class BrowserSttProvider {
             let finalTranscript = "";
             let interimTranscript = "";
 
-            for (
-                let i = speechEvent.resultIndex;
-                i < speechEvent.results.length;
-                ++i
-            ) {
+            for (let i = speechEvent.resultIndex; i < speechEvent.results.length; ++i) {
                 const transcript = speechEvent.results[i][0].transcript;
 
                 if (speechEvent.results[i].isFinal) {
-                    let interim =
-                        BrowserSttProvider.capitalizeInterim(transcript);
+                    let interim = BrowserSttProvider.capitalizeInterim(transcript);
                     if (interim != "") {
                         let final = finalTranscript;
-                        final = BrowserSttProvider.composeValues(
-                            final,
-                            interim,
-                        );
-                        if ((final.slice(-1) != ".") & (final.slice(-1) != "?"))
-                            final += ".";
+                        final = BrowserSttProvider.composeValues(final, interim);
+                        if ((final.slice(-1) != ".") & (final.slice(-1) != "?")) final += ".";
                         finalTranscript = final;
                         recognition.abort();
                         listening = false;
@@ -233,8 +206,7 @@ class BrowserSttProvider {
                 }
             }
 
-            interimTranscript =
-                BrowserSttProvider.capitalizeInterim(interimTranscript);
+            interimTranscript = BrowserSttProvider.capitalizeInterim(interimTranscript);
 
             textarea.val(initialText + finalTranscript + interimTranscript);
         };

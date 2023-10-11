@@ -4,9 +4,7 @@ import { getTokenizerModel } from "../../openai.js";
 
 async function doTokenCounter() {
     const selectedTokenizer =
-        main_api == "openai"
-            ? `tiktoken (${getTokenizerModel()})`
-            : $("#tokenizer").find(":selected").text();
+        main_api == "openai" ? `tiktoken (${getTokenizerModel()})` : $("#tokenizer").find(":selected").text();
     const html = `
     <div class="wide100p">
         <h3>Token Counter</h3>

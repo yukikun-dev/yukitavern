@@ -15,10 +15,7 @@ export function shuffle(array) {
     while (currentIndex != 0) {
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [
-            array[randomIndex],
-            array[currentIndex],
-        ];
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
     }
     return array;
 }
@@ -104,12 +101,8 @@ export function getStringHash(str, seed = 0) {
         h2 = Math.imul(h2 ^ ch, 1597334677);
     }
 
-    h1 =
-        Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
-        Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2 =
-        Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
-        Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
 
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
@@ -143,13 +136,8 @@ export function isElementInViewport(el) {
     return (
         rect.top >= 0 &&
         rect.left >= 0 &&
-        rect.bottom <=
-            (window.innerHeight ||
-                document.documentElement
-                    .clientHeight) /* or $(window).height() */ &&
-        rect.right <=
-            (window.innerWidth ||
-                document.documentElement.clientWidth) /* or $(window).width() */
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) /* or $(window).height() */ &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth) /* or $(window).width() */
     );
 }
 
@@ -164,10 +152,7 @@ export function getUniqueName(name, exists) {
 }
 
 export const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-export const isSubsetOf = (a, b) =>
-    Array.isArray(a) && Array.isArray(b)
-        ? b.every((val) => a.includes(val))
-        : false;
+export const isSubsetOf = (a, b) => (Array.isArray(a) && Array.isArray(b) ? b.every((val) => a.includes(val)) : false);
 
 export function incrementString(str) {
     // Find the trailing number or it will match the empty string
@@ -340,25 +325,12 @@ export function timestampToMoment(timestamp) {
     }
 
     // ST "humanized" format pattern
-    const pattern1 =
-        /(\d{4})-(\d{1,2})-(\d{1,2}) @(\d{1,2})h (\d{1,2})m (\d{1,2})s (\d{1,3})ms/;
-    const replacement1 = (
-        match,
-        year,
-        month,
-        day,
-        hour,
-        minute,
-        second,
-        millisecond,
-    ) => {
-        return `${year.padStart(4, "0")}-${month.padStart(
+    const pattern1 = /(\d{4})-(\d{1,2})-(\d{1,2}) @(\d{1,2})h (\d{1,2})m (\d{1,2})s (\d{1,3})ms/;
+    const replacement1 = (match, year, month, day, hour, minute, second, millisecond) => {
+        return `${year.padStart(4, "0")}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${hour.padStart(
             2,
             "0",
-        )}-${day.padStart(2, "0")}T${hour.padStart(2, "0")}:${minute.padStart(
-            2,
-            "0",
-        )}:${second.padStart(2, "0")}.${millisecond.padStart(3, "0")}Z`;
+        )}:${minute.padStart(2, "0")}:${second.padStart(2, "0")}.${millisecond.padStart(3, "0")}Z`;
     };
     const isoTimestamp1 = timestamp.replace(pattern1, replacement1);
     if (moment(isoTimestamp1).isValid()) {
@@ -369,13 +341,11 @@ export function timestampToMoment(timestamp) {
     const pattern2 = /(\w+)\s(\d{1,2}),\s(\d{4})\s(\d{1,2}):(\d{1,2})(am|pm)/i;
     const replacement2 = (match, month, day, year, hour, minute, meridiem) => {
         const monthNum = moment().month(month).format("MM");
-        const hour24 =
-            meridiem.toLowerCase() === "pm"
-                ? (parseInt(hour, 10) % 12) + 12
-                : parseInt(hour, 10) % 12;
-        return `${year}-${monthNum}-${day.padStart(2, "0")}T${hour24
-            .toString()
-            .padStart(2, "0")}:${minute.padStart(2, "0")}:00`;
+        const hour24 = meridiem.toLowerCase() === "pm" ? (parseInt(hour, 10) % 12) + 12 : parseInt(hour, 10) % 12;
+        return `${year}-${monthNum}-${day.padStart(2, "0")}T${hour24.toString().padStart(2, "0")}:${minute.padStart(
+            2,
+            "0",
+        )}:00`;
     };
     const isoTimestamp2 = timestamp.replace(pattern2, replacement2);
     if (moment(isoTimestamp2).isValid()) {
@@ -397,11 +367,7 @@ export function sortMoments(a, b) {
 }
 
 /** Split string to parts no more than length in size */
-export function splitRecursive(
-    input,
-    length,
-    delimitiers = ["\n\n", "\n", " ", ""],
-) {
+export function splitRecursive(input, length, delimitiers = ["\n\n", "\n", " ", ""]) {
     const delim = delimitiers[0] ?? "";
     const parts = input.split(delim);
 
@@ -418,10 +384,7 @@ export function splitRecursive(
         let j = i + 1;
         while (j < flatParts.length) {
             const nextChunk = flatParts[j];
-            if (
-                currentChunk.length + nextChunk.length + delim.length <=
-                length
-            ) {
+            if (currentChunk.length + nextChunk.length + delim.length <= length) {
                 currentChunk += delim + nextChunk;
             } else {
                 break;
@@ -490,10 +453,7 @@ export class IndexedDBStore {
         if (!this.db) await this.open();
 
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(
-                this.storeName,
-                "readwrite",
-            );
+            const transaction = this.db.transaction(this.storeName, "readwrite");
             const objectStore = transaction.objectStore(this.storeName);
             const request = objectStore.put(object, key);
 
@@ -513,10 +473,7 @@ export class IndexedDBStore {
         if (!this.db) await this.open();
 
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(
-                this.storeName,
-                "readwrite",
-            );
+            const transaction = this.db.transaction(this.storeName, "readwrite");
             const objectStore = transaction.objectStore(this.storeName);
             const request = objectStore.delete(key);
 
@@ -700,9 +657,7 @@ export function extractDataFromPng(data, identifier = "chara") {
         (x) =>
             x.name == "tEXt" &&
             x.data.length > identifier.length &&
-            x.data
-                .slice(0, identifier.length)
-                .every((v, i) => String.fromCharCode(v) == identifier[i]),
+            x.data.slice(0, identifier.length).every((v, i) => String.fromCharCode(v) == identifier[i]),
     );
 
     if (found.length == 0) {
@@ -760,11 +715,7 @@ export function createThumbnail(dataUrl, maxWidth, maxHeight) {
     });
 }
 
-export async function waitUntilCondition(
-    condition,
-    timeout = 1000,
-    interval = 100,
-) {
+export async function waitUntilCondition(condition, timeout = 1000, interval = 100) {
     return new Promise((resolve, reject) => {
         const timeoutId = setTimeout(() => {
             clearInterval(intervalId);
@@ -782,14 +733,11 @@ export async function waitUntilCondition(
 }
 
 export function uuidv4() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            const r = (Math.random() * 16) | 0;
-            const v = c === "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        },
-    );
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0;
+        const v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
 }
 
 export function deepClone(obj) {

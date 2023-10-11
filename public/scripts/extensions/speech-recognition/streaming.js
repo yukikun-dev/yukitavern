@@ -37,23 +37,15 @@ class StreamingSttProvider {
     }
 
     onSettingsChange() {
-        this.settings.triggerWordsText = $(
-            "#speech_recognition_streaming_trigger_words",
-        ).val();
-        let array = $("#speech_recognition_streaming_trigger_words")
-            .val()
-            .split(",");
+        this.settings.triggerWordsText = $("#speech_recognition_streaming_trigger_words").val();
+        let array = $("#speech_recognition_streaming_trigger_words").val().split(",");
         array = array.map((element) => {
             return element.trim().toLowerCase();
         });
         array = array.filter((str) => str !== "");
         this.settings.triggerWords = array;
-        this.settings.triggerWordsEnabled = $(
-            "#speech_recognition_streaming_trigger_words_enabled",
-        ).is(":checked");
-        this.settings.debug = $("#speech_recognition_streaming_debug").is(
-            ":checked",
-        );
+        this.settings.triggerWordsEnabled = $("#speech_recognition_streaming_trigger_words_enabled").is(":checked");
+        this.settings.debug = $("#speech_recognition_streaming_debug").is(":checked");
         console.debug(DEBUG_PREFIX + " Updated settings: ", this.settings);
         this.loadSettings(this.settings);
     }
@@ -61,9 +53,7 @@ class StreamingSttProvider {
     loadSettings(settings) {
         // Populate Provider UI given input settings
         if (Object.keys(settings).length == 0) {
-            console.debug(
-                DEBUG_PREFIX + "Using default Whisper STT extension settings",
-            );
+            console.debug(DEBUG_PREFIX + "Using default Whisper STT extension settings");
         }
 
         // Only accept keys defined in defaultSettings
@@ -77,17 +67,9 @@ class StreamingSttProvider {
             }
         }
 
-        $("#speech_recognition_streaming_trigger_words").val(
-            this.settings.triggerWordsText,
-        );
-        $("#speech_recognition_streaming_trigger_words_enabled").prop(
-            "checked",
-            this.settings.triggerWordsEnabled,
-        );
-        $("#speech_recognition_streaming_debug").prop(
-            "checked",
-            this.settings.debug,
-        );
+        $("#speech_recognition_streaming_trigger_words").val(this.settings.triggerWordsText);
+        $("#speech_recognition_streaming_trigger_words_enabled").prop("checked", this.settings.triggerWordsEnabled);
+        $("#speech_recognition_streaming_debug").prop("checked", this.settings.debug);
 
         console.debug(DEBUG_PREFIX + "streaming STT settings loaded");
     }
@@ -96,15 +78,13 @@ class StreamingSttProvider {
         // Return if module is not loaded
         if (!modules.includes("streaming-stt")) {
             console.debug(
-                DEBUG_PREFIX +
-                    "Module streaming-stt must be activated in yukitavern Extras for streaming user voice.",
+                DEBUG_PREFIX + "Module streaming-stt must be activated in yukitavern Extras for streaming user voice.",
             );
             return "";
         }
 
         const url = new URL(getApiUrl());
-        url.pathname =
-            "/api/speech-recognition/streaming/record-and-transcript";
+        url.pathname = "/api/speech-recognition/streaming/record-and-transcript";
 
         const apiResult = await doExtrasFetch(url, {
             method: "POST",
@@ -116,18 +96,12 @@ class StreamingSttProvider {
         });
 
         if (!apiResult.ok) {
-            toastr.error(
-                apiResult.statusText,
-                DEBUG_PREFIX + "STT Generation Failed  (streaming)",
-                {
-                    timeOut: 10000,
-                    extendedTimeOut: 20000,
-                    preventDuplicates: true,
-                },
-            );
-            throw new Error(
-                `HTTP ${apiResult.status}: ${await apiResult.text()}`,
-            );
+            toastr.error(apiResult.statusText, DEBUG_PREFIX + "STT Generation Failed  (streaming)", {
+                timeOut: 10000,
+                extendedTimeOut: 20000,
+                preventDuplicates: true,
+            });
+            throw new Error(`HTTP ${apiResult.status}: ${await apiResult.text()}`);
         }
 
         const data = await apiResult.json();

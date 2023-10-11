@@ -5,9 +5,7 @@ export { CoquiTtsProvider };
 
 function throwIfModuleMissing() {
     if (!modules.includes("coqui-tts")) {
-        toastr.error(
-            `Coqui TTS module not loaded. Add coqui-tts to enable-modules and restart the Extras API.`,
-        );
+        toastr.error(`Coqui TTS module not loaded. Add coqui-tts to enable-modules and restart the Extras API.`);
         throw new Error(`Coqui TTS module not loaded.`);
     }
 }
@@ -129,13 +127,9 @@ class CoquiTtsProvider {
 
     async getLang() {
         try {
-            const response = await doExtrasFetch(
-                `${getApiUrl()}/api/coqui-tts/multlang`,
-            );
+            const response = await doExtrasFetch(`${getApiUrl()}/api/coqui-tts/multlang`);
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                );
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             const voiceData = await response.json();
 
@@ -171,13 +165,9 @@ class CoquiTtsProvider {
 
     async getSpeakers() {
         try {
-            const response = await doExtrasFetch(
-                `${getApiUrl()}/api/coqui-tts/multspeaker`,
-            );
+            const response = await doExtrasFetch(`${getApiUrl()}/api/coqui-tts/multspeaker`);
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                );
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             const voiceData = await response.json();
 
@@ -214,13 +204,9 @@ class CoquiTtsProvider {
     async getModels() {
         try {
             throwIfModuleMissing();
-            const response = await doExtrasFetch(
-                `${getApiUrl()}/api/coqui-tts/list`,
-            );
+            const response = await doExtrasFetch(`${getApiUrl()}/api/coqui-tts/list`);
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                );
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             const voiceIds = await response.json();
 
@@ -262,13 +248,9 @@ class CoquiTtsProvider {
         previewButton.innerText = "Loading";
         try {
             throwIfModuleMissing();
-            const response = await doExtrasFetch(
-                `${getApiUrl()}/api/coqui-tts/load?_model=${selectedModel}`,
-            );
+            const response = await doExtrasFetch(`${getApiUrl()}/api/coqui-tts/load?_model=${selectedModel}`);
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                );
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             this.getSpeakers();
             this.getLang();
@@ -297,9 +279,7 @@ class CoquiTtsProvider {
         // Search for a voice object in the 'this.voices' array where the 'name' property matches the provided 'voiceName'
 
         //const match = this.voices.find((CoquiVoice) => CoquiVoice.name === voiceName);
-        const match = this.voices.find(
-            (CoquiVoice) => CoquiVoice.name === voiceName,
-        );
+        const match = this.voices.find((CoquiVoice) => CoquiVoice.name === voiceName);
 
         // If no match is found, throw an error indicating that the TTS Voice name was not found
         if (!match) {
@@ -317,9 +297,7 @@ class CoquiTtsProvider {
         const response = await doExtrasFetch(endpoint);
 
         if (!response.ok) {
-            throw new Error(
-                `HTTP ${response.status}: ${await response.json()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.json()}`);
         }
         const voiceData = await response.json();
         const voices = voiceData.map((voice) => ({
@@ -338,9 +316,7 @@ class CoquiTtsProvider {
         const response = await doExtrasFetch(endpoint);
 
         if (!response.ok) {
-            throw new Error(
-                `HTTP ${response.status}: ${await response.json()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.json()}`);
         }
         const voiceData = await response.json();
         const voices = voiceData.map((voice) => ({
@@ -386,8 +362,7 @@ class CoquiTtsProvider {
         doExtrasFetch(url)
             .then((response) => response.text()) // Expecting a text response
             .then((responseText) => {
-                const isResponseTrue =
-                    responseText.trim().toLowerCase() === "true";
+                const isResponseTrue = responseText.trim().toLowerCase() === "true";
 
                 if (isResponseTrue) {
                     console.log("Downloading Model"); //if true
@@ -409,21 +384,15 @@ class CoquiTtsProvider {
         throwIfModuleMissing();
         console.info(`Generating new TTS for voice_id ${voiceId}`);
         const response = await doExtrasFetch(
-            `${getApiUrl()}/api/coqui-tts/tts?text=${encodeURIComponent(
-                inputText,
-            )}&speaker_id=${voiceId}`,
+            `${getApiUrl()}/api/coqui-tts/tts?text=${encodeURIComponent(inputText)}&speaker_id=${voiceId}`,
         );
         if (!response.ok) {
             toastr.error(response.statusText, "TTS Generation Failed");
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         if (!response.ok) {
             toastr.error(response.statusText, "TTS Generation Failed");
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         return response;
     }

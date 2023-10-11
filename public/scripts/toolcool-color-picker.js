@@ -10,11 +10,11 @@ License: MIT License
     var kt = (o, e, t) =>
         e in o
             ? Mt(o, e, {
-                enumerable: !0,
-                configurable: !0,
-                writable: !0,
-                value: t,
-            })
+                  enumerable: !0,
+                  configurable: !0,
+                  writable: !0,
+                  value: t,
+              })
             : (o[e] = t);
     var h = (o, e, t) => (kt(o, typeof e != "symbol" ? e + "" : e, t), t);
     var ot =
@@ -28,16 +28,10 @@ License: MIT License
         m = "tc-alpha-changed",
         D = "tc-button-clicked",
         nt = (o) => {
-            !o ||
-                document.dispatchEvent(
-                    new CustomEvent(D, { detail: { cid: o } }),
-                );
+            !o || document.dispatchEvent(new CustomEvent(D, { detail: { cid: o } }));
         },
         M = (o, e) => {
-            !o ||
-                document.dispatchEvent(
-                    new CustomEvent(m, { detail: { a: e, cid: o } }),
-                );
+            !o || document.dispatchEvent(new CustomEvent(m, { detail: { a: e, cid: o } }));
         },
         b = (o, e, t, i) => {
             !o ||
@@ -48,10 +42,7 @@ License: MIT License
                 );
         },
         st = (o, e) => {
-            !o ||
-                document.dispatchEvent(
-                    new CustomEvent(f, { detail: { h: e, cid: o } }),
-                );
+            !o || document.dispatchEvent(new CustomEvent(f, { detail: { h: e, cid: o } }));
         };
     function u(o, e) {
         St(o) && (o = "100%");
@@ -62,20 +53,16 @@ License: MIT License
             Math.abs(o - e) < 1e-6
                 ? 1
                 : (e === 360
-                    ? (o =
-                            (o < 0 ? (o % e) + e : o % e) /
-                            parseFloat(String(e)))
-                    : (o = (o % e) / parseFloat(String(e))),
-                o)
+                      ? (o = (o < 0 ? (o % e) + e : o % e) / parseFloat(String(e)))
+                      : (o = (o % e) / parseFloat(String(e))),
+                  o)
         );
     }
     function k(o) {
         return Math.min(1, Math.max(0, o));
     }
     function St(o) {
-        return (
-            typeof o == "string" && o.indexOf(".") !== -1 && parseFloat(o) === 1
-        );
+        return typeof o == "string" && o.indexOf(".") !== -1 && parseFloat(o) === 1;
     }
     function Tt(o) {
         return typeof o == "string" && o.indexOf("%") !== -1;
@@ -103,17 +90,17 @@ License: MIT License
         else {
             var d = i - r;
             switch (((s = a > 0.5 ? d / (2 - i - r) : d / (i + r)), i)) {
-            case o:
-                n = (e - t) / d + (e < t ? 6 : 0);
-                break;
-            case e:
-                n = (t - o) / d + 2;
-                break;
-            case t:
-                n = (o - e) / d + 4;
-                break;
-            default:
-                break;
+                case o:
+                    n = (e - t) / d + (e < t ? 6 : 0);
+                    break;
+                case e:
+                    n = (t - o) / d + 2;
+                    break;
+                case t:
+                    n = (o - e) / d + 4;
+                    break;
+                default:
+                    break;
             }
             n /= 6;
         }
@@ -123,25 +110,16 @@ License: MIT License
         return (
             t < 0 && (t += 1),
             t > 1 && (t -= 1),
-            t < 1 / 6
-                ? o + (e - o) * (6 * t)
-                : t < 1 / 2
-                    ? e
-                    : t < 2 / 3
-                        ? o + (e - o) * (2 / 3 - t) * 6
-                        : o
+            t < 1 / 6 ? o + (e - o) * (6 * t) : t < 1 / 2 ? e : t < 2 / 3 ? o + (e - o) * (2 / 3 - t) * 6 : o
         );
     }
     function ht(o, e, t) {
         var i, r, n;
-        if (((o = u(o, 360)), (e = u(e, 100)), (t = u(t, 100)), e === 0))
-            (r = t), (n = t), (i = t);
+        if (((o = u(o, 360)), (e = u(e, 100)), (t = u(t, 100)), e === 0)) (r = t), (n = t), (i = t);
         else {
             var s = t < 0.5 ? t * (1 + e) : t + e - t * e,
                 a = 2 * t - s;
-            (i = O(a, s, o + 1 / 3)),
-            (r = O(a, s, o)),
-            (n = O(a, s, o - 1 / 3));
+            (i = O(a, s, o + 1 / 3)), (r = O(a, s, o)), (n = O(a, s, o - 1 / 3));
         }
         return { r: i * 255, g: r * 255, b: n * 255 };
     }
@@ -156,17 +134,17 @@ License: MIT License
         if (i === r) n = 0;
         else {
             switch (i) {
-            case o:
-                n = (e - t) / a + (e < t ? 6 : 0);
-                break;
-            case e:
-                n = (t - o) / a + 2;
-                break;
-            case t:
-                n = (o - e) / a + 4;
-                break;
-            default:
-                break;
+                case o:
+                    n = (e - t) / a + (e < t ? 6 : 0);
+                    break;
+                case e:
+                    n = (t - o) / a + 2;
+                    break;
+                case t:
+                    n = (o - e) / a + 4;
+                    break;
+                default:
+                    break;
             }
             n /= 6;
         }
@@ -186,11 +164,7 @@ License: MIT License
         return { r: w * 255, g: x * 255, b: R * 255 };
     }
     function K(o, e, t, i) {
-        var r = [
-            C(Math.round(o).toString(16)),
-            C(Math.round(e).toString(16)),
-            C(Math.round(t).toString(16)),
-        ];
+        var r = [C(Math.round(o).toString(16)), C(Math.round(e).toString(16)), C(Math.round(t).toString(16))];
         return i &&
             r[0].startsWith(r[0].charAt(1)) &&
             r[1].startsWith(r[1].charAt(1)) &&
@@ -199,12 +173,7 @@ License: MIT License
             : r.join("");
     }
     function dt(o, e, t, i, r) {
-        var n = [
-            C(Math.round(o).toString(16)),
-            C(Math.round(e).toString(16)),
-            C(Math.round(t).toString(16)),
-            C(Rt(i)),
-        ];
+        var n = [C(Math.round(o).toString(16)), C(Math.round(e).toString(16)), C(Math.round(t).toString(16)), C(Rt(i))];
         return r &&
             n[0].startsWith(n[0].charAt(1)) &&
             n[1].startsWith(n[1].charAt(1)) &&
@@ -387,23 +356,13 @@ License: MIT License
             typeof o == "string" && (o = Pt(o)),
             typeof o == "object" &&
                 (E(o.r) && E(o.g) && E(o.b)
-                    ? ((e = at(o.r, o.g, o.b)),
-                    (s = !0),
-                    (a = String(o.r).substr(-1) === "%" ? "prgb" : "rgb"))
+                    ? ((e = at(o.r, o.g, o.b)), (s = !0), (a = String(o.r).substr(-1) === "%" ? "prgb" : "rgb"))
                     : E(o.h) && E(o.s) && E(o.v)
-                        ? ((i = L(o.s)),
-                        (r = L(o.v)),
-                        (e = lt(o.h, i, r)),
-                        (s = !0),
-                        (a = "hsv"))
-                        : E(o.h) &&
+                    ? ((i = L(o.s)), (r = L(o.v)), (e = lt(o.h, i, r)), (s = !0), (a = "hsv"))
+                    : E(o.h) &&
                       E(o.s) &&
                       E(o.l) &&
-                      ((i = L(o.s)),
-                      (n = L(o.l)),
-                      (e = ht(o.h, i, n)),
-                      (s = !0),
-                      (a = "hsl")),
+                      ((i = L(o.s)), (n = L(o.l)), (e = ht(o.h, i, n)), (s = !0), (a = "hsl")),
                 Object.prototype.hasOwnProperty.call(o, "a") && (t = o.a)),
             (t = _(t)),
             {
@@ -419,10 +378,7 @@ License: MIT License
     var Dt = "[-\\+]?\\d+%?",
         _t = "[-\\+]?\\d*\\.\\d+%?",
         y = "(?:".concat(_t, ")|(?:").concat(Dt, ")"),
-        G = "[\\s|\\(]+("
-            .concat(y, ")[,|\\s]+(")
-            .concat(y, ")[,|\\s]+(")
-            .concat(y, ")\\s*\\)?"),
+        G = "[\\s|\\(]+(".concat(y, ")[,|\\s]+(").concat(y, ")[,|\\s]+(").concat(y, ")\\s*\\)?"),
         F = "[\\s|\\(]+("
             .concat(y, ")[,|\\s]+(")
             .concat(y, ")[,|\\s]+(")
@@ -445,98 +401,65 @@ License: MIT License
         if (((o = o.trim().toLowerCase()), o.length === 0)) return !1;
         var e = !1;
         if (A[o]) (o = A[o]), (e = !0);
-        else if (o === "transparent")
-            return { r: 0, g: 0, b: 0, a: 0, format: "name" };
+        else if (o === "transparent") return { r: 0, g: 0, b: 0, a: 0, format: "name" };
         var t = v.rgb.exec(o);
         return t
             ? { r: t[1], g: t[2], b: t[3] }
             : ((t = v.rgba.exec(o)),
-            t
-                ? { r: t[1], g: t[2], b: t[3], a: t[4] }
-                : ((t = v.hsl.exec(o)),
-                t
-                    ? { h: t[1], s: t[2], l: t[3] }
-                    : ((t = v.hsla.exec(o)),
+              t
+                  ? { r: t[1], g: t[2], b: t[3], a: t[4] }
+                  : ((t = v.hsl.exec(o)),
                     t
-                        ? { h: t[1], s: t[2], l: t[3], a: t[4] }
-                        : ((t = v.hsv.exec(o)),
-                        t
-                            ? { h: t[1], s: t[2], v: t[3] }
-                            : ((t = v.hsva.exec(o)),
-                            t
-                                ? {
-                                    h: t[1],
-                                    s: t[2],
-                                    v: t[3],
-                                    a: t[4],
-                                }
-                                : ((t = v.hex8.exec(o)),
+                        ? { h: t[1], s: t[2], l: t[3] }
+                        : ((t = v.hsla.exec(o)),
+                          t
+                              ? { h: t[1], s: t[2], l: t[3], a: t[4] }
+                              : ((t = v.hsv.exec(o)),
                                 t
-                                    ? {
-                                        r: g(t[1]),
-                                        g: g(t[2]),
-                                        b: g(t[3]),
-                                        a: V(t[4]),
-                                        format: e
-                                            ? "name"
-                                            : "hex8",
-                                    }
-                                    : ((t = v.hex6.exec(o)),
-                                    t
-                                        ? {
-                                            r: g(t[1]),
-                                            g: g(t[2]),
-                                            b: g(t[3]),
-                                            format: e
-                                                ? "name"
-                                                : "hex",
-                                        }
-                                        : ((t = v.hex4.exec(o)),
-                                        t
-                                            ? {
-                                                r: g(
-                                                    t[1] +
-                                                                          t[1],
-                                                ),
-                                                g: g(
-                                                    t[2] +
-                                                                          t[2],
-                                                ),
-                                                b: g(
-                                                    t[3] +
-                                                                          t[3],
-                                                ),
-                                                a: V(
-                                                    t[4] +
-                                                                          t[4],
-                                                ),
-                                                format: e
-                                                    ? "name"
-                                                    : "hex8",
+                                    ? { h: t[1], s: t[2], v: t[3] }
+                                    : ((t = v.hsva.exec(o)),
+                                      t
+                                          ? {
+                                                h: t[1],
+                                                s: t[2],
+                                                v: t[3],
+                                                a: t[4],
                                             }
-                                            : ((t =
-                                                                  v.hex3.exec(
-                                                                      o,
-                                                                  )),
+                                          : ((t = v.hex8.exec(o)),
                                             t
                                                 ? {
-                                                    r: g(
-                                                        t[1] +
-                                                                                t[1],
-                                                    ),
-                                                    g: g(
-                                                        t[2] +
-                                                                                t[2],
-                                                    ),
-                                                    b: g(
-                                                        t[3] +
-                                                                                t[3],
-                                                    ),
-                                                    format: e
-                                                        ? "name"
-                                                        : "hex",
-                                                }
-                                                : !1)))))))));
+                                                      r: g(t[1]),
+                                                      g: g(t[2]),
+                                                      b: g(t[3]),
+                                                      a: V(t[4]),
+                                                      format: e ? "name" : "hex8",
+                                                  }
+                                                : ((t = v.hex6.exec(o)),
+                                                  t
+                                                      ? {
+                                                            r: g(t[1]),
+                                                            g: g(t[2]),
+                                                            b: g(t[3]),
+                                                            format: e ? "name" : "hex",
+                                                        }
+                                                      : ((t = v.hex4.exec(o)),
+                                                        t
+                                                            ? {
+                                                                  r: g(t[1] + t[1]),
+                                                                  g: g(t[2] + t[2]),
+                                                                  b: g(t[3] + t[3]),
+                                                                  a: V(t[4] + t[4]),
+                                                                  format: e ? "name" : "hex8",
+                                                              }
+                                                            : ((t = v.hex3.exec(o)),
+                                                              t
+                                                                  ? {
+                                                                        r: g(t[1] + t[1]),
+                                                                        g: g(t[2] + t[2]),
+                                                                        b: g(t[3] + t[3]),
+                                                                        format: e ? "name" : "hex",
+                                                                    }
+                                                                  : !1)))))))));
     }
     function E(o) {
         return Boolean(v.CSS_UNIT.exec(String(o)));
@@ -549,18 +472,17 @@ License: MIT License
             typeof e == "number" && (e = ut(e)), (this.originalInput = e);
             var r = ct(e);
             (this.originalInput = e),
-            (this.r = r.r),
-            (this.g = r.g),
-            (this.b = r.b),
-            (this.a = r.a),
-            (this.roundA = Math.round(100 * this.a) / 100),
-            (this.format =
-                    (i = t.format) !== null && i !== void 0 ? i : r.format),
-            (this.gradientType = t.gradientType),
-            this.r < 1 && (this.r = Math.round(this.r)),
-            this.g < 1 && (this.g = Math.round(this.g)),
-            this.b < 1 && (this.b = Math.round(this.b)),
-            (this.isValid = r.ok);
+                (this.r = r.r),
+                (this.g = r.g),
+                (this.b = r.b),
+                (this.a = r.a),
+                (this.roundA = Math.round(100 * this.a) / 100),
+                (this.format = (i = t.format) !== null && i !== void 0 ? i : r.format),
+                (this.gradientType = t.gradientType),
+                this.r < 1 && (this.r = Math.round(this.r)),
+                this.g < 1 && (this.g = Math.round(this.g)),
+                this.b < 1 && (this.b = Math.round(this.b)),
+                (this.isValid = r.ok);
         }
         return (
             (o.prototype.isDark = function () {
@@ -582,15 +504,9 @@ License: MIT License
                     s = e.g / 255,
                     a = e.b / 255;
                 return (
-                    n <= 0.03928
-                        ? (t = n / 12.92)
-                        : (t = Math.pow((n + 0.055) / 1.055, 2.4)),
-                    s <= 0.03928
-                        ? (i = s / 12.92)
-                        : (i = Math.pow((s + 0.055) / 1.055, 2.4)),
-                    a <= 0.03928
-                        ? (r = a / 12.92)
-                        : (r = Math.pow((a + 0.055) / 1.055, 2.4)),
+                    n <= 0.03928 ? (t = n / 12.92) : (t = Math.pow((n + 0.055) / 1.055, 2.4)),
+                    s <= 0.03928 ? (i = s / 12.92) : (i = Math.pow((s + 0.055) / 1.055, 2.4)),
+                    a <= 0.03928 ? (r = a / 12.92) : (r = Math.pow((a + 0.055) / 1.055, 2.4)),
                     0.2126 * t + 0.7152 * i + 0.0722 * r
                 );
             }),
@@ -598,11 +514,7 @@ License: MIT License
                 return this.a;
             }),
             (o.prototype.setAlpha = function (e) {
-                return (
-                    (this.a = _(e)),
-                    (this.roundA = Math.round(100 * this.a) / 100),
-                    this
-                );
+                return (this.a = _(e)), (this.roundA = Math.round(100 * this.a) / 100), this;
             }),
             (o.prototype.toHsv = function () {
                 var e = N(this.r, this.g, this.b);
@@ -615,11 +527,7 @@ License: MIT License
                     r = Math.round(e.v * 100);
                 return this.a === 1
                     ? "hsv(".concat(t, ", ").concat(i, "%, ").concat(r, "%)")
-                    : "hsva("
-                        .concat(t, ", ")
-                        .concat(i, "%, ")
-                        .concat(r, "%, ")
-                        .concat(this.roundA, ")");
+                    : "hsva(".concat(t, ", ").concat(i, "%, ").concat(r, "%, ").concat(this.roundA, ")");
             }),
             (o.prototype.toHsl = function () {
                 var e = U(this.r, this.g, this.b);
@@ -632,11 +540,7 @@ License: MIT License
                     r = Math.round(e.l * 100);
                 return this.a === 1
                     ? "hsl(".concat(t, ", ").concat(i, "%, ").concat(r, "%)")
-                    : "hsla("
-                        .concat(t, ", ")
-                        .concat(i, "%, ")
-                        .concat(r, "%, ")
-                        .concat(this.roundA, ")");
+                    : "hsla(".concat(t, ", ").concat(i, "%, ").concat(r, "%, ").concat(this.roundA, ")");
             }),
             (o.prototype.toHex = function (e) {
                 return e === void 0 && (e = !1), K(this.r, this.g, this.b, e);
@@ -645,10 +549,7 @@ License: MIT License
                 return e === void 0 && (e = !1), "#" + this.toHex(e);
             }),
             (o.prototype.toHex8 = function (e) {
-                return (
-                    e === void 0 && (e = !1),
-                    dt(this.r, this.g, this.b, this.a, e)
-                );
+                return e === void 0 && (e = !1), dt(this.r, this.g, this.b, this.a, e);
             }),
             (o.prototype.toHex8String = function (e) {
                 return e === void 0 && (e = !1), "#" + this.toHex8(e);
@@ -667,11 +568,7 @@ License: MIT License
                     i = Math.round(this.b);
                 return this.a === 1
                     ? "rgb(".concat(e, ", ").concat(t, ", ").concat(i, ")")
-                    : "rgba("
-                        .concat(e, ", ")
-                        .concat(t, ", ")
-                        .concat(i, ", ")
-                        .concat(this.roundA, ")");
+                    : "rgba(".concat(e, ", ").concat(t, ", ").concat(i, ", ").concat(this.roundA, ")");
             }),
             (o.prototype.toPercentageRgb = function () {
                 var e = function (t) {
@@ -684,26 +581,17 @@ License: MIT License
                     return Math.round(u(t, 255) * 100);
                 };
                 return this.a === 1
-                    ? "rgb("
-                        .concat(e(this.r), "%, ")
-                        .concat(e(this.g), "%, ")
-                        .concat(e(this.b), "%)")
+                    ? "rgb(".concat(e(this.r), "%, ").concat(e(this.g), "%, ").concat(e(this.b), "%)")
                     : "rgba("
-                        .concat(e(this.r), "%, ")
-                        .concat(e(this.g), "%, ")
-                        .concat(e(this.b), "%, ")
-                        .concat(this.roundA, ")");
+                          .concat(e(this.r), "%, ")
+                          .concat(e(this.g), "%, ")
+                          .concat(e(this.b), "%, ")
+                          .concat(this.roundA, ")");
             }),
             (o.prototype.toName = function () {
                 if (this.a === 0) return "transparent";
                 if (this.a < 1) return !1;
-                for (
-                    var e = "#" + K(this.r, this.g, this.b, !1),
-                        t = 0,
-                        i = Object.entries(A);
-                    t < i.length;
-                    t++
-                ) {
+                for (var e = "#" + K(this.r, this.g, this.b, !1), t = 0, i = Object.entries(A); t < i.length; t++) {
                     var r = i[t],
                         n = r[0],
                         s = r[1];
@@ -722,22 +610,18 @@ License: MIT License
                         ? this.toName()
                         : this.toRgbString()
                     : (e === "rgb" && (i = this.toRgbString()),
-                    e === "prgb" && (i = this.toPercentageRgbString()),
-                    (e === "hex" || e === "hex6") && (i = this.toHexString()),
-                    e === "hex3" && (i = this.toHexString(!0)),
-                    e === "hex4" && (i = this.toHex8String(!0)),
-                    e === "hex8" && (i = this.toHex8String()),
-                    e === "name" && (i = this.toName()),
-                    e === "hsl" && (i = this.toHslString()),
-                    e === "hsv" && (i = this.toHsvString()),
-                    i || this.toHexString());
+                      e === "prgb" && (i = this.toPercentageRgbString()),
+                      (e === "hex" || e === "hex6") && (i = this.toHexString()),
+                      e === "hex3" && (i = this.toHexString(!0)),
+                      e === "hex4" && (i = this.toHex8String(!0)),
+                      e === "hex8" && (i = this.toHex8String()),
+                      e === "name" && (i = this.toName()),
+                      e === "hsl" && (i = this.toHslString()),
+                      e === "hsv" && (i = this.toHsvString()),
+                      i || this.toHexString());
             }),
             (o.prototype.toNumber = function () {
-                return (
-                    (Math.round(this.r) << 16) +
-                    (Math.round(this.g) << 8) +
-                    Math.round(this.b)
-                );
+                return (Math.round(this.r) << 16) + (Math.round(this.g) << 8) + Math.round(this.b);
             }),
             (o.prototype.clone = function () {
                 return new o(this.toString());
@@ -751,18 +635,9 @@ License: MIT License
                 e === void 0 && (e = 10);
                 var t = this.toRgb();
                 return (
-                    (t.r = Math.max(
-                        0,
-                        Math.min(255, t.r - Math.round(255 * -(e / 100))),
-                    )),
-                    (t.g = Math.max(
-                        0,
-                        Math.min(255, t.g - Math.round(255 * -(e / 100))),
-                    )),
-                    (t.b = Math.max(
-                        0,
-                        Math.min(255, t.b - Math.round(255 * -(e / 100))),
-                    )),
+                    (t.r = Math.max(0, Math.min(255, t.r - Math.round(255 * -(e / 100))))),
+                    (t.g = Math.max(0, Math.min(255, t.g - Math.round(255 * -(e / 100))))),
+                    (t.b = Math.max(0, Math.min(255, t.b - Math.round(255 * -(e / 100))))),
                     new o(t)
                 );
             }),
@@ -813,8 +688,7 @@ License: MIT License
                 var i = this.toHsl(),
                     r = 360 / t,
                     n = [this];
-                for (i.h = (i.h - ((r * e) >> 1) + 720) % 360; --e; )
-                    (i.h = (i.h + r) % 360), n.push(new o(i));
+                for (i.h = (i.h - ((r * e) >> 1) + 720) % 360; --e; ) (i.h = (i.h + r) % 360), n.push(new o(i));
                 return n;
             }),
             (o.prototype.complement = function () {
@@ -823,16 +697,7 @@ License: MIT License
             }),
             (o.prototype.monochromatic = function (e) {
                 e === void 0 && (e = 6);
-                for (
-                    var t = this.toHsv(),
-                        i = t.h,
-                        r = t.s,
-                        n = t.v,
-                        s = [],
-                        a = 1 / e;
-                    e--;
-
-                )
+                for (var t = this.toHsv(), i = t.h, r = t.s, n = t.v, s = [], a = 1 / e; e--; )
                     s.push(new o({ h: i, s: r, v: n })), (n = (n + a) % 1);
                 return s;
             }),
@@ -861,15 +726,7 @@ License: MIT License
                 return this.polyad(4);
             }),
             (o.prototype.polyad = function (e) {
-                for (
-                    var t = this.toHsl(),
-                        i = t.h,
-                        r = [this],
-                        n = 360 / e,
-                        s = 1;
-                    s < e;
-                    s++
-                )
+                for (var t = this.toHsl(), i = t.h, r = [this], n = 360 / e, s = 1; s < e; s++)
                     r.push(new o({ h: (i + s * n) % 360, s: t.s, l: t.l }));
                 return r;
             }),
@@ -882,11 +739,7 @@ License: MIT License
     var $ = () => Math.random().toString(16).slice(2),
         P = (o) => Math.round((o + Number.EPSILON) * 100) / 100;
     var H = 0.01,
-        q = (o) => (
-            o < 0 && (o = 0),
-            o > 360 && (o = 360),
-            `hsl(${Math.round(o)}, 100%, 50%)`
-        ),
+        q = (o) => (o < 0 && (o = 0), o > 360 && (o = 360), `hsl(${Math.round(o)}, 100%, 50%)`),
         z = (o) => {
             let e = o.toRgb();
             return `linear-gradient(to right, rgba(${e.r},${e.g},${e.b}, 0) 0%, rgba(${e.r},${e.g},${e.b}, 1) 100%)`;
@@ -897,24 +750,14 @@ License: MIT License
         },
         pt = (o) => {
             let e = o.toHsl();
-            return `hsla(${Math.round(e.h)}, ${Math.round(
-                e.s * 100,
-            )}%, ${Math.round(e.l * 100)}%, ${P(e.a)})`;
+            return `hsla(${Math.round(e.h)}, ${Math.round(e.s * 100)}%, ${Math.round(e.l * 100)}%, ${P(e.a)})`;
         },
         gt = (o) => {
             let e = o.toHsv();
-            return `hsva(${Math.round(e.h)}, ${Math.round(
-                e.s * 100,
-            )}%, ${Math.round(e.v * 100)}%, ${P(e.a)})`;
+            return `hsva(${Math.round(e.h)}, ${Math.round(e.s * 100)}%, ${Math.round(e.v * 100)}%, ${P(e.a)})`;
         },
-        W = (o) => (
-            o < 0 && (o = 0),
-            o > 1 && (o = 1),
-            `${(-(o * 100) + 100).toFixed(2)}%`
-        ),
-        X = (o) => (
-            o < 0 && (o = 0), o > 1 && (o = 1), `${(o * 100).toFixed(2)}%`
-        ),
+        W = (o) => (o < 0 && (o = 0), o > 1 && (o = 1), `${(-(o * 100) + 100).toFixed(2)}%`),
+        X = (o) => (o < 0 && (o = 0), o > 1 && (o = 1), `${(o * 100).toFixed(2)}%`),
         T = (o) => {
             o < 0 && (o = 0), o > 360 && (o = 360);
             let e = (o * 100) / 360,
@@ -924,21 +767,11 @@ License: MIT License
         B = (o) => (360 * o) / 100,
         I = (o) => {
             let e = Number(o) || 0;
-            return (
-                (e = Math.round(e)),
-                (e = Math.max(0, e)),
-                (e = Math.min(255, e)),
-                e
-            );
+            return (e = Math.round(e)), (e = Math.max(0, e)), (e = Math.min(255, e)), e;
         },
         ft = (o) => {
             let e = Number(o) || 100;
-            return (
-                (e = Math.round(e)),
-                (e = Math.max(0, e)),
-                (e = Math.min(100, e)),
-                e
-            );
+            return (e = Math.round(e)), (e = Math.max(0, e)), (e = Math.min(100, e)), e;
         },
         c = (o) => {
             let e = new l(o || "#000");
@@ -955,111 +788,79 @@ License: MIT License
                 h(this, "saturation", 0);
                 h(this, "value", 0);
                 this.attachShadow({ mode: "open" }),
-                (this.onMouseDown = this.onMouseDown.bind(this)),
-                (this.onMouseUp = this.onMouseUp.bind(this)),
-                (this.onChange = this.onChange.bind(this)),
-                (this.onPointerKeyDown = this.onPointerKeyDown.bind(this)),
-                (this.hsvChanged = this.hsvChanged.bind(this)),
-                (this.hueChanged = this.hueChanged.bind(this));
+                    (this.onMouseDown = this.onMouseDown.bind(this)),
+                    (this.onMouseUp = this.onMouseUp.bind(this)),
+                    (this.onChange = this.onChange.bind(this)),
+                    (this.onPointerKeyDown = this.onPointerKeyDown.bind(this)),
+                    (this.hsvChanged = this.hsvChanged.bind(this)),
+                    (this.hueChanged = this.hueChanged.bind(this));
             }
             static get observedAttributes() {
                 return ["color"];
             }
             render(t = !0) {
                 this.$pointer &&
-                    ((this.$pointer.style.left = X(this.saturation)),
-                    (this.$pointer.style.top = W(this.value))),
-                this.$color &&
-                        this.$color.setAttribute(
-                            "style",
-                            `background: ${q(this.hue)}`,
-                        ),
-                t && b(this.cid, this.hue, this.saturation, this.value);
+                    ((this.$pointer.style.left = X(this.saturation)), (this.$pointer.style.top = W(this.value))),
+                    this.$color && this.$color.setAttribute("style", `background: ${q(this.hue)}`),
+                    t && b(this.cid, this.hue, this.saturation, this.value);
             }
             onChange(t) {
                 if (!this.$saturation) return;
-                let {
-                    width: i,
-                    height: r,
-                    left: n,
-                    top: s,
-                } = this.$saturation.getBoundingClientRect();
+                let { width: i, height: r, left: n, top: s } = this.$saturation.getBoundingClientRect();
                 if (i === 0 || r === 0) return;
-                let a =
-                        typeof t.clientX == "number"
-                            ? t.clientX
-                            : t.touches[0].clientX,
-                    d =
-                        typeof t.clientY == "number"
-                            ? t.clientY
-                            : t.touches[0].clientY,
+                let a = typeof t.clientX == "number" ? t.clientX : t.touches[0].clientX,
+                    d = typeof t.clientY == "number" ? t.clientY : t.touches[0].clientY,
                     w = Math.min(Math.max(0, a - n), i),
                     x = Math.min(Math.max(0, d - s), r);
-                (this.saturation = w / i),
-                (this.value = 1 - x / r),
-                this.render();
+                (this.saturation = w / i), (this.value = 1 - x / r), this.render();
             }
             onPointerKeyDown(t) {
                 switch (t.key) {
-                case "ArrowLeft": {
-                    (this.saturation = Math.max(0, this.saturation - H)),
-                    this.render();
-                    break;
-                }
-                case "ArrowRight": {
-                    (this.saturation = Math.min(1, this.saturation + H)),
-                    this.render();
-                    break;
-                }
-                case "ArrowUp": {
-                    (this.value = Math.min(1, this.value + H)),
-                    this.render();
-                    break;
-                }
-                case "ArrowDown": {
-                    t.preventDefault(),
-                    (this.value = Math.max(0, this.value - H)),
-                    this.render();
-                    break;
-                }
+                    case "ArrowLeft": {
+                        (this.saturation = Math.max(0, this.saturation - H)), this.render();
+                        break;
+                    }
+                    case "ArrowRight": {
+                        (this.saturation = Math.min(1, this.saturation + H)), this.render();
+                        break;
+                    }
+                    case "ArrowUp": {
+                        (this.value = Math.min(1, this.value + H)), this.render();
+                        break;
+                    }
+                    case "ArrowDown": {
+                        t.preventDefault(), (this.value = Math.max(0, this.value - H)), this.render();
+                        break;
+                    }
                 }
             }
             onMouseDown(t) {
                 t.preventDefault && t.preventDefault(),
-                this.onChange(t),
-                window.addEventListener("mousemove", this.onChange),
-                window.addEventListener("mouseup", this.onMouseUp),
-                window.setTimeout(() => {
-                    var i;
-                    (i = this.$pointer) == null || i.focus();
-                }, 0);
+                    this.onChange(t),
+                    window.addEventListener("mousemove", this.onChange),
+                    window.addEventListener("mouseup", this.onMouseUp),
+                    window.setTimeout(() => {
+                        var i;
+                        (i = this.$pointer) == null || i.focus();
+                    }, 0);
             }
             onMouseUp() {
                 window.removeEventListener("mousemove", this.onChange),
-                window.removeEventListener("mouseup", this.onChange);
+                    window.removeEventListener("mouseup", this.onChange);
             }
             hsvChanged(t) {
-                if (
-                    !t ||
-                    !t.detail ||
-                    !t.detail.cid ||
-                    t.detail.cid !== this.cid
-                )
-                    return;
+                if (!t || !t.detail || !t.detail.cid || t.detail.cid !== this.cid) return;
                 let i = !1;
                 this.hue !== t.detail.h && ((this.hue = t.detail.h), (i = !0)),
-                this.saturation !== t.detail.s &&
-                        ((this.saturation = t.detail.s), (i = !0)),
-                this.value !== t.detail.v &&
-                        ((this.value = t.detail.v), (i = !0)),
-                i && this.render(!1);
+                    this.saturation !== t.detail.s && ((this.saturation = t.detail.s), (i = !0)),
+                    this.value !== t.detail.v && ((this.value = t.detail.v), (i = !0)),
+                    i && this.render(!1);
             }
             hueChanged(t) {
                 !t ||
                     !t.detail ||
                     !t.detail.cid ||
-                    (t.detail.cid === this.cid &&
-                        ((this.hue = t.detail.h), this.render()));
+                    (t.detail.cid === this.cid && ((this.hue = t.detail.h), this.render()));
             }
             connectedCallback() {
                 var s, a, d, w, x;
@@ -1083,44 +884,30 @@ License: MIT License
                 </div>
            </div>
         `),
-                (this.$saturation =
-                        this.shadowRoot.querySelector(".saturation")),
-                (this.$color = this.shadowRoot.querySelector(".box")),
-                (this.$pointer = this.shadowRoot.querySelector(".pointer")),
-                (s = this.$pointer) == null ||
-                        s.addEventListener("keydown", this.onPointerKeyDown),
-                (a = this.$saturation) == null ||
-                        a.addEventListener("mousedown", this.onMouseDown),
-                (d = this.$saturation) == null ||
-                        d.addEventListener("mouseup", this.onMouseUp),
-                (w = this.$saturation) == null ||
-                        w.addEventListener("touchmove", this.onChange),
-                (x = this.$saturation) == null ||
-                        x.addEventListener("touchstart", this.onChange),
-                document.addEventListener(p, this.hsvChanged),
-                document.addEventListener(f, this.hueChanged);
+                    (this.$saturation = this.shadowRoot.querySelector(".saturation")),
+                    (this.$color = this.shadowRoot.querySelector(".box")),
+                    (this.$pointer = this.shadowRoot.querySelector(".pointer")),
+                    (s = this.$pointer) == null || s.addEventListener("keydown", this.onPointerKeyDown),
+                    (a = this.$saturation) == null || a.addEventListener("mousedown", this.onMouseDown),
+                    (d = this.$saturation) == null || d.addEventListener("mouseup", this.onMouseUp),
+                    (w = this.$saturation) == null || w.addEventListener("touchmove", this.onChange),
+                    (x = this.$saturation) == null || x.addEventListener("touchstart", this.onChange),
+                    document.addEventListener(p, this.hsvChanged),
+                    document.addEventListener(f, this.hueChanged);
             }
             disconnectedCallback() {
                 var t, i, r, n, s;
-                (t = this.$saturation) == null ||
-                    t.removeEventListener("mousedown", this.onMouseDown),
-                (i = this.$saturation) == null ||
-                        i.removeEventListener("mouseup", this.onMouseUp),
-                (r = this.$saturation) == null ||
-                        r.removeEventListener("touchmove", this.onChange),
-                (n = this.$saturation) == null ||
-                        n.removeEventListener("touchstart", this.onChange),
-                (s = this.$pointer) == null ||
-                        s.removeEventListener("keydown", this.onPointerKeyDown),
-                document.removeEventListener(p, this.hsvChanged),
-                document.removeEventListener(f, this.hueChanged);
+                (t = this.$saturation) == null || t.removeEventListener("mousedown", this.onMouseDown),
+                    (i = this.$saturation) == null || i.removeEventListener("mouseup", this.onMouseUp),
+                    (r = this.$saturation) == null || r.removeEventListener("touchmove", this.onChange),
+                    (n = this.$saturation) == null || n.removeEventListener("touchstart", this.onChange),
+                    (s = this.$pointer) == null || s.removeEventListener("keydown", this.onPointerKeyDown),
+                    document.removeEventListener(p, this.hsvChanged),
+                    document.removeEventListener(f, this.hueChanged);
             }
             attributeChangedCallback(t, i, r) {
                 let s = c(r).toHsv();
-                (this.hue = s.h),
-                (this.saturation = s.s),
-                (this.value = s.v),
-                this.render(!1);
+                (this.hue = s.h), (this.saturation = s.s), (this.value = s.v), this.render(!1);
             }
         },
         bt = j;
@@ -1134,36 +921,30 @@ License: MIT License
                 h(this, "$pointer");
                 h(this, "hue", 0);
                 this.attachShadow({ mode: "open" }),
-                (this.onMouseDown = this.onMouseDown.bind(this)),
-                (this.onMouseUp = this.onMouseUp.bind(this)),
-                (this.onChange = this.onChange.bind(this)),
-                (this.onKeyDown = this.onKeyDown.bind(this)),
-                (this.hsvChanged = this.hsvChanged.bind(this));
+                    (this.onMouseDown = this.onMouseDown.bind(this)),
+                    (this.onMouseUp = this.onMouseUp.bind(this)),
+                    (this.onChange = this.onChange.bind(this)),
+                    (this.onKeyDown = this.onKeyDown.bind(this)),
+                    (this.hsvChanged = this.hsvChanged.bind(this));
             }
             static get observedAttributes() {
                 return ["color"];
             }
             render() {
-                this.$pointer && (this.$pointer.style.left = `${T(this.hue)}%`),
-                st(this.cid, this.hue);
+                this.$pointer && (this.$pointer.style.left = `${T(this.hue)}%`), st(this.cid, this.hue);
             }
             hsvChanged(t) {
                 !t ||
                     !t.detail ||
                     !t.detail.cid ||
-                    (t.detail.cid === this.cid &&
-                        this.hue !== t.detail.h &&
-                        ((this.hue = t.detail.h), this.render()));
+                    (t.detail.cid === this.cid && this.hue !== t.detail.h && ((this.hue = t.detail.h), this.render()));
             }
             onChange(t) {
                 if (!this.$hue) return;
                 t.preventDefault && t.preventDefault();
                 let { width: i, left: r } = this.$hue.getBoundingClientRect();
                 if (i === 0) return;
-                let n =
-                        typeof t.clientX == "number"
-                            ? t.clientX
-                            : t.touches[0].clientX,
+                let n = typeof t.clientX == "number" ? t.clientX : t.touches[0].clientX,
                     s = Math.min(Math.max(0, n - r), i),
                     a = Math.min(Math.max(0, Math.round((s * 100) / i)), 100);
                 (this.hue = B(a)), this.render();
@@ -1171,35 +952,31 @@ License: MIT License
             onKeyDown(t) {
                 var i;
                 switch (((i = this.$pointer) == null || i.focus(), t.key)) {
-                case "ArrowLeft": {
-                    let r = T(this.hue);
-                    (r = Math.max(0, r - 1)),
-                    (this.hue = B(r)),
-                    this.render();
-                    break;
-                }
-                case "ArrowRight": {
-                    let r = T(this.hue);
-                    (r = Math.min(100, r + 1)),
-                    (this.hue = B(r)),
-                    this.render();
-                    break;
-                }
+                    case "ArrowLeft": {
+                        let r = T(this.hue);
+                        (r = Math.max(0, r - 1)), (this.hue = B(r)), this.render();
+                        break;
+                    }
+                    case "ArrowRight": {
+                        let r = T(this.hue);
+                        (r = Math.min(100, r + 1)), (this.hue = B(r)), this.render();
+                        break;
+                    }
                 }
             }
             onMouseDown(t) {
                 t.preventDefault && t.preventDefault(),
-                this.onChange(t),
-                window.addEventListener("mousemove", this.onChange),
-                window.addEventListener("mouseup", this.onMouseUp),
-                window.setTimeout(() => {
-                    var i;
-                    (i = this.$pointer) == null || i.focus();
-                }, 0);
+                    this.onChange(t),
+                    window.addEventListener("mousemove", this.onChange),
+                    window.addEventListener("mouseup", this.onMouseUp),
+                    window.setTimeout(() => {
+                        var i;
+                        (i = this.$pointer) == null || i.focus();
+                    }, 0);
             }
             onMouseUp() {
                 window.removeEventListener("mousemove", this.onChange),
-                window.removeEventListener("mouseup", this.onChange);
+                    window.removeEventListener("mouseup", this.onChange);
             }
             connectedCallback() {
                 var i, r, n, s, a;
@@ -1207,7 +984,7 @@ License: MIT License
                 this.cid = this.getAttribute("cid") || "";
                 let t = c(this.getAttribute("color"));
                 (this.hue = t.toHsv().h),
-                (this.shadowRoot.innerHTML = `
+                    (this.shadowRoot.innerHTML = `
            <style>${vt}</style>
            <div class="hue">
                 <div class="box">
@@ -1216,43 +993,30 @@ License: MIT License
                     </div>
                     
                     <div class="pointer box">
-                        <div class="pointer-box" tabindex="0" style="left: ${T(
-                        this.hue,
-                    )}%">
+                        <div class="pointer-box" tabindex="0" style="left: ${T(this.hue)}%">
                             <div class="handler"></div>
                         </div>
                     </div>
                 </div>
            </div>
         `),
-                (this.$hue = this.shadowRoot.querySelector(".hue")),
-                (this.$pointer =
-                        this.shadowRoot.querySelector(".pointer-box")),
-                (i = this.$hue) == null ||
-                        i.addEventListener("mousedown", this.onMouseDown),
-                (r = this.$hue) == null ||
-                        r.addEventListener("mouseup", this.onMouseUp),
-                (n = this.$hue) == null ||
-                        n.addEventListener("touchmove", this.onChange),
-                (s = this.$hue) == null ||
-                        s.addEventListener("touchstart", this.onChange),
-                (a = this.$pointer) == null ||
-                        a.addEventListener("keydown", this.onKeyDown),
-                document.addEventListener(p, this.hsvChanged);
+                    (this.$hue = this.shadowRoot.querySelector(".hue")),
+                    (this.$pointer = this.shadowRoot.querySelector(".pointer-box")),
+                    (i = this.$hue) == null || i.addEventListener("mousedown", this.onMouseDown),
+                    (r = this.$hue) == null || r.addEventListener("mouseup", this.onMouseUp),
+                    (n = this.$hue) == null || n.addEventListener("touchmove", this.onChange),
+                    (s = this.$hue) == null || s.addEventListener("touchstart", this.onChange),
+                    (a = this.$pointer) == null || a.addEventListener("keydown", this.onKeyDown),
+                    document.addEventListener(p, this.hsvChanged);
             }
             disconnectedCallback() {
                 var t, i, r, n, s;
-                (t = this.$hue) == null ||
-                    t.removeEventListener("mousedown", this.onMouseDown),
-                (i = this.$hue) == null ||
-                        i.removeEventListener("mouseup", this.onMouseUp),
-                (r = this.$hue) == null ||
-                        r.removeEventListener("touchmove", this.onChange),
-                (n = this.$hue) == null ||
-                        n.removeEventListener("touchstart", this.onChange),
-                (s = this.$pointer) == null ||
-                        s.removeEventListener("keydown", this.onKeyDown),
-                document.removeEventListener(p, this.hsvChanged);
+                (t = this.$hue) == null || t.removeEventListener("mousedown", this.onMouseDown),
+                    (i = this.$hue) == null || i.removeEventListener("mouseup", this.onMouseUp),
+                    (r = this.$hue) == null || r.removeEventListener("touchmove", this.onChange),
+                    (n = this.$hue) == null || n.removeEventListener("touchstart", this.onChange),
+                    (s = this.$pointer) == null || s.removeEventListener("keydown", this.onKeyDown),
+                    document.removeEventListener(p, this.hsvChanged);
             }
             attributeChangedCallback(t, i, r) {
                 let s = c(r).toHsv();
@@ -1274,23 +1038,19 @@ License: MIT License
                 h(this, "saturation", 0);
                 h(this, "value", 0);
                 this.attachShadow({ mode: "open" }),
-                (this.onMouseDown = this.onMouseDown.bind(this)),
-                (this.onMouseUp = this.onMouseUp.bind(this)),
-                (this.onChange = this.onChange.bind(this)),
-                (this.onKeyDown = this.onKeyDown.bind(this)),
-                (this.hsvChanged = this.hsvChanged.bind(this)),
-                (this.hueChanged = this.hueChanged.bind(this)),
-                (this.alphaChanged = this.alphaChanged.bind(this));
+                    (this.onMouseDown = this.onMouseDown.bind(this)),
+                    (this.onMouseUp = this.onMouseUp.bind(this)),
+                    (this.onChange = this.onChange.bind(this)),
+                    (this.onKeyDown = this.onKeyDown.bind(this)),
+                    (this.hsvChanged = this.hsvChanged.bind(this)),
+                    (this.hueChanged = this.hueChanged.bind(this)),
+                    (this.alphaChanged = this.alphaChanged.bind(this));
             }
             static get observedAttributes() {
                 return ["color"];
             }
             render(t = !0) {
-                if (
-                    (this.$pointer &&
-                        (this.$pointer.style.left = `${this.alpha * 100}%`),
-                    this.$color)
-                ) {
+                if ((this.$pointer && (this.$pointer.style.left = `${this.alpha * 100}%`), this.$color)) {
                     let i = new l({
                         h: this.hue,
                         s: this.saturation,
@@ -1306,10 +1066,7 @@ License: MIT License
                 t.preventDefault && t.preventDefault();
                 let { width: i, left: r } = this.$alpha.getBoundingClientRect();
                 if (i === 0) return;
-                let n =
-                        typeof t.clientX == "number"
-                            ? t.clientX
-                            : t.touches[0].clientX,
+                let n = typeof t.clientX == "number" ? t.clientX : t.touches[0].clientX,
                     s = Math.min(Math.max(0, n - r), i),
                     a = Math.min(Math.max(0, (s * 100) / i), 100);
                 (this.alpha = a / 100), this.render();
@@ -1317,20 +1074,16 @@ License: MIT License
             onKeyDown(t) {
                 var i;
                 switch (((i = this.$pointer) == null || i.focus(), t.key)) {
-                case "ArrowLeft": {
-                    let r = this.alpha * 100;
-                    (r = Math.max(0, r - 1)),
-                    (this.alpha = r / 100),
-                    this.render();
-                    break;
-                }
-                case "ArrowRight": {
-                    let r = this.alpha * 100;
-                    (r = Math.min(100, r + 1)),
-                    (this.alpha = r / 100),
-                    this.render();
-                    break;
-                }
+                    case "ArrowLeft": {
+                        let r = this.alpha * 100;
+                        (r = Math.max(0, r - 1)), (this.alpha = r / 100), this.render();
+                        break;
+                    }
+                    case "ArrowRight": {
+                        let r = this.alpha * 100;
+                        (r = Math.min(100, r + 1)), (this.alpha = r / 100), this.render();
+                        break;
+                    }
                 }
             }
             hsvChanged(t) {
@@ -1347,8 +1100,7 @@ License: MIT License
                 !t ||
                     !t.detail ||
                     !t.detail.cid ||
-                    (t.detail.cid === this.cid &&
-                        ((this.hue = t.detail.h), this.render(!1)));
+                    (t.detail.cid === this.cid && ((this.hue = t.detail.h), this.render(!1)));
             }
             alphaChanged(t) {
                 !t ||
@@ -1360,17 +1112,17 @@ License: MIT License
             }
             onMouseDown(t) {
                 t.preventDefault && t.preventDefault(),
-                this.onChange(t),
-                window.addEventListener("mousemove", this.onChange),
-                window.addEventListener("mouseup", this.onMouseUp),
-                window.setTimeout(() => {
-                    var i;
-                    (i = this.$pointer) == null || i.focus();
-                }, 0);
+                    this.onChange(t),
+                    window.addEventListener("mousemove", this.onChange),
+                    window.addEventListener("mouseup", this.onMouseUp),
+                    window.setTimeout(() => {
+                        var i;
+                        (i = this.$pointer) == null || i.focus();
+                    }, 0);
             }
             onMouseUp() {
                 window.removeEventListener("mousemove", this.onChange),
-                window.removeEventListener("mouseup", this.onChange);
+                    window.removeEventListener("mouseup", this.onChange);
             }
             connectedCallback() {
                 var r, n, s, a, d;
@@ -1379,10 +1131,10 @@ License: MIT License
                 let t = c(this.getAttribute("color")),
                     i = t.toHsv();
                 (this.alpha = i.a),
-                (this.hue = i.h),
-                (this.saturation = i.s),
-                (this.value = i.v),
-                (this.shadowRoot.innerHTML = `
+                    (this.hue = i.h),
+                    (this.saturation = i.s),
+                    (this.value = i.v),
+                    (this.shadowRoot.innerHTML = `
            <style>${wt}</style>
            <div class="alpha">
                 <div class="box">
@@ -1390,56 +1142,39 @@ License: MIT License
                     <div class="color-bg box" style="background: ${z(t)}"></div>
                     
                     <div class="pointer box">
-                        <div class="pointer-box" tabindex="0" style="left: ${
-                    this.alpha * 100
-                    }%;" >
+                        <div class="pointer-box" tabindex="0" style="left: ${this.alpha * 100}%;" >
                             <div class="handler"></div>
                         </div>
                     </div>
                 </div>
            </div>
         `),
-                (this.$alpha = this.shadowRoot.querySelector(".alpha")),
-                (this.$color = this.shadowRoot.querySelector(".color-bg")),
-                (this.$pointer =
-                        this.shadowRoot.querySelector(".pointer-box")),
-                (r = this.$alpha) == null ||
-                        r.addEventListener("mousedown", this.onMouseDown),
-                (n = this.$alpha) == null ||
-                        n.addEventListener("mouseup", this.onMouseUp),
-                (s = this.$alpha) == null ||
-                        s.addEventListener("touchmove", this.onChange),
-                (a = this.$alpha) == null ||
-                        a.addEventListener("touchstart", this.onChange),
-                (d = this.$pointer) == null ||
-                        d.addEventListener("keydown", this.onKeyDown),
-                document.addEventListener(p, this.hsvChanged),
-                document.addEventListener(f, this.hueChanged),
-                document.addEventListener(m, this.alphaChanged);
+                    (this.$alpha = this.shadowRoot.querySelector(".alpha")),
+                    (this.$color = this.shadowRoot.querySelector(".color-bg")),
+                    (this.$pointer = this.shadowRoot.querySelector(".pointer-box")),
+                    (r = this.$alpha) == null || r.addEventListener("mousedown", this.onMouseDown),
+                    (n = this.$alpha) == null || n.addEventListener("mouseup", this.onMouseUp),
+                    (s = this.$alpha) == null || s.addEventListener("touchmove", this.onChange),
+                    (a = this.$alpha) == null || a.addEventListener("touchstart", this.onChange),
+                    (d = this.$pointer) == null || d.addEventListener("keydown", this.onKeyDown),
+                    document.addEventListener(p, this.hsvChanged),
+                    document.addEventListener(f, this.hueChanged),
+                    document.addEventListener(m, this.alphaChanged);
             }
             disconnectedCallback() {
                 var t, i, r, n, s;
-                (t = this.$alpha) == null ||
-                    t.removeEventListener("mousedown", this.onMouseDown),
-                (i = this.$alpha) == null ||
-                        i.removeEventListener("mouseup", this.onMouseUp),
-                (r = this.$alpha) == null ||
-                        r.removeEventListener("touchmove", this.onChange),
-                (n = this.$alpha) == null ||
-                        n.removeEventListener("touchstart", this.onChange),
-                (s = this.$pointer) == null ||
-                        s.removeEventListener("keydown", this.onKeyDown),
-                document.removeEventListener(p, this.hsvChanged),
-                document.removeEventListener(f, this.hueChanged),
-                document.removeEventListener(m, this.alphaChanged);
+                (t = this.$alpha) == null || t.removeEventListener("mousedown", this.onMouseDown),
+                    (i = this.$alpha) == null || i.removeEventListener("mouseup", this.onMouseUp),
+                    (r = this.$alpha) == null || r.removeEventListener("touchmove", this.onChange),
+                    (n = this.$alpha) == null || n.removeEventListener("touchstart", this.onChange),
+                    (s = this.$pointer) == null || s.removeEventListener("keydown", this.onKeyDown),
+                    document.removeEventListener(p, this.hsvChanged),
+                    document.removeEventListener(f, this.hueChanged),
+                    document.removeEventListener(m, this.alphaChanged);
             }
             attributeChangedCallback(t, i, r) {
                 let s = c(r).toHsv();
-                (this.alpha = s.a),
-                (this.hue = s.h),
-                (this.saturation = s.s),
-                (this.value = s.v),
-                this.render();
+                (this.alpha = s.a), (this.hue = s.h), (this.saturation = s.s), (this.value = s.v), this.render();
             }
         },
         xt = Q;
@@ -1461,31 +1196,25 @@ License: MIT License
                 h(this, "b", 0);
                 h(this, "a", 1);
                 this.attachShadow({ mode: "open" }),
-                (this.hsvChanged = this.hsvChanged.bind(this)),
-                (this.hueChanged = this.hueChanged.bind(this)),
-                (this.alphaChanged = this.alphaChanged.bind(this)),
-                (this.onHexChange = this.onHexChange.bind(this)),
-                (this.render = this.render.bind(this)),
-                (this.onRedChange = this.onRedChange.bind(this)),
-                (this.onGreenChange = this.onGreenChange.bind(this)),
-                (this.onBlueChange = this.onBlueChange.bind(this)),
-                (this.onAlphaChange = this.onAlphaChange.bind(this)),
-                (this.onRedKeyDown = this.onRedKeyDown.bind(this)),
-                (this.onBlueKeyDown = this.onBlueKeyDown.bind(this)),
-                (this.onGreenKeyDown = this.onGreenKeyDown.bind(this)),
-                (this.onAlphaKeyDown = this.onAlphaKeyDown.bind(this));
+                    (this.hsvChanged = this.hsvChanged.bind(this)),
+                    (this.hueChanged = this.hueChanged.bind(this)),
+                    (this.alphaChanged = this.alphaChanged.bind(this)),
+                    (this.onHexChange = this.onHexChange.bind(this)),
+                    (this.render = this.render.bind(this)),
+                    (this.onRedChange = this.onRedChange.bind(this)),
+                    (this.onGreenChange = this.onGreenChange.bind(this)),
+                    (this.onBlueChange = this.onBlueChange.bind(this)),
+                    (this.onAlphaChange = this.onAlphaChange.bind(this)),
+                    (this.onRedKeyDown = this.onRedKeyDown.bind(this)),
+                    (this.onBlueKeyDown = this.onBlueKeyDown.bind(this)),
+                    (this.onGreenKeyDown = this.onGreenKeyDown.bind(this)),
+                    (this.onAlphaKeyDown = this.onAlphaKeyDown.bind(this));
             }
             static get observedAttributes() {
                 return ["color"];
             }
             hueChanged(t) {
-                if (
-                    !t ||
-                    !t.detail ||
-                    !t.detail.cid ||
-                    t.detail.cid !== this.cid
-                )
-                    return;
+                if (!t || !t.detail || !t.detail.cid || t.detail.cid !== this.cid) return;
                 let i = this.color.toHsv();
                 (this.color = new l({
                     h: Number(t.detail.h),
@@ -1493,16 +1222,10 @@ License: MIT License
                     v: i.v,
                     a: i.a,
                 })),
-                this.render();
+                    this.render();
             }
             alphaChanged(t) {
-                if (
-                    !t ||
-                    !t.detail ||
-                    !t.detail.cid ||
-                    t.detail.cid !== this.cid
-                )
-                    return;
+                if (!t || !t.detail || !t.detail.cid || t.detail.cid !== this.cid) return;
                 let i = this.color.toRgb();
                 (i.a = t.detail.a), (this.color = new l(i)), this.render();
             }
@@ -1523,124 +1246,88 @@ License: MIT License
                 var i, r, n, s, a;
                 let t = this.color.toRgb();
                 (this.r = t.r),
-                (this.g = t.g),
-                (this.b = t.b),
-                (this.a = t.a),
-                (this.hex = this.color.toHex()),
-                this.$hex &&
-                        ((i = this.shadowRoot) == null
-                            ? void 0
-                            : i.activeElement) !== this.$hex &&
+                    (this.g = t.g),
+                    (this.b = t.b),
+                    (this.a = t.a),
+                    (this.hex = this.color.toHex()),
+                    this.$hex &&
+                        ((i = this.shadowRoot) == null ? void 0 : i.activeElement) !== this.$hex &&
                         (this.$hex.value = this.hex.toUpperCase()),
-                this.$r &&
-                        ((r = this.shadowRoot) == null
-                            ? void 0
-                            : r.activeElement) !== this.$r &&
+                    this.$r &&
+                        ((r = this.shadowRoot) == null ? void 0 : r.activeElement) !== this.$r &&
                         (this.$r.value = this.r.toString()),
-                this.$g &&
-                        ((n = this.shadowRoot) == null
-                            ? void 0
-                            : n.activeElement) !== this.$g &&
+                    this.$g &&
+                        ((n = this.shadowRoot) == null ? void 0 : n.activeElement) !== this.$g &&
                         (this.$g.value = this.g.toString()),
-                this.$b &&
-                        ((s = this.shadowRoot) == null
-                            ? void 0
-                            : s.activeElement) !== this.$b &&
+                    this.$b &&
+                        ((s = this.shadowRoot) == null ? void 0 : s.activeElement) !== this.$b &&
                         (this.$b.value = this.b.toString()),
-                this.$a &&
-                        ((a = this.shadowRoot) == null
-                            ? void 0
-                            : a.activeElement) !== this.$a &&
+                    this.$a &&
+                        ((a = this.shadowRoot) == null ? void 0 : a.activeElement) !== this.$a &&
                         (this.$a.value = Math.round(this.a * 100).toString());
             }
             onFieldKeyDown(t, i) {
                 var n, s;
                 let r = this.color.toRgb();
                 switch (t.key) {
-                case "ArrowUp": {
-                    if (i === "r") {
-                        (this.r = Math.min(255, r.r + 1)), (r.r = this.r);
-                        let a = new l(r).toHsv();
-                        b(this.cid, a.h, a.s, a.v),
-                        (this.$r.value = this.r.toString()),
-                        this.render();
+                    case "ArrowUp": {
+                        if (i === "r") {
+                            (this.r = Math.min(255, r.r + 1)), (r.r = this.r);
+                            let a = new l(r).toHsv();
+                            b(this.cid, a.h, a.s, a.v), (this.$r.value = this.r.toString()), this.render();
+                        }
+                        if (i === "g") {
+                            (this.g = Math.min(255, r.g + 1)), (r.g = this.g);
+                            let a = new l(r).toHsv();
+                            b(this.cid, a.h, a.s, a.v), (this.$g.value = this.g.toString()), this.render();
+                        }
+                        if (i === "b") {
+                            (this.b = Math.min(255, r.b + 1)), (r.b = this.b);
+                            let a = new l(r).toHsv();
+                            b(this.cid, a.h, a.s, a.v), (this.$b.value = this.b.toString()), this.render();
+                        }
+                        if (i === "a") {
+                            (this.a = Math.min(100, this.a + 0.01)),
+                                (this.$a.value = Math.round(this.a * 100).toString());
+                            let a = this.color.toRgb();
+                            (a.a = this.a), (this.color = new l(a)), this.render(), M(this.cid, this.a);
+                        }
+                        break;
                     }
-                    if (i === "g") {
-                        (this.g = Math.min(255, r.g + 1)), (r.g = this.g);
-                        let a = new l(r).toHsv();
-                        b(this.cid, a.h, a.s, a.v),
-                        (this.$g.value = this.g.toString()),
-                        this.render();
+                    case "ArrowDown": {
+                        if (i === "r") {
+                            (this.r = Math.max(0, r.r - 1)), (r.r = this.r);
+                            let a = new l(r).toHsv();
+                            b(this.cid, a.h, a.s, a.v), (this.$r.value = this.r.toString()), this.render();
+                        }
+                        if (i === "g") {
+                            (this.g = Math.max(0, r.g - 1)), (r.g = this.g);
+                            let a = new l(r).toHsv();
+                            b(this.cid, a.h, a.s, a.v), (this.$g.value = this.g.toString()), this.render();
+                        }
+                        if (i === "b") {
+                            (this.b = Math.max(0, r.b - 1)), (r.b = this.b);
+                            let a = new l(r).toHsv();
+                            b(this.cid, a.h, a.s, a.v), (this.$b.value = this.b.toString()), this.render();
+                        }
+                        if (i === "a") {
+                            (this.a = Math.max(0, this.a - 0.01)),
+                                (this.$a.value = Math.round(this.a * 100).toString());
+                            let a = this.color.toRgb();
+                            (a.a = this.a), (this.color = new l(a)), this.render(), M(this.cid, this.a);
+                        }
+                        break;
                     }
-                    if (i === "b") {
-                        (this.b = Math.min(255, r.b + 1)), (r.b = this.b);
-                        let a = new l(r).toHsv();
-                        b(this.cid, a.h, a.s, a.v),
-                        (this.$b.value = this.b.toString()),
-                        this.render();
+                    case "Escape": {
+                        (n = this.shadowRoot) != null && n.activeElement && this.shadowRoot.activeElement.blur(),
+                            this.render();
+                        break;
                     }
-                    if (i === "a") {
-                        (this.a = Math.min(100, this.a + 0.01)),
-                        (this.$a.value = Math.round(
-                            this.a * 100,
-                        ).toString());
-                        let a = this.color.toRgb();
-                        (a.a = this.a),
-                        (this.color = new l(a)),
-                        this.render(),
-                        M(this.cid, this.a);
+                    case "Enter": {
+                        (s = this.shadowRoot) != null && s.activeElement && this.shadowRoot.activeElement.blur(),
+                            this.render();
+                        break;
                     }
-                    break;
-                }
-                case "ArrowDown": {
-                    if (i === "r") {
-                        (this.r = Math.max(0, r.r - 1)), (r.r = this.r);
-                        let a = new l(r).toHsv();
-                        b(this.cid, a.h, a.s, a.v),
-                        (this.$r.value = this.r.toString()),
-                        this.render();
-                    }
-                    if (i === "g") {
-                        (this.g = Math.max(0, r.g - 1)), (r.g = this.g);
-                        let a = new l(r).toHsv();
-                        b(this.cid, a.h, a.s, a.v),
-                        (this.$g.value = this.g.toString()),
-                        this.render();
-                    }
-                    if (i === "b") {
-                        (this.b = Math.max(0, r.b - 1)), (r.b = this.b);
-                        let a = new l(r).toHsv();
-                        b(this.cid, a.h, a.s, a.v),
-                        (this.$b.value = this.b.toString()),
-                        this.render();
-                    }
-                    if (i === "a") {
-                        (this.a = Math.max(0, this.a - 0.01)),
-                        (this.$a.value = Math.round(
-                            this.a * 100,
-                        ).toString());
-                        let a = this.color.toRgb();
-                        (a.a = this.a),
-                        (this.color = new l(a)),
-                        this.render(),
-                        M(this.cid, this.a);
-                    }
-                    break;
-                }
-                case "Escape": {
-                    (n = this.shadowRoot) != null &&
-                            n.activeElement &&
-                            this.shadowRoot.activeElement.blur(),
-                    this.render();
-                    break;
-                }
-                case "Enter": {
-                    (s = this.shadowRoot) != null &&
-                            s.activeElement &&
-                            this.shadowRoot.activeElement.blur(),
-                    this.render();
-                    break;
-                }
                 }
             }
             onRedKeyDown(t) {
@@ -1702,14 +1389,9 @@ License: MIT License
             }
             connectedCallback() {
                 if (!this.shadowRoot) return;
-                (this.cid = this.getAttribute("cid") || ""),
-                (this.color = c(this.getAttribute("color")));
+                (this.cid = this.getAttribute("cid") || ""), (this.color = c(this.getAttribute("color")));
                 let t = this.color.toRgb();
-                (this.r = t.r),
-                (this.g = t.g),
-                (this.b = t.b),
-                (this.a = t.a),
-                (this.hex = this.color.toHex());
+                (this.r = t.r), (this.g = t.g), (this.b = t.b), (this.a = t.a), (this.hex = this.color.toHex());
                 let i = $(),
                     r = $(),
                     n = $(),
@@ -1722,9 +1404,7 @@ License: MIT License
                <input id="r-${r}" type="text" value="${this.r}" data-type="r" />
                <input id="g-${n}" type="text" value="${this.g}" data-type="g" />
                <input id="b-${s}" type="text" value="${this.b}" data-type="b" />
-               <input id="a-${a}" type="text" value="${Math.round(
-                        this.a * 100,
-                    )}" data-type="a" />
+               <input id="a-${a}" type="text" value="${Math.round(this.a * 100)}" data-type="a" />
                
                <label for="hex-${i}">Hex</label>
                <label for="r-${r}">R</label>
@@ -1733,47 +1413,47 @@ License: MIT License
                <label for="a-${a}">A</label>
            </div>
         `),
-                (this.$hex = this.shadowRoot.getElementById(`hex-${i}`)),
-                (this.$r = this.shadowRoot.getElementById(`r-${r}`)),
-                (this.$g = this.shadowRoot.getElementById(`g-${n}`)),
-                (this.$b = this.shadowRoot.getElementById(`b-${s}`)),
-                (this.$a = this.shadowRoot.getElementById(`a-${a}`)),
-                document.addEventListener(p, this.hsvChanged),
-                document.addEventListener(f, this.hueChanged),
-                document.addEventListener(m, this.alphaChanged),
-                this.$hex.addEventListener("input", this.onHexChange),
-                this.$r.addEventListener("input", this.onRedChange),
-                this.$g.addEventListener("input", this.onGreenChange),
-                this.$b.addEventListener("input", this.onBlueChange),
-                this.$a.addEventListener("input", this.onAlphaChange),
-                this.$hex.addEventListener("blur", this.render),
-                this.$r.addEventListener("blur", this.render),
-                this.$g.addEventListener("blur", this.render),
-                this.$b.addEventListener("blur", this.render),
-                this.$a.addEventListener("blur", this.render),
-                this.$r.addEventListener("keydown", this.onRedKeyDown),
-                this.$g.addEventListener("keydown", this.onGreenKeyDown),
-                this.$b.addEventListener("keydown", this.onBlueKeyDown),
-                this.$a.addEventListener("keydown", this.onAlphaKeyDown);
+                    (this.$hex = this.shadowRoot.getElementById(`hex-${i}`)),
+                    (this.$r = this.shadowRoot.getElementById(`r-${r}`)),
+                    (this.$g = this.shadowRoot.getElementById(`g-${n}`)),
+                    (this.$b = this.shadowRoot.getElementById(`b-${s}`)),
+                    (this.$a = this.shadowRoot.getElementById(`a-${a}`)),
+                    document.addEventListener(p, this.hsvChanged),
+                    document.addEventListener(f, this.hueChanged),
+                    document.addEventListener(m, this.alphaChanged),
+                    this.$hex.addEventListener("input", this.onHexChange),
+                    this.$r.addEventListener("input", this.onRedChange),
+                    this.$g.addEventListener("input", this.onGreenChange),
+                    this.$b.addEventListener("input", this.onBlueChange),
+                    this.$a.addEventListener("input", this.onAlphaChange),
+                    this.$hex.addEventListener("blur", this.render),
+                    this.$r.addEventListener("blur", this.render),
+                    this.$g.addEventListener("blur", this.render),
+                    this.$b.addEventListener("blur", this.render),
+                    this.$a.addEventListener("blur", this.render),
+                    this.$r.addEventListener("keydown", this.onRedKeyDown),
+                    this.$g.addEventListener("keydown", this.onGreenKeyDown),
+                    this.$b.addEventListener("keydown", this.onBlueKeyDown),
+                    this.$a.addEventListener("keydown", this.onAlphaKeyDown);
             }
             disconnectedCallback() {
                 document.removeEventListener(p, this.hsvChanged),
-                document.removeEventListener(f, this.hueChanged),
-                document.removeEventListener(m, this.alphaChanged),
-                this.$hex.removeEventListener("input", this.onHexChange),
-                this.$r.removeEventListener("input", this.onRedChange),
-                this.$g.removeEventListener("input", this.onGreenChange),
-                this.$b.removeEventListener("input", this.onBlueChange),
-                this.$a.removeEventListener("input", this.onAlphaChange),
-                this.$hex.removeEventListener("blur", this.render),
-                this.$r.removeEventListener("blur", this.render),
-                this.$g.removeEventListener("blur", this.render),
-                this.$b.removeEventListener("blur", this.render),
-                this.$a.removeEventListener("blur", this.render),
-                this.$r.removeEventListener("keydown", this.onRedKeyDown),
-                this.$g.removeEventListener("keydown", this.onGreenKeyDown),
-                this.$b.removeEventListener("keydown", this.onBlueKeyDown),
-                this.$a.removeEventListener("keydown", this.onAlphaKeyDown);
+                    document.removeEventListener(f, this.hueChanged),
+                    document.removeEventListener(m, this.alphaChanged),
+                    this.$hex.removeEventListener("input", this.onHexChange),
+                    this.$r.removeEventListener("input", this.onRedChange),
+                    this.$g.removeEventListener("input", this.onGreenChange),
+                    this.$b.removeEventListener("input", this.onBlueChange),
+                    this.$a.removeEventListener("input", this.onAlphaChange),
+                    this.$hex.removeEventListener("blur", this.render),
+                    this.$r.removeEventListener("blur", this.render),
+                    this.$g.removeEventListener("blur", this.render),
+                    this.$b.removeEventListener("blur", this.render),
+                    this.$a.removeEventListener("blur", this.render),
+                    this.$r.removeEventListener("keydown", this.onRedKeyDown),
+                    this.$g.removeEventListener("keydown", this.onGreenKeyDown),
+                    this.$b.removeEventListener("keydown", this.onBlueKeyDown),
+                    this.$a.removeEventListener("keydown", this.onAlphaKeyDown);
             }
             attributeChangedCallback(t, i, r) {
                 (this.color = c(r)), this.render();
@@ -1788,25 +1468,16 @@ License: MIT License
                 h(this, "$popup");
                 h(this, "color", "#000");
                 customElements.get("toolcool-color-picker-saturation") ||
-                    customElements.define(
-                        "toolcool-color-picker-saturation",
-                        bt,
-                    ),
-                customElements.get("toolcool-color-picker-hue") ||
+                    customElements.define("toolcool-color-picker-saturation", bt),
+                    customElements.get("toolcool-color-picker-hue") ||
                         customElements.define("toolcool-color-picker-hue", mt),
-                customElements.get("toolcool-color-picker-alpha") ||
-                        customElements.define(
-                            "toolcool-color-picker-alpha",
-                            xt,
-                        ),
-                customElements.get("toolcool-color-picker-fields") ||
-                        customElements.define(
-                            "toolcool-color-picker-fields",
-                            Ct,
-                        ),
-                (this.cid = this.getAttribute("cid") || ""),
-                (this.prevent = this.prevent.bind(this)),
-                this.attachShadow({ mode: "open" });
+                    customElements.get("toolcool-color-picker-alpha") ||
+                        customElements.define("toolcool-color-picker-alpha", xt),
+                    customElements.get("toolcool-color-picker-fields") ||
+                        customElements.define("toolcool-color-picker-fields", Ct),
+                    (this.cid = this.getAttribute("cid") || ""),
+                    (this.prevent = this.prevent.bind(this)),
+                    this.attachShadow({ mode: "open" });
             }
             static get observedAttributes() {
                 return ["color", "popup-position"];
@@ -1818,8 +1489,7 @@ License: MIT License
                 var t, i;
                 !this.shadowRoot ||
                     ((this.color = this.getAttribute("color") || "#000"),
-                    (this.popupPosition =
-                        this.getAttribute("popup-position") || "left"),
+                    (this.popupPosition = this.getAttribute("popup-position") || "left"),
                     (this.shadowRoot.innerHTML = `
            <style>${it}</style>
            <div class="popup">
@@ -1830,58 +1500,33 @@ License: MIT License
            </div>
         `),
                     (this.$popup = this.shadowRoot.querySelector(".popup")),
-                    (t = this.$popup) == null ||
-                        t.addEventListener("mousedown", this.prevent),
-                    (i = this.$popup) == null ||
-                        i.classList.toggle(
-                            "right",
-                            this.popupPosition === "right",
-                        ));
+                    (t = this.$popup) == null || t.addEventListener("mousedown", this.prevent),
+                    (i = this.$popup) == null || i.classList.toggle("right", this.popupPosition === "right"));
             }
             disconnectedCallback() {
                 var t;
-                (t = this.$popup) == null ||
-                    t.removeEventListener("mousedown", this.prevent);
+                (t = this.$popup) == null || t.removeEventListener("mousedown", this.prevent);
             }
             attributeChangedCallback(t, i, r) {
                 var n, s, a, d;
                 if (
                     (t === "popup-position" &&
                         ((this.popupPosition = r),
-                        this.$popup &&
-                            this.$popup.classList.toggle(
-                                "right",
-                                this.popupPosition === "right",
-                            )),
+                        this.$popup && this.$popup.classList.toggle("right", this.popupPosition === "right")),
                     t === "color")
                 ) {
                     this.color = r;
                     let w =
                             (n = this.shadowRoot) == null
                                 ? void 0
-                                : n.querySelector(
-                                    "toolcool-color-picker-saturation",
-                                ),
-                        x =
-                            (s = this.shadowRoot) == null
-                                ? void 0
-                                : s.querySelector("toolcool-color-picker-hue"),
-                        R =
-                            (a = this.shadowRoot) == null
-                                ? void 0
-                                : a.querySelector(
-                                    "toolcool-color-picker-alpha",
-                                ),
-                        et =
-                            (d = this.shadowRoot) == null
-                                ? void 0
-                                : d.querySelector(
-                                    "toolcool-color-picker-fields",
-                                );
+                                : n.querySelector("toolcool-color-picker-saturation"),
+                        x = (s = this.shadowRoot) == null ? void 0 : s.querySelector("toolcool-color-picker-hue"),
+                        R = (a = this.shadowRoot) == null ? void 0 : a.querySelector("toolcool-color-picker-alpha"),
+                        et = (d = this.shadowRoot) == null ? void 0 : d.querySelector("toolcool-color-picker-fields");
                     w && w.setAttribute("color", this.color),
-                    x && x.setAttribute("color", this.color),
-                    R && R.setAttribute("color", this.color),
-                    et && et.setAttribute("color", this.color);
+                        x && x.setAttribute("color", this.color),
+                        R && R.setAttribute("color", this.color),
+                        et && et.setAttribute("color", this.color);
                 }
             }
         },
@@ -1913,31 +1558,22 @@ License: MIT License
                 });
                 h(this, "state");
                 (this.cid = $()),
-                customElements.get("toolcool-color-picker-popup") ||
-                        customElements.define(
-                            "toolcool-color-picker-popup",
-                            yt,
-                        ),
-                this.attachShadow({ mode: "open" }),
-                (this.toggle = this.toggle.bind(this)),
-                (this.onKeyDown = this.onKeyDown.bind(this)),
-                (this.clickedOutside = this.clickedOutside.bind(this)),
-                (this.stopPropagation = this.stopPropagation.bind(this)),
-                (this.hsvChanged = this.hsvChanged.bind(this)),
-                (this.hueChanged = this.hueChanged.bind(this)),
-                (this.alphaChanged = this.alphaChanged.bind(this)),
-                (this.buttonClicked = this.buttonClicked.bind(this)),
-                (this.formatButtonSize = this.formatButtonSize.bind(this)),
-                this.initState();
+                    customElements.get("toolcool-color-picker-popup") ||
+                        customElements.define("toolcool-color-picker-popup", yt),
+                    this.attachShadow({ mode: "open" }),
+                    (this.toggle = this.toggle.bind(this)),
+                    (this.onKeyDown = this.onKeyDown.bind(this)),
+                    (this.clickedOutside = this.clickedOutside.bind(this)),
+                    (this.stopPropagation = this.stopPropagation.bind(this)),
+                    (this.hsvChanged = this.hsvChanged.bind(this)),
+                    (this.hueChanged = this.hueChanged.bind(this)),
+                    (this.alphaChanged = this.alphaChanged.bind(this)),
+                    (this.buttonClicked = this.buttonClicked.bind(this)),
+                    (this.formatButtonSize = this.formatButtonSize.bind(this)),
+                    this.initState();
             }
             static get observedAttributes() {
-                return [
-                    "color",
-                    "popup-position",
-                    "button-width",
-                    "button-height",
-                    "button-padding",
-                ];
+                return ["color", "popup-position", "button-width", "button-height", "button-padding"];
             }
             set color(t) {
                 this.state.color = new l(t);
@@ -1981,15 +1617,11 @@ License: MIT License
                     set(i, r, n, s) {
                         return (
                             (i[r] = n),
-                            r === "isPopupVisible" &&
-                                t.onPopupVisibilityChange(),
+                            r === "isPopupVisible" && t.onPopupVisibilityChange(),
                             r === "popupPosition" && t.onPopupPosChange(),
                             r === "initialColor" && t.onInitialColorChange(),
                             r === "color" && t.onColorChange(),
-                            (r === "buttonWidth" ||
-                                r === "buttonHeight" ||
-                                r === "buttonPadding") &&
-                                t.setButtonSize(),
+                            (r === "buttonWidth" || r === "buttonHeight" || r === "buttonPadding") && t.setButtonSize(),
                             !0
                         );
                     },
@@ -1999,63 +1631,47 @@ License: MIT License
                 !this.$popupBox ||
                     (this.$popupBox.innerHTML = this.state.isPopupVisible
                         ? `<toolcool-color-picker-popup color="${this.state.color.toRgbString()}" cid="${
-                            this.cid
-                        }" popup-position="${this.state.popupPosition}" />`
+                              this.cid
+                          }" popup-position="${this.state.popupPosition}" />`
                         : "");
             }
             onPopupPosChange() {
                 if (!this.$popupBox) return;
-                let t = this.$popupBox.querySelector(
-                    "toolcool-color-picker-popup",
-                );
-                !t ||
-                    t.setAttribute("popup-position", this.state.popupPosition);
+                let t = this.$popupBox.querySelector("toolcool-color-picker-popup");
+                !t || t.setAttribute("popup-position", this.state.popupPosition);
             }
             onInitialColorChange() {
                 var r;
                 let t = S(this.state.color);
-                this.$buttonColor &&
-                    (this.$buttonColor.style.backgroundColor = t);
-                let i =
-                    (r = this.shadowRoot) == null
-                        ? void 0
-                        : r.querySelector("toolcool-color-picker-popup");
+                this.$buttonColor && (this.$buttonColor.style.backgroundColor = t);
+                let i = (r = this.shadowRoot) == null ? void 0 : r.querySelector("toolcool-color-picker-popup");
                 i && i.setAttribute("color", t);
             }
             setButtonSize() {
                 !this.$button ||
                     (this.state.buttonWidth &&
-                        (this.$button.style.width = this.formatButtonSize(
-                            this.state.buttonWidth,
-                        )),
+                        (this.$button.style.width = this.formatButtonSize(this.state.buttonWidth)),
                     this.state.buttonHeight &&
-                        (this.$button.style.height = this.formatButtonSize(
-                            this.state.buttonHeight,
-                        )),
-                    this.state.buttonPadding &&
-                        (this.$button.style.padding =
-                            this.state.buttonPadding));
+                        (this.$button.style.height = this.formatButtonSize(this.state.buttonHeight)),
+                    this.state.buttonPadding && (this.$button.style.padding = this.state.buttonPadding));
             }
             onColorChange() {
-                this.$buttonColor &&
-                    (this.$buttonColor.style.backgroundColor = S(
-                        this.state.color,
-                    )),
-                this.dispatchEvent(
-                    new CustomEvent("change", {
-                        detail: {
-                            hex: this.hex,
-                            hex8: this.hex8,
-                            rgb: this.rgb,
-                            rgba: this.rgba,
-                            hsl: this.hsl,
-                            hsla: this.hsla,
-                            hsv: this.hsv,
-                            hsva: this.hsva,
-                            color: this.color,
-                        },
-                    }),
-                );
+                this.$buttonColor && (this.$buttonColor.style.backgroundColor = S(this.state.color)),
+                    this.dispatchEvent(
+                        new CustomEvent("change", {
+                            detail: {
+                                hex: this.hex,
+                                hex8: this.hex8,
+                                rgb: this.rgb,
+                                rgba: this.rgba,
+                                hsl: this.hsl,
+                                hsla: this.hsla,
+                                hsv: this.hsv,
+                                hsva: this.hsva,
+                                color: this.color,
+                            },
+                        }),
+                    );
             }
             hsvChanged(t) {
                 !t ||
@@ -2070,13 +1686,7 @@ License: MIT License
                         })));
             }
             hueChanged(t) {
-                if (
-                    !t ||
-                    !t.detail ||
-                    !t.detail.cid ||
-                    t.detail.cid !== this.cid
-                )
-                    return;
+                if (!t || !t.detail || !t.detail.cid || t.detail.cid !== this.cid) return;
                 let i = this.state.color.toHsv();
                 this.state.color = new l({
                     h: t.detail.h,
@@ -2086,22 +1696,12 @@ License: MIT License
                 });
             }
             alphaChanged(t) {
-                if (
-                    !t ||
-                    !t.detail ||
-                    !t.detail.cid ||
-                    t.detail.cid !== this.cid
-                )
-                    return;
+                if (!t || !t.detail || !t.detail.cid || t.detail.cid !== this.cid) return;
                 let i = this.state.color.toRgb();
                 (i.a = t.detail.a), (this.state.color = new l(i));
             }
             buttonClicked(t) {
-                !t ||
-                    !t.detail ||
-                    !t.detail.cid ||
-                    (t.detail.cid !== this.cid &&
-                        (this.state.isPopupVisible = !1));
+                !t || !t.detail || !t.detail.cid || (t.detail.cid !== this.cid && (this.state.isPopupVisible = !1));
             }
             clickedOutside() {
                 this.state.isPopupVisible = !1;
@@ -2127,14 +1727,10 @@ License: MIT License
                 !this.shadowRoot ||
                     ((this.state.initialColor = c(this.getAttribute("color"))),
                     (this.state.color = c(this.getAttribute("color"))),
-                    (this.state.popupPosition =
-                        this.getAttribute("popup-position") || "left"),
-                    (this.state.buttonWidth =
-                        this.getAttribute("button-width")),
-                    (this.state.buttonHeight =
-                        this.getAttribute("button-height")),
-                    (this.state.buttonPadding =
-                        this.getAttribute("button-padding")),
+                    (this.state.popupPosition = this.getAttribute("popup-position") || "left"),
+                    (this.state.buttonWidth = this.getAttribute("button-width")),
+                    (this.state.buttonHeight = this.getAttribute("button-height")),
+                    (this.state.buttonPadding = this.getAttribute("button-padding")),
                     (this.shadowRoot.innerHTML = `
             <style>
                 ${ot} 
@@ -2145,24 +1741,17 @@ License: MIT License
                     tabIndex="0"
                     class="button"
                     title="Select Color">
-                    <span class="button-color" style="background: ${S(
-                            this.state.color,
-                        )};"></span>
+                    <span class="button-color" style="background: ${S(this.state.color)};"></span>
                 </button>
                 <div data-popup-box></div>
             </div>
         `),
                     (this.$button = this.shadowRoot.querySelector(".button")),
-                    (this.$buttonColor =
-                        this.shadowRoot.querySelector(".button-color")),
-                    (t = this.$button) == null ||
-                        t.addEventListener("click", this.toggle),
-                    (i = this.$button) == null ||
-                        i.addEventListener("keydown", this.onKeyDown),
-                    (r = this.$button) == null ||
-                        r.addEventListener("mousedown", this.stopPropagation),
-                    (this.$popupBox =
-                        this.shadowRoot.querySelector("[data-popup-box]")),
+                    (this.$buttonColor = this.shadowRoot.querySelector(".button-color")),
+                    (t = this.$button) == null || t.addEventListener("click", this.toggle),
+                    (i = this.$button) == null || i.addEventListener("keydown", this.onKeyDown),
+                    (r = this.$button) == null || r.addEventListener("mousedown", this.stopPropagation),
+                    (this.$popupBox = this.shadowRoot.querySelector("[data-popup-box]")),
                     this.setButtonSize(),
                     document.addEventListener("mousedown", this.clickedOutside),
                     document.addEventListener(p, this.hsvChanged),
@@ -2172,62 +1761,43 @@ License: MIT License
             }
             disconnectedCallback() {
                 var t, i, r;
-                (t = this.$button) == null ||
-                    t.removeEventListener("click", this.toggle),
-                (i = this.$button) == null ||
-                        i.removeEventListener("keydown", this.onKeyDown),
-                (r = this.$button) == null ||
-                        r.removeEventListener(
-                            "mousedown",
-                            this.stopPropagation,
-                        ),
-                document.removeEventListener(
-                    "mousedown",
-                    this.clickedOutside,
-                ),
-                document.removeEventListener(p, this.hsvChanged),
-                document.removeEventListener(f, this.hueChanged),
-                document.removeEventListener(m, this.alphaChanged),
-                document.removeEventListener(D, this.buttonClicked);
+                (t = this.$button) == null || t.removeEventListener("click", this.toggle),
+                    (i = this.$button) == null || i.removeEventListener("keydown", this.onKeyDown),
+                    (r = this.$button) == null || r.removeEventListener("mousedown", this.stopPropagation),
+                    document.removeEventListener("mousedown", this.clickedOutside),
+                    document.removeEventListener(p, this.hsvChanged),
+                    document.removeEventListener(f, this.hueChanged),
+                    document.removeEventListener(m, this.alphaChanged),
+                    document.removeEventListener(D, this.buttonClicked);
             }
             attributeChangedCallback(t) {
                 switch (t) {
-                case "color": {
-                    (this.state.initialColor = c(
-                        this.getAttribute("color"),
-                    )),
-                    (this.state.color = c(this.getAttribute("color"))),
-                    this.onInitialColorChange();
-                    break;
-                }
-                case "popup-position": {
-                    (this.state.popupPosition =
-                            this.getAttribute("popup-position") || "left"),
-                    this.onPopupPosChange();
-                    break;
-                }
-                case "button-width": {
-                    (this.state.buttonWidth =
-                            this.getAttribute("button-width")),
-                    this.setButtonSize();
-                    break;
-                }
-                case "button-height": {
-                    (this.state.buttonHeight =
-                            this.getAttribute("button-height")),
-                    this.setButtonSize();
-                    break;
-                }
-                case "button-padding": {
-                    (this.state.buttonPadding =
-                            this.getAttribute("button-padding")),
-                    this.setButtonSize();
-                    break;
-                }
+                    case "color": {
+                        (this.state.initialColor = c(this.getAttribute("color"))),
+                            (this.state.color = c(this.getAttribute("color"))),
+                            this.onInitialColorChange();
+                        break;
+                    }
+                    case "popup-position": {
+                        (this.state.popupPosition = this.getAttribute("popup-position") || "left"),
+                            this.onPopupPosChange();
+                        break;
+                    }
+                    case "button-width": {
+                        (this.state.buttonWidth = this.getAttribute("button-width")), this.setButtonSize();
+                        break;
+                    }
+                    case "button-height": {
+                        (this.state.buttonHeight = this.getAttribute("button-height")), this.setButtonSize();
+                        break;
+                    }
+                    case "button-padding": {
+                        (this.state.buttonPadding = this.getAttribute("button-padding")), this.setButtonSize();
+                        break;
+                    }
                 }
             }
         },
         $t = tt;
-    customElements.get("toolcool-color-picker") ||
-        customElements.define("toolcool-color-picker", $t);
+    customElements.get("toolcool-color-picker") || customElements.define("toolcool-color-picker", $t);
 })();

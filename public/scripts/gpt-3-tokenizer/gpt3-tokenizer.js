@@ -20,8 +20,7 @@ function _unsupportedIterableToArray(o, minLen) {
     var n = Object.prototype.toString.call(o).slice(8, -1);
     if (n === "Object" && o.constructor) n = o.constructor.name;
     if (n === "Map" || n === "Set") return Array.from(o);
-    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
-        return _arrayLikeToArray(o, minLen);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
 }
 function _arrayLikeToArray(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
@@ -29,9 +28,7 @@ function _arrayLikeToArray(arr, len) {
     return arr2;
 }
 function _createForOfIteratorHelperLoose(o, allowArrayLike) {
-    var it =
-        (typeof Symbol !== "undefined" && o[Symbol.iterator]) ||
-        o["@@iterator"];
+    var it = (typeof Symbol !== "undefined" && o[Symbol.iterator]) || o["@@iterator"];
     if (it) return (it = it.call(o)).next.bind(it);
     if (
         Array.isArray(o) ||
@@ -58,16 +55,12 @@ function _createForOfIteratorHelperLoose(o, allowArrayLike) {
 
 // import { TextEncoder } from 'util';
 if (typeof TextEncoder === "undefined") {
-    throw new Error(
-        "TextEncoder is required for this module to work in the browser",
-    );
+    throw new Error("TextEncoder is required for this module to work in the browser");
 }
 
 // import { TextDecoder } from 'util';
 if (typeof TextDecoder === "undefined") {
-    throw new Error(
-        "TextDecoder is required for this module to work in the browser",
-    );
+    throw new Error("TextDecoder is required for this module to work in the browser");
 }
 
 // This is grabbed from source code of https://beta.openai.com/tokenizer?view=bpe
@@ -113,35 +106,25 @@ var GPT3Tokenizer = /*#__PURE__*/ (function () {
             throw new Error("Tokenizer vocab file did not load correctly");
         }
         var vocabLines = this.vocab.split("\n");
-        var bpeMerges = vocabLines
-            .slice(1, vocabLines.length - 1)
-            .map(function (line) {
-                return line.split(/(\s+)/).filter(function (part) {
-                    return part.trim().length > 0;
-                });
+        var bpeMerges = vocabLines.slice(1, vocabLines.length - 1).map(function (line) {
+            return line.split(/(\s+)/).filter(function (part) {
+                return part.trim().length > 0;
             });
+        });
         // add merged spaces for codex tokenizer
         if (this.nMergedSpaces > 0) {
             for (var i = 1; i < this.nMergedSpaces; i++) {
                 for (var j = 1; j < this.nMergedSpaces; j++) {
                     if (i + j <= this.nMergedSpaces) {
-                        bpeMerges.push([
-                            "\u0120".repeat(i),
-                            "\u0120".repeat(j),
-                        ]);
+                        bpeMerges.push(["\u0120".repeat(i), "\u0120".repeat(j)]);
                     }
                 }
             }
             for (var _i = 0; _i < this.nMergedSpaces; _i++) {
-                this.encodings["\u0120".repeat(_i + 2)] =
-                    this.nVocab - this.nMergedSpaces + _i;
+                this.encodings["\u0120".repeat(_i + 2)] = this.nVocab - this.nMergedSpaces + _i;
             }
         }
-        for (
-            var _i2 = 0, _Object$keys = Object.keys(this.encodings);
-            _i2 < _Object$keys.length;
-            _i2++
-        ) {
+        for (var _i2 = 0, _Object$keys = Object.keys(this.encodings); _i2 < _Object$keys.length; _i2++) {
             var key = _Object$keys[_i2];
             this.decodings[this.encodings[key]] = key;
         }
@@ -199,11 +182,7 @@ var GPT3Tokenizer = /*#__PURE__*/ (function () {
         }
         while (true) {
             var minPairs = {};
-            for (
-                var _i3 = 0, _Array$from = Array.from(pairs);
-                _i3 < _Array$from.length;
-                _i3++
-            ) {
+            for (var _i3 = 0, _Array$from = Array.from(pairs); _i3 < _Array$from.length; _i3++) {
                 var pair = _Array$from[_i3];
                 var rank = this.bpeRanks.get(pair);
                 minPairs[isNaN(rank) ? 1e11 : rank] = pair;
@@ -232,11 +211,7 @@ var GPT3Tokenizer = /*#__PURE__*/ (function () {
                 }
                 newWord = newWord.concat(word.slice(i, j));
                 i = j;
-                if (
-                    word[i] === first &&
-                    i < word.length - 1 &&
-                    word[i + 1] === second
-                ) {
+                if (word[i] === first && i < word.length - 1 && word[i + 1] === second) {
                     newWord.push(first + second);
                     i = i + 2;
                 } else {
@@ -260,11 +235,7 @@ var GPT3Tokenizer = /*#__PURE__*/ (function () {
         var bpeTokens = [];
         var texts = [];
         var matches = text.match(bpeRegex) || [];
-        for (
-            var _iterator = _createForOfIteratorHelperLoose(matches), _step;
-            !(_step = _iterator()).done;
-
-        ) {
+        for (var _iterator = _createForOfIteratorHelperLoose(matches), _step; !(_step = _iterator()).done; ) {
             var token = _step.value;
             token = Array.from(this.encodeUtf8(token))
                 .map(function (x) {

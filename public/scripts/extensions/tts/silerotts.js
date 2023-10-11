@@ -75,9 +75,7 @@ class SileroTtsProvider {
         if (this.voices.length == 0) {
             this.voices = await this.fetchTtsVoiceIds();
         }
-        const match = this.voices.filter(
-            (sileroVoice) => sileroVoice.name == voiceName,
-        )[0];
+        const match = this.voices.filter((sileroVoice) => sileroVoice.name == voiceName)[0];
         if (!match) {
             throw `TTS Voice name ${voiceName} not found`;
         }
@@ -93,13 +91,9 @@ class SileroTtsProvider {
     // API CALLS //
     //###########//
     async fetchTtsVoiceIds() {
-        const response = await doExtrasFetch(
-            `${this.settings.provider_endpoint}/speakers`,
-        );
+        const response = await doExtrasFetch(`${this.settings.provider_endpoint}/speakers`);
         if (!response.ok) {
-            throw new Error(
-                `HTTP ${response.status}: ${await response.json()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.json()}`);
         }
         const responseJson = await response.json();
         return responseJson;
@@ -107,25 +101,20 @@ class SileroTtsProvider {
 
     async fetchTtsGeneration(inputText, voiceId) {
         console.info(`Generating new TTS for voice_id ${voiceId}`);
-        const response = await doExtrasFetch(
-            `${this.settings.provider_endpoint}/generate`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-cache", // Added this line to disable caching of file so new files are always played - Rolyat 7/7/23
-                },
-                body: JSON.stringify({
-                    text: inputText,
-                    speaker: voiceId,
-                }),
+        const response = await doExtrasFetch(`${this.settings.provider_endpoint}/generate`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-cache", // Added this line to disable caching of file so new files are always played - Rolyat 7/7/23
             },
-        );
+            body: JSON.stringify({
+                text: inputText,
+                speaker: voiceId,
+            }),
+        });
         if (!response.ok) {
             toastr.error(response.statusText, "TTS Generation Failed");
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         return response;
     }

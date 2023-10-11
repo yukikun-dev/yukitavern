@@ -56,11 +56,7 @@ async function viewSecrets() {
     $(table).append("<thead><th>Key</th><th>Value</th></thead>");
 
     for (const [key, value] of Object.entries(data)) {
-        $(table).append(
-            `<tr><td>${DOMPurify.sanitize(key)}</td><td>${DOMPurify.sanitize(
-                value,
-            )}</td></tr>`,
-        );
+        $(table).append(`<tr><td>${DOMPurify.sanitize(key)}</td><td>${DOMPurify.sanitize(value)}</td></tr>`);
     }
 
     callPopup(table.outerHTML, "text");
@@ -107,9 +103,7 @@ export async function readSecretState() {
 }
 
 function authorizeOpenRouter() {
-    const openRouterUrl = `https://openrouter.ai/auth?callback_url=${encodeURIComponent(
-        location.origin,
-    )}`;
+    const openRouterUrl = `https://openrouter.ai/auth?callback_url=${encodeURIComponent(location.origin)}`;
     location.href = openRouterUrl;
 }
 
@@ -118,13 +112,10 @@ async function checkOpenRouterAuth() {
     if (params.has("code")) {
         const code = params.get("code");
         try {
-            const response = await fetch(
-                "https://openrouter.ai/api/v1/auth/keys",
-                {
-                    method: "POST",
-                    body: JSON.stringify({ code }),
-                },
-            );
+            const response = await fetch("https://openrouter.ai/api/v1/auth/keys", {
+                method: "POST",
+                body: JSON.stringify({ code }),
+            });
 
             if (!response.ok) {
                 throw new Error("OpenRouter exchange error");
@@ -147,9 +138,7 @@ async function checkOpenRouterAuth() {
                 throw new Error("OpenRouter token not saved");
             }
         } catch (err) {
-            toastr.error(
-                "Could not verify OpenRouter token. Please try again.",
-            );
+            toastr.error("Could not verify OpenRouter token. Please try again.");
             return;
         }
     }

@@ -1,8 +1,4 @@
-import {
-    callPopup,
-    getRequestHeaders,
-    saveSettingsDebounced,
-} from "../script.js";
+import { callPopup, getRequestHeaders, saveSettingsDebounced } from "../script.js";
 import { debounce } from "./utils.js";
 
 export let context_templates = [];
@@ -10,17 +6,11 @@ export let context_settings = {
     selected_template: "",
 };
 
-const saveTemplateDebounced = debounce(
-    (name) => alert("implement me", name),
-    2000,
-);
+const saveTemplateDebounced = debounce((name) => alert("implement me", name), 2000);
 
 export function loadContextTemplatesFromSettings(data, settings) {
     context_templates = data.context || [];
-    context_settings = Object.assign(
-        context_settings,
-        settings.context_settings || {},
-    );
+    context_settings = Object.assign(context_settings, settings.context_settings || {});
 
     const dropdown = $("#context_template");
     dropdown.empty();
@@ -43,9 +33,7 @@ function onContextTemplateChange() {
 }
 
 function openContextTemplateEditor() {
-    const template = context_templates.find(
-        (x) => x.name == context_settings.selected_template,
-    );
+    const template = context_templates.find((x) => x.name == context_settings.selected_template);
 
     if (!template || !context_settings.selected_template) {
         toastr.info("No context template selected");
@@ -134,10 +122,7 @@ async function inputTemplateName() {
     name = DOMPurify.sanitize(name.trim());
 
     if (context_templates.findIndex((x) => x.name == name) > -1) {
-        toastr.warning(
-            "Template with that name already exists",
-            "Pick a unique name",
-        );
+        toastr.warning("Template with that name already exists", "Pick a unique name");
         return false;
     }
 
@@ -206,9 +191,7 @@ async function onNewContextTemplateClick() {
 }
 
 async function onDeleteContextTemplateClick() {
-    const template = context_templates.find(
-        (x) => x.name == context_settings.selected_template,
-    );
+    const template = context_templates.find((x) => x.name == context_settings.selected_template);
 
     if (!template || !context_settings.selected_template) {
         toastr.info("No context template selected");
@@ -222,9 +205,7 @@ async function onDeleteContextTemplateClick() {
     }
 
     await deleteContextTemplate(context_settings.selected_template);
-    $(
-        `#context_template option[value="${context_settings.selected_template}"]`,
-    ).remove();
+    $(`#context_template option[value="${context_settings.selected_template}"]`).remove();
     $("#context_template").trigger("change");
 }
 
@@ -234,9 +215,5 @@ jQuery(() => {
     $("#context_template_new").on("click", onNewContextTemplateClick);
     $("#context_template_rename").on("click", onRenameContextTemplateClick);
     $("#context_template_delete").on("click", onDeleteContextTemplateClick);
-    $(document).on(
-        "pointerup",
-        ".template_parameters_list code",
-        copyTemplateParameter,
-    );
+    $(document).on("pointerup", ".template_parameters_list code", copyTemplateParameter);
 });

@@ -5,15 +5,11 @@ function toggleRandomizedSetting(buttonRef, forId) {
     if (extension_settings.randomizer.controls.indexOf(forId) === -1) {
         extension_settings.randomizer.controls.push(forId);
     } else {
-        extension_settings.randomizer.controls =
-            extension_settings.randomizer.controls.filter((x) => x !== forId);
+        extension_settings.randomizer.controls = extension_settings.randomizer.controls.filter((x) => x !== forId);
     }
 
     buttonRef.toggleClass("active");
-    console.debug(
-        "Randomizer controls:",
-        extension_settings.randomizer.controls,
-    );
+    console.debug("Randomizer controls:", extension_settings.randomizer.controls);
     saveSettingsDebounced();
 }
 
@@ -27,13 +23,8 @@ function addRandomizeButton() {
     }
 
     const forId = labelRef.data("for");
-    const buttonRef = $(
-        '<div class="randomize_button menu_button fa-solid fa-shuffle"></div>',
-    );
-    buttonRef.toggleClass(
-        "active",
-        extension_settings.randomizer.controls.indexOf(forId) !== -1,
-    );
+    const buttonRef = $('<div class="randomize_button menu_button fa-solid fa-shuffle"></div>');
+    buttonRef.toggleClass("active", extension_settings.randomizer.controls.indexOf(forId) !== -1);
     buttonRef.hide();
     buttonRef.on("click", () => toggleRandomizedSetting(buttonRef, forId));
     counterRef.append(buttonRef);
@@ -51,10 +42,7 @@ window["randomizerInterceptor"] = function () {
         return;
     }
 
-    if (
-        extension_settings.randomizer.fluctuation === 0 ||
-        extension_settings.randomizer.controls.length === 0
-    ) {
+    if (extension_settings.randomizer.fluctuation === 0 || extension_settings.randomizer.controls.length === 0) {
         console.debug("Randomizer skipped: nothing to do.");
         return;
     }
@@ -68,9 +56,7 @@ window["randomizerInterceptor"] = function () {
         }
 
         if (!controlRef.is(":visible")) {
-            console.debug(
-                `Randomizer skipped: control ${control} is not visible.`,
-            );
+            console.debug(`Randomizer skipped: control ${control} is not visible.`);
             continue;
         }
 
@@ -92,14 +78,10 @@ window["randomizerInterceptor"] = function () {
 
         // If the current value hasn't changed compared to the previous value, use the original value as a base for the calculation
         if (currentValue === previousValue) {
-            console.debug(
-                `Randomizer for ${control} reusing original value: ${originalValue}`,
-            );
+            console.debug(`Randomizer for ${control} reusing original value: ${originalValue}`);
             value = originalValue;
         } else {
-            console.debug(
-                `Randomizer for ${control} using current value: ${currentValue}`,
-            );
+            console.debug(`Randomizer for ${control} using current value: ${currentValue}`);
             value = currentValue;
             controlRef.data("previous-value", currentValue); // Update the previous value when using the current value
             controlRef.data("original-value", currentValue); // Update the original value when using the current value
@@ -115,9 +97,7 @@ window["randomizerInterceptor"] = function () {
         const max = parseFloat(controlRef.attr("max"));
         const delta = (Math.random() * fluctuation * 2 - fluctuation) * value;
         const newValue = Math.min(Math.max(value + delta, min), max);
-        console.debug(
-            `Randomizer for ${control}: ${value} -> ${newValue} (delta: ${delta}, min: ${min}, max: ${max})`,
-        );
+        console.debug(`Randomizer for ${control}: ${value} -> ${newValue} (delta: ${delta}, min: ${min}, max: ${max})`);
         controlRef.val(newValue).trigger("input");
         controlRef.data("previous-value", parseFloat(controlRef.val()));
     }
@@ -157,27 +137,16 @@ jQuery(() => {
     </div>`;
 
     $("#extensions_settings").append(html);
-    $("#ai_response_configuration .range-block-counter").each(
-        addRandomizeButton,
-    );
+    $("#ai_response_configuration .range-block-counter").each(addRandomizeButton);
     $("#randomizer_enabled").on("input", onRandomizerEnabled);
-    $("#randomizer_enabled")
-        .prop("checked", extension_settings.randomizer.enabled)
-        .trigger("input");
-    $("#randomizer_fluctuation")
-        .val(extension_settings.randomizer.fluctuation)
-        .trigger("input");
-    $("#randomizer_fluctuation_counter").text(
-        extension_settings.randomizer.fluctuation,
-    );
+    $("#randomizer_enabled").prop("checked", extension_settings.randomizer.enabled).trigger("input");
+    $("#randomizer_fluctuation").val(extension_settings.randomizer.fluctuation).trigger("input");
+    $("#randomizer_fluctuation_counter").text(extension_settings.randomizer.fluctuation);
     $("#randomizer_fluctuation").on("input", function () {
         const value = parseFloat($(this).val());
         $("#randomizer_fluctuation_counter").text(value);
         extension_settings.randomizer.fluctuation = value;
-        console.debug(
-            "Randomizer fluctuation:",
-            extension_settings.randomizer.fluctuation,
-        );
+        console.debug("Randomizer fluctuation:", extension_settings.randomizer.fluctuation);
         saveSettingsDebounced();
     });
 });

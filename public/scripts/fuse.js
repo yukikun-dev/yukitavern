@@ -12,9 +12,7 @@
         ? (module.exports = factory())
         : typeof define === "function" && define.amd
         ? define(factory)
-        : ((global =
-              typeof globalThis !== "undefined" ? globalThis : global || self),
-          (global.Fuse = factory()));
+        : ((global = typeof globalThis !== "undefined" ? globalThis : global || self), (global.Fuse = factory()));
 })(this, function () {
     "use strict";
 
@@ -25,8 +23,7 @@
             var symbols = Object.getOwnPropertySymbols(object);
             enumerableOnly &&
                 (symbols = symbols.filter(function (sym) {
-                    return Object.getOwnPropertyDescriptor(object, sym)
-                        .enumerable;
+                    return Object.getOwnPropertyDescriptor(object, sym).enumerable;
                 })),
                 keys.push.apply(keys, symbols);
         }
@@ -42,16 +39,9 @@
                       _defineProperty(target, key, source[key]);
                   })
                 : Object.getOwnPropertyDescriptors
-                ? Object.defineProperties(
-                      target,
-                      Object.getOwnPropertyDescriptors(source),
-                  )
+                ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source))
                 : ownKeys(Object(source)).forEach(function (key) {
-                      Object.defineProperty(
-                          target,
-                          key,
-                          Object.getOwnPropertyDescriptor(source, key),
-                      );
+                      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
                   });
         }
 
@@ -63,8 +53,7 @@
 
         return (
             (_typeof =
-                "function" == typeof Symbol &&
-                "symbol" == typeof Symbol.iterator
+                "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
                     ? function (obj) {
                           return typeof obj;
                       }
@@ -122,9 +111,7 @@
 
     function _inherits(subClass, superClass) {
         if (typeof superClass !== "function" && superClass !== null) {
-            throw new TypeError(
-                "Super expression must either be null or a function",
-            );
+            throw new TypeError("Super expression must either be null or a function");
         }
 
         Object.defineProperty(subClass, "prototype", {
@@ -166,9 +153,7 @@
         if (typeof Proxy === "function") return true;
 
         try {
-            Boolean.prototype.valueOf.call(
-                Reflect.construct(Boolean, [], function () {}),
-            );
+            Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
             return true;
         } catch (e) {
             return false;
@@ -177,9 +162,7 @@
 
     function _assertThisInitialized(self) {
         if (self === void 0) {
-            throw new ReferenceError(
-                "this hasn't been initialised - super() hasn't been called",
-            );
+            throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
         }
 
         return self;
@@ -189,9 +172,7 @@
         if (call && (typeof call === "object" || typeof call === "function")) {
             return call;
         } else if (call !== void 0) {
-            throw new TypeError(
-                "Derived constructors may only return object or undefined",
-            );
+            throw new TypeError("Derived constructors may only return object or undefined");
         }
 
         return _assertThisInitialized(self);
@@ -218,10 +199,7 @@
 
     function _toConsumableArray(arr) {
         return (
-            _arrayWithoutHoles(arr) ||
-            _iterableToArray(arr) ||
-            _unsupportedIterableToArray(arr) ||
-            _nonIterableSpread()
+            _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread()
         );
     }
 
@@ -230,10 +208,7 @@
     }
 
     function _iterableToArray(iter) {
-        if (
-            (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null) ||
-            iter["@@iterator"] != null
-        )
+        if ((typeof Symbol !== "undefined" && iter[Symbol.iterator] != null) || iter["@@iterator"] != null)
             return Array.from(iter);
     }
 
@@ -243,10 +218,7 @@
         var n = Object.prototype.toString.call(o).slice(8, -1);
         if (n === "Object" && o.constructor) n = o.constructor.name;
         if (n === "Map" || n === "Set") return Array.from(o);
-        if (
-            n === "Arguments" ||
-            /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)
-        )
+        if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))
             return _arrayLikeToArray(o, minLen);
     }
 
@@ -265,9 +237,7 @@
     }
 
     function isArray(value) {
-        return !Array.isArray
-            ? getTag(value) === "[object Array]"
-            : Array.isArray(value);
+        return !Array.isArray ? getTag(value) === "[object Array]" : Array.isArray(value);
     } // Adapted from: https://github.com/lodash/lodash/blob/master/.internal/baseToString.js
 
     var INFINITY = 1 / 0;
@@ -291,11 +261,7 @@
     } // Adapted from: https://github.com/lodash/lodash/blob/master/isBoolean.js
 
     function isBoolean(value) {
-        return (
-            value === true ||
-            value === false ||
-            (isObjectLike(value) && getTag(value) == "[object Boolean]")
-        );
+        return value === true || value === false || (isObjectLike(value) && getTag(value) == "[object Boolean]");
     }
     function isObject(value) {
         return _typeof(value) === "object";
@@ -322,10 +288,9 @@
 
     var EXTENDED_SEARCH_UNAVAILABLE = "Extended search is not available";
     var INCORRECT_INDEX_TYPE = "Incorrect 'index' type";
-    var LOGICAL_SEARCH_INVALID_QUERY_FOR_KEY =
-        function LOGICAL_SEARCH_INVALID_QUERY_FOR_KEY(key) {
-            return "Invalid value for key ".concat(key);
-        };
+    var LOGICAL_SEARCH_INVALID_QUERY_FOR_KEY = function LOGICAL_SEARCH_INVALID_QUERY_FOR_KEY(key) {
+        return "Invalid value for key ".concat(key);
+    };
     var PATTERN_LENGTH_TOO_LARGE = function PATTERN_LENGTH_TOO_LARGE(max) {
         return "Pattern length exceeds max of ".concat(max, ".");
     };
@@ -333,10 +298,7 @@
         return "Missing ".concat(name, " property in key");
     };
     var INVALID_KEY_WEIGHT_VALUE = function INVALID_KEY_WEIGHT_VALUE(key) {
-        return "Property 'weight' in key '".concat(
-            key,
-            "' must be a positive integer",
-        );
+        return "Property 'weight' in key '".concat(key, "' must be a positive integer");
     };
 
     var hasOwn = Object.prototype.hasOwnProperty;
@@ -456,10 +418,7 @@
                 } // If we're at the last value in the path, and if it's a string/number/bool,
                 // add it to the list
 
-                if (
-                    index === path.length - 1 &&
-                    (isString(value) || isNumber(value) || isBoolean(value))
-                ) {
+                if (index === path.length - 1 && (isString(value) || isNumber(value) || isBoolean(value))) {
                     list.push(toString(value));
                 } else if (isArray(value)) {
                     arr = true; // Search each item in the array.
@@ -501,13 +460,7 @@
         shouldSort: true,
         // Default sort function: sort by ascending score, ascending index
         sortFn: function sortFn(a, b) {
-            return a.score === b.score
-                ? a.idx < b.idx
-                    ? -1
-                    : 1
-                : a.score < b.score
-                ? -1
-                : 1;
+            return a.score === b.score ? (a.idx < b.idx ? -1 : 1) : a.score < b.score ? -1 : 1;
         },
     };
     var FuzzyOptions = {
@@ -541,10 +494,7 @@
         fieldNormWeight: 1,
     };
     var Config = _objectSpread2(
-        _objectSpread2(
-            _objectSpread2(_objectSpread2({}, BasicOptions), MatchOptions),
-            FuzzyOptions,
-        ),
+        _objectSpread2(_objectSpread2(_objectSpread2({}, BasicOptions), MatchOptions), FuzzyOptions),
         AdvancedOptions,
     );
 
@@ -552,14 +502,8 @@
     // Set to 3 decimals to reduce index size.
 
     function norm() {
-        var weight =
-            arguments.length > 0 && arguments[0] !== undefined
-                ? arguments[0]
-                : 1;
-        var mantissa =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : 3;
+        var weight = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+        var mantissa = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3;
         var cache = new Map();
         var m = Math.pow(10, mantissa);
         return {
@@ -584,17 +528,11 @@
 
     var FuseIndex = /*#__PURE__*/ (function () {
         function FuseIndex() {
-            var _ref =
-                    arguments.length > 0 && arguments[0] !== undefined
-                        ? arguments[0]
-                        : {},
+            var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
                 _ref$getFn = _ref.getFn,
                 getFn = _ref$getFn === void 0 ? Config.getFn : _ref$getFn,
                 _ref$fieldNormWeight = _ref.fieldNormWeight,
-                fieldNormWeight =
-                    _ref$fieldNormWeight === void 0
-                        ? Config.fieldNormWeight
-                        : _ref$fieldNormWeight;
+                fieldNormWeight = _ref$fieldNormWeight === void 0 ? Config.fieldNormWeight : _ref$fieldNormWeight;
 
             _classCallCheck(this, FuseIndex);
 
@@ -608,20 +546,14 @@
             {
                 key: "setSources",
                 value: function setSources() {
-                    var docs =
-                        arguments.length > 0 && arguments[0] !== undefined
-                            ? arguments[0]
-                            : [];
+                    var docs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
                     this.docs = docs;
                 },
             },
             {
                 key: "setIndexRecords",
                 value: function setIndexRecords() {
-                    var records =
-                        arguments.length > 0 && arguments[0] !== undefined
-                            ? arguments[0]
-                            : [];
+                    var records = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
                     this.records = records;
                 },
             },
@@ -630,10 +562,7 @@
                 value: function setKeys() {
                     var _this = this;
 
-                    var keys =
-                        arguments.length > 0 && arguments[0] !== undefined
-                            ? arguments[0]
-                            : [];
+                    var keys = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
                     this.keys = keys;
                     this._keysMap = {};
                     keys.forEach(function (key, idx) {
@@ -726,9 +655,7 @@
                     }; // Iterate over every key (i.e, path), and fetch the value at that key
 
                     this.keys.forEach(function (key, keyIndex) {
-                        var value = key.getFn
-                            ? key.getFn(doc)
-                            : _this3.getFn(doc, key.path);
+                        var value = key.getFn ? key.getFn(doc) : _this3.getFn(doc, key.path);
 
                         if (!isDefined(value)) {
                             return;
@@ -746,8 +673,7 @@
 
                                 while (stack.length) {
                                     var _stack$pop = stack.pop(),
-                                        nestedArrIndex =
-                                            _stack$pop.nestedArrIndex,
+                                        nestedArrIndex = _stack$pop.nestedArrIndex,
                                         _value = _stack$pop.value;
 
                                     if (!isDefined(_value)) {
@@ -798,17 +724,11 @@
         return FuseIndex;
     })();
     function createIndex(keys, docs) {
-        var _ref2 =
-                arguments.length > 2 && arguments[2] !== undefined
-                    ? arguments[2]
-                    : {},
+        var _ref2 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
             _ref2$getFn = _ref2.getFn,
             getFn = _ref2$getFn === void 0 ? Config.getFn : _ref2$getFn,
             _ref2$fieldNormWeight = _ref2.fieldNormWeight,
-            fieldNormWeight =
-                _ref2$fieldNormWeight === void 0
-                    ? Config.fieldNormWeight
-                    : _ref2$fieldNormWeight;
+            fieldNormWeight = _ref2$fieldNormWeight === void 0 ? Config.fieldNormWeight : _ref2$fieldNormWeight;
 
         var myIndex = new FuseIndex({
             getFn: getFn,
@@ -820,17 +740,11 @@
         return myIndex;
     }
     function parseIndex(data) {
-        var _ref3 =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {},
+        var _ref3 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
             _ref3$getFn = _ref3.getFn,
             getFn = _ref3$getFn === void 0 ? Config.getFn : _ref3$getFn,
             _ref3$fieldNormWeight = _ref3.fieldNormWeight,
-            fieldNormWeight =
-                _ref3$fieldNormWeight === void 0
-                    ? Config.fieldNormWeight
-                    : _ref3$fieldNormWeight;
+            fieldNormWeight = _ref3$fieldNormWeight === void 0 ? Config.fieldNormWeight : _ref3$fieldNormWeight;
 
         var keys = data.keys,
             records = data.records;
@@ -844,26 +758,17 @@
     }
 
     function computeScore$1(pattern) {
-        var _ref =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {},
+        var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
             _ref$errors = _ref.errors,
             errors = _ref$errors === void 0 ? 0 : _ref$errors,
             _ref$currentLocation = _ref.currentLocation,
-            currentLocation =
-                _ref$currentLocation === void 0 ? 0 : _ref$currentLocation,
+            currentLocation = _ref$currentLocation === void 0 ? 0 : _ref$currentLocation,
             _ref$expectedLocation = _ref.expectedLocation,
-            expectedLocation =
-                _ref$expectedLocation === void 0 ? 0 : _ref$expectedLocation,
+            expectedLocation = _ref$expectedLocation === void 0 ? 0 : _ref$expectedLocation,
             _ref$distance = _ref.distance,
-            distance =
-                _ref$distance === void 0 ? Config.distance : _ref$distance,
+            distance = _ref$distance === void 0 ? Config.distance : _ref$distance,
             _ref$ignoreLocation = _ref.ignoreLocation,
-            ignoreLocation =
-                _ref$ignoreLocation === void 0
-                    ? Config.ignoreLocation
-                    : _ref$ignoreLocation;
+            ignoreLocation = _ref$ignoreLocation === void 0 ? Config.ignoreLocation : _ref$ignoreLocation;
 
         var accuracy = errors / pattern.length;
 
@@ -882,14 +787,9 @@
     }
 
     function convertMaskToIndices() {
-        var matchmask =
-            arguments.length > 0 && arguments[0] !== undefined
-                ? arguments[0]
-                : [];
+        var matchmask = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
         var minMatchCharLength =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : Config.minMatchCharLength;
+            arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Config.minMatchCharLength;
         var indices = [];
         var start = -1;
         var end = -1;
@@ -922,39 +822,21 @@
     var MAX_BITS = 32;
 
     function search(text, pattern, patternAlphabet) {
-        var _ref =
-                arguments.length > 3 && arguments[3] !== undefined
-                    ? arguments[3]
-                    : {},
+        var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
             _ref$location = _ref.location,
-            location =
-                _ref$location === void 0 ? Config.location : _ref$location,
+            location = _ref$location === void 0 ? Config.location : _ref$location,
             _ref$distance = _ref.distance,
-            distance =
-                _ref$distance === void 0 ? Config.distance : _ref$distance,
+            distance = _ref$distance === void 0 ? Config.distance : _ref$distance,
             _ref$threshold = _ref.threshold,
-            threshold =
-                _ref$threshold === void 0 ? Config.threshold : _ref$threshold,
+            threshold = _ref$threshold === void 0 ? Config.threshold : _ref$threshold,
             _ref$findAllMatches = _ref.findAllMatches,
-            findAllMatches =
-                _ref$findAllMatches === void 0
-                    ? Config.findAllMatches
-                    : _ref$findAllMatches,
+            findAllMatches = _ref$findAllMatches === void 0 ? Config.findAllMatches : _ref$findAllMatches,
             _ref$minMatchCharLeng = _ref.minMatchCharLength,
-            minMatchCharLength =
-                _ref$minMatchCharLeng === void 0
-                    ? Config.minMatchCharLength
-                    : _ref$minMatchCharLeng,
+            minMatchCharLength = _ref$minMatchCharLeng === void 0 ? Config.minMatchCharLength : _ref$minMatchCharLeng,
             _ref$includeMatches = _ref.includeMatches,
-            includeMatches =
-                _ref$includeMatches === void 0
-                    ? Config.includeMatches
-                    : _ref$includeMatches,
+            includeMatches = _ref$includeMatches === void 0 ? Config.includeMatches : _ref$includeMatches,
             _ref$ignoreLocation = _ref.ignoreLocation,
-            ignoreLocation =
-                _ref$ignoreLocation === void 0
-                    ? Config.ignoreLocation
-                    : _ref$ignoreLocation;
+            ignoreLocation = _ref$ignoreLocation === void 0 ? Config.ignoreLocation : _ref$ignoreLocation;
 
         if (pattern.length > MAX_BITS) {
             throw new Error(PATTERN_LENGTH_TOO_LARGE(MAX_BITS));
@@ -1029,9 +911,7 @@
 
             binMax = binMid;
             var start = Math.max(1, expectedLocation - binMid + 1);
-            var finish = findAllMatches
-                ? textLen
-                : Math.min(expectedLocation + binMid, textLen) + patternLen; // Initialize the bit array
+            var finish = findAllMatches ? textLen : Math.min(expectedLocation + binMid, textLen) + patternLen; // Initialize the bit array
 
             var bitArr = Array(finish + 2);
             bitArr[finish + 1] = (1 << _i) - 1;
@@ -1048,10 +928,7 @@
                 bitArr[j] = ((bitArr[j + 1] << 1) | 1) & charMatch; // Subsequent passes: fuzzy match
 
                 if (_i) {
-                    bitArr[j] |=
-                        ((lastBitArr[j + 1] | lastBitArr[j]) << 1) |
-                        1 |
-                        lastBitArr[j + 1];
+                    bitArr[j] |= ((lastBitArr[j + 1] | lastBitArr[j]) << 1) | 1 | lastBitArr[j + 1];
                 }
 
                 if (bitArr[j] & mask) {
@@ -1073,10 +950,7 @@
                             break;
                         } // When passing `bestLocation`, don't exceed our current distance from `expectedLocation`.
 
-                        start = Math.max(
-                            1,
-                            2 * expectedLocation - bestLocation,
-                        );
+                        start = Math.max(1, 2 * expectedLocation - bestLocation);
                     }
                 }
             } // No hope for a (better) match at greater error levels.
@@ -1131,46 +1005,24 @@
         function BitapSearch(pattern) {
             var _this = this;
 
-            var _ref =
-                    arguments.length > 1 && arguments[1] !== undefined
-                        ? arguments[1]
-                        : {},
+            var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
                 _ref$location = _ref.location,
-                location =
-                    _ref$location === void 0 ? Config.location : _ref$location,
+                location = _ref$location === void 0 ? Config.location : _ref$location,
                 _ref$threshold = _ref.threshold,
-                threshold =
-                    _ref$threshold === void 0
-                        ? Config.threshold
-                        : _ref$threshold,
+                threshold = _ref$threshold === void 0 ? Config.threshold : _ref$threshold,
                 _ref$distance = _ref.distance,
-                distance =
-                    _ref$distance === void 0 ? Config.distance : _ref$distance,
+                distance = _ref$distance === void 0 ? Config.distance : _ref$distance,
                 _ref$includeMatches = _ref.includeMatches,
-                includeMatches =
-                    _ref$includeMatches === void 0
-                        ? Config.includeMatches
-                        : _ref$includeMatches,
+                includeMatches = _ref$includeMatches === void 0 ? Config.includeMatches : _ref$includeMatches,
                 _ref$findAllMatches = _ref.findAllMatches,
-                findAllMatches =
-                    _ref$findAllMatches === void 0
-                        ? Config.findAllMatches
-                        : _ref$findAllMatches,
+                findAllMatches = _ref$findAllMatches === void 0 ? Config.findAllMatches : _ref$findAllMatches,
                 _ref$minMatchCharLeng = _ref.minMatchCharLength,
                 minMatchCharLength =
-                    _ref$minMatchCharLeng === void 0
-                        ? Config.minMatchCharLength
-                        : _ref$minMatchCharLeng,
+                    _ref$minMatchCharLeng === void 0 ? Config.minMatchCharLength : _ref$minMatchCharLeng,
                 _ref$isCaseSensitive = _ref.isCaseSensitive,
-                isCaseSensitive =
-                    _ref$isCaseSensitive === void 0
-                        ? Config.isCaseSensitive
-                        : _ref$isCaseSensitive,
+                isCaseSensitive = _ref$isCaseSensitive === void 0 ? Config.isCaseSensitive : _ref$isCaseSensitive,
                 _ref$ignoreLocation = _ref.ignoreLocation,
-                ignoreLocation =
-                    _ref$ignoreLocation === void 0
-                        ? Config.ignoreLocation
-                        : _ref$ignoreLocation;
+                ignoreLocation = _ref$ignoreLocation === void 0 ? Config.ignoreLocation : _ref$ignoreLocation;
 
             _classCallCheck(this, BitapSearch);
 
@@ -1280,10 +1132,7 @@
                         totalScore += score;
 
                         if (isMatch && indices) {
-                            allIndices = [].concat(
-                                _toConsumableArray(allIndices),
-                                _toConsumableArray(indices),
-                            );
+                            allIndices = [].concat(_toConsumableArray(allIndices), _toConsumableArray(indices));
                         }
                     });
                     var result = {
@@ -1568,10 +1417,7 @@
                         return {
                             isMatch: isMatch,
                             score: isMatch ? 0 : 1,
-                            indices: [
-                                text.length - this.pattern.length,
-                                text.length - 1,
-                            ],
+                            indices: [text.length - this.pattern.length, text.length - 1],
                         };
                     },
                 },
@@ -1660,46 +1506,24 @@
         function FuzzyMatch(pattern) {
             var _this;
 
-            var _ref =
-                    arguments.length > 1 && arguments[1] !== undefined
-                        ? arguments[1]
-                        : {},
+            var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
                 _ref$location = _ref.location,
-                location =
-                    _ref$location === void 0 ? Config.location : _ref$location,
+                location = _ref$location === void 0 ? Config.location : _ref$location,
                 _ref$threshold = _ref.threshold,
-                threshold =
-                    _ref$threshold === void 0
-                        ? Config.threshold
-                        : _ref$threshold,
+                threshold = _ref$threshold === void 0 ? Config.threshold : _ref$threshold,
                 _ref$distance = _ref.distance,
-                distance =
-                    _ref$distance === void 0 ? Config.distance : _ref$distance,
+                distance = _ref$distance === void 0 ? Config.distance : _ref$distance,
                 _ref$includeMatches = _ref.includeMatches,
-                includeMatches =
-                    _ref$includeMatches === void 0
-                        ? Config.includeMatches
-                        : _ref$includeMatches,
+                includeMatches = _ref$includeMatches === void 0 ? Config.includeMatches : _ref$includeMatches,
                 _ref$findAllMatches = _ref.findAllMatches,
-                findAllMatches =
-                    _ref$findAllMatches === void 0
-                        ? Config.findAllMatches
-                        : _ref$findAllMatches,
+                findAllMatches = _ref$findAllMatches === void 0 ? Config.findAllMatches : _ref$findAllMatches,
                 _ref$minMatchCharLeng = _ref.minMatchCharLength,
                 minMatchCharLength =
-                    _ref$minMatchCharLeng === void 0
-                        ? Config.minMatchCharLength
-                        : _ref$minMatchCharLeng,
+                    _ref$minMatchCharLeng === void 0 ? Config.minMatchCharLength : _ref$minMatchCharLeng,
                 _ref$isCaseSensitive = _ref.isCaseSensitive,
-                isCaseSensitive =
-                    _ref$isCaseSensitive === void 0
-                        ? Config.isCaseSensitive
-                        : _ref$isCaseSensitive,
+                isCaseSensitive = _ref$isCaseSensitive === void 0 ? Config.isCaseSensitive : _ref$isCaseSensitive,
                 _ref$ignoreLocation = _ref.ignoreLocation,
-                ignoreLocation =
-                    _ref$ignoreLocation === void 0
-                        ? Config.ignoreLocation
-                        : _ref$ignoreLocation;
+                ignoreLocation = _ref$ignoreLocation === void 0 ? Config.ignoreLocation : _ref$ignoreLocation;
 
             _classCallCheck(this, FuzzyMatch);
 
@@ -1774,9 +1598,7 @@
                         var indices = [];
                         var patternLen = this.pattern.length; // Get all exact matches
 
-                        while (
-                            (index = text.indexOf(this.pattern, location)) > -1
-                        ) {
+                        while ((index = text.indexOf(this.pattern, location)) > -1) {
                             location = index + patternLen;
                             indices.push([index, location - 1]);
                         }
@@ -1833,10 +1655,7 @@
     // "^core go$ | rb$ | py$ xy$" => [["^core", "go$"], ["rb$"], ["py$", "xy$"]]
 
     function parseQuery(pattern) {
-        var options =
-            arguments.length > 1 && arguments[1] !== undefined
-                ? arguments[1]
-                : {};
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         return pattern.split(OR_TOKEN).map(function (item) {
             var query = item
                 .trim()
@@ -1918,46 +1737,24 @@
 
     var ExtendedSearch = /*#__PURE__*/ (function () {
         function ExtendedSearch(pattern) {
-            var _ref =
-                    arguments.length > 1 && arguments[1] !== undefined
-                        ? arguments[1]
-                        : {},
+            var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
                 _ref$isCaseSensitive = _ref.isCaseSensitive,
-                isCaseSensitive =
-                    _ref$isCaseSensitive === void 0
-                        ? Config.isCaseSensitive
-                        : _ref$isCaseSensitive,
+                isCaseSensitive = _ref$isCaseSensitive === void 0 ? Config.isCaseSensitive : _ref$isCaseSensitive,
                 _ref$includeMatches = _ref.includeMatches,
-                includeMatches =
-                    _ref$includeMatches === void 0
-                        ? Config.includeMatches
-                        : _ref$includeMatches,
+                includeMatches = _ref$includeMatches === void 0 ? Config.includeMatches : _ref$includeMatches,
                 _ref$minMatchCharLeng = _ref.minMatchCharLength,
                 minMatchCharLength =
-                    _ref$minMatchCharLeng === void 0
-                        ? Config.minMatchCharLength
-                        : _ref$minMatchCharLeng,
+                    _ref$minMatchCharLeng === void 0 ? Config.minMatchCharLength : _ref$minMatchCharLeng,
                 _ref$ignoreLocation = _ref.ignoreLocation,
-                ignoreLocation =
-                    _ref$ignoreLocation === void 0
-                        ? Config.ignoreLocation
-                        : _ref$ignoreLocation,
+                ignoreLocation = _ref$ignoreLocation === void 0 ? Config.ignoreLocation : _ref$ignoreLocation,
                 _ref$findAllMatches = _ref.findAllMatches,
-                findAllMatches =
-                    _ref$findAllMatches === void 0
-                        ? Config.findAllMatches
-                        : _ref$findAllMatches,
+                findAllMatches = _ref$findAllMatches === void 0 ? Config.findAllMatches : _ref$findAllMatches,
                 _ref$location = _ref.location,
-                location =
-                    _ref$location === void 0 ? Config.location : _ref$location,
+                location = _ref$location === void 0 ? Config.location : _ref$location,
                 _ref$threshold = _ref.threshold,
-                threshold =
-                    _ref$threshold === void 0
-                        ? Config.threshold
-                        : _ref$threshold,
+                threshold = _ref$threshold === void 0 ? Config.threshold : _ref$threshold,
                 _ref$distance = _ref.distance,
-                distance =
-                    _ref$distance === void 0 ? Config.distance : _ref$distance;
+                distance = _ref$distance === void 0 ? Config.distance : _ref$distance;
 
             _classCallCheck(this, ExtendedSearch);
 
@@ -2005,11 +1802,7 @@
                             allIndices.length = 0;
                             numMatches = 0; // ANDs
 
-                            for (
-                                var j = 0, pLen = searchers.length;
-                                j < pLen;
-                                j += 1
-                            ) {
+                            for (var j = 0, pLen = searchers.length; j < pLen; j += 1) {
                                 var searcher = searchers[j];
 
                                 var _searcher$search = searcher.search(text),
@@ -2124,10 +1917,7 @@
     // the appropriate `Searcher` instance
 
     function parse(query, options) {
-        var _ref3 =
-                arguments.length > 2 && arguments[2] !== undefined
-                    ? arguments[2]
-                    : {},
+        var _ref3 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
             _ref3$auto = _ref3.auto,
             auto = _ref3$auto === void 0 ? true : _ref3$auto;
 
@@ -2184,10 +1974,7 @@
 
     function computeScore(results, _ref) {
         var _ref$ignoreFieldNorm = _ref.ignoreFieldNorm,
-            ignoreFieldNorm =
-                _ref$ignoreFieldNorm === void 0
-                    ? Config.ignoreFieldNorm
-                    : _ref$ignoreFieldNorm;
+            ignoreFieldNorm = _ref$ignoreFieldNorm === void 0 ? Config.ignoreFieldNorm : _ref$ignoreFieldNorm;
         results.forEach(function (result) {
             var totalScore = 1;
             result.matches.forEach(function (_ref2) {
@@ -2241,20 +2028,11 @@
     }
 
     function format(results, docs) {
-        var _ref =
-                arguments.length > 2 && arguments[2] !== undefined
-                    ? arguments[2]
-                    : {},
+        var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
             _ref$includeMatches = _ref.includeMatches,
-            includeMatches =
-                _ref$includeMatches === void 0
-                    ? Config.includeMatches
-                    : _ref$includeMatches,
+            includeMatches = _ref$includeMatches === void 0 ? Config.includeMatches : _ref$includeMatches,
             _ref$includeScore = _ref.includeScore,
-            includeScore =
-                _ref$includeScore === void 0
-                    ? Config.includeScore
-                    : _ref$includeScore;
+            includeScore = _ref$includeScore === void 0 ? Config.includeScore : _ref$includeScore;
 
         var transformers = [];
         if (includeMatches) transformers.push(transformMatches);
@@ -2278,10 +2056,7 @@
 
     var Fuse$1 = /*#__PURE__*/ (function () {
         function Fuse(docs) {
-            var options =
-                arguments.length > 1 && arguments[1] !== undefined
-                    ? arguments[1]
-                    : {};
+            var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
             var index = arguments.length > 2 ? arguments[2] : undefined;
 
             _classCallCheck(this, Fuse);
@@ -2369,10 +2144,7 @@
             {
                 key: "search",
                 value: function search(query) {
-                    var _ref =
-                            arguments.length > 1 && arguments[1] !== undefined
-                                ? arguments[1]
-                                : {},
+                    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
                         _ref$limit = _ref.limit,
                         limit = _ref$limit === void 0 ? -1 : _ref$limit;
 
@@ -2458,10 +2230,7 @@
 
                             var matches = _this._findMatches({
                                 key: _this._keyStore.get(keyId),
-                                value: _this._myIndex.getValueForItemAtKeyId(
-                                    item,
-                                    keyId,
-                                ),
+                                value: _this._myIndex.getValueForItemAtKeyId(item, keyId),
                                 searcher: searcher,
                             });
 
@@ -2480,11 +2249,7 @@
 
                         var res = [];
 
-                        for (
-                            var i = 0, len = node.children.length;
-                            i < len;
-                            i += 1
-                        ) {
+                        for (var i = 0, len = node.children.length; i < len; i += 1) {
                             var child = node.children[i];
                             var result = evaluate(child, item, idx);
 
@@ -2524,8 +2289,7 @@
 
                                     var matches = _ref4.matches;
 
-                                    (_resultMap$idx$matche =
-                                        resultMap[idx].matches).push.apply(
+                                    (_resultMap$idx$matche = resultMap[idx].matches).push.apply(
                                         _resultMap$idx$matche,
                                         _toConsumableArray(matches),
                                     );

@@ -17,9 +17,7 @@ const parse = async (cardUrl, format) => {
     switch (fileFormat) {
         case "webp":
             try {
-                const exif_data = await ExifReader.load(
-                    fs.readFileSync(cardUrl),
-                );
+                const exif_data = await ExifReader.load(fs.readFileSync(cardUrl));
                 let char_data;
 
                 if (exif_data["UserComment"]["description"]) {
@@ -64,9 +62,7 @@ const parse = async (cardUrl, format) => {
                 });
 
             if (textChunks.length === 0) {
-                console.error(
-                    "PNG metadata does not contain any character data.",
-                );
+                console.error("PNG metadata does not contain any character data.");
                 throw new Error("No PNG metadata.");
             }
 

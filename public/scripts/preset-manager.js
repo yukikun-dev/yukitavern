@@ -28,9 +28,7 @@ function autoSelectPreset() {
         return;
     }
 
-    const name = selected_group
-        ? groups.find((x) => x.id == selected_group)?.name
-        : characters[this_chid]?.name;
+    const name = selected_group ? groups.find((x) => x.id == selected_group)?.name : characters[this_chid]?.name;
 
     if (!name) {
         console.debug(`Preset candidate not found for API: ${main_api}`);
@@ -41,9 +39,7 @@ function autoSelectPreset() {
     const selectedPreset = presetManager.getSelectedPreset();
 
     if (preset === selectedPreset) {
-        console.debug(
-            `Preset already selected for API: ${main_api}, name: ${name}`,
-        );
+        console.debug(`Preset already selected for API: ${main_api}, name: ${name}`);
         return;
     }
 
@@ -162,16 +158,12 @@ class PresetManager {
         if (presetExists) {
             if (this.apiId == "textgenerationwebui") {
                 presets[preset_names.indexOf(name)] = preset;
-                $(this.select)
-                    .find(`option[value="${name}"]`)
-                    .prop("selected", true);
+                $(this.select).find(`option[value="${name}"]`).prop("selected", true);
                 $(this.select).val(name).trigger("change");
             } else {
                 const value = preset_names[name];
                 presets[value] = preset;
-                $(this.select)
-                    .find(`option[value="${value}"]`)
-                    .prop("selected", true);
+                $(this.select).find(`option[value="${value}"]`).prop("selected", true);
                 $(this.select).val(value).trigger("change");
             }
         } else {
@@ -211,12 +203,7 @@ class PresetManager {
             }
         }
 
-        const filteredKeys = [
-            "preset",
-            "streaming_url",
-            "stopping_strings",
-            "use_stop_sequence",
-        ];
+        const filteredKeys = ["preset", "streaming_url", "stopping_strings", "use_stop_sequence"];
         const settings = Object.assign({}, getSettingsByApiId(this.apiId));
 
         for (const key of filteredKeys) {
@@ -252,9 +239,7 @@ class PresetManager {
         if (Object.keys(preset_names).length) {
             const nextPresetName = Object.keys(preset_names)[0];
             const newValue = preset_names[nextPresetName];
-            $(this.select)
-                .find(`option[value="${newValue}"]`)
-                .attr("selected", true);
+            $(this.select).find(`option[value="${newValue}"]`).attr("selected", true);
             $(this.select).trigger("change");
         }
 
