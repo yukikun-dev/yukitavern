@@ -8,7 +8,7 @@ import {
     extractAllWords,
 } from "./utils.js";
 import { RA_CountCharTokens, humanizedDateTime } from "./RossAscends-mods.js";
-import { sortCharactersList, sortGroupMembers } from "./power-user.js";
+import { sortGroupMembers } from "./power-user.js";
 
 import {
     chat,
@@ -69,6 +69,7 @@ import {
     applyTagsOnCharacterSelect,
     tag_map,
 } from "./tags.js";
+import { FilterHelper } from "./filters.js";
 
 export {
     selected_group,
@@ -81,7 +82,6 @@ export {
     deleteGroup,
     getGroupAvatar,
     getGroups,
-    printGroups,
     regenerateGroup,
     resetSelectedGroup,
     select_group_chats,
@@ -99,7 +99,15 @@ export const group_activation_strategy = {
     LIST: 1,
 };
 
+export const groupCandidatesFilter = new FilterHelper(
+    debounce(printGroupCandidates, 100),
+);
 const saveGroupDebounced = debounce(async (group) => await _save(group), 500);
+
+function printGroupCandidates(fullRefresh = false) {
+    toastr.info("Group candidates tags filter is temporarily unavailable.");
+    console.log("TODO: implement printGroupCandidates");
+}
 
 async function _save(group, reload = true) {
     await fetch("/editgroup", {
@@ -242,7 +250,6 @@ async function saveGroupChat(groupId, shouldSaveGroup) {
     if (shouldSaveGroup && response.ok) {
         await editGroup(groupId);
     }
-    sortCharactersList();
 }
 
 export async function renameGroupMember(oldAvatar, newAvatar, newName) {
@@ -361,25 +368,28 @@ async function getGroups() {
     }
 }
 
-function printGroups() {
-    for (let group of groups) {
-        const template = $("#group_list_template .group_select").clone();
-        template.data("id", group.id);
-        template.attr("grid", group.id);
-        template.find(".ch_name").html(group.name);
-        template.find(".group_fav_icon").css("display", "none");
-        template.addClass(group.fav ? "is_fav" : "");
-        template.find(".ch_fav").val(group.fav);
+export function getGroupBlock(group) {
+    const template = $("#group_list_template .group_select").clone();
+    template.data("id", group.id);
+    template.attr("grid", group.id);
+    template.find(".ch_name").html(group.name);
+    template.find(".group_fav_icon").css("display", "none");
+    template.addClass(group.fav ? "is_fav" : "");
+    template.find(".ch_fav").val(group.fav);
 
-        // Display inline tags
-        const tags = getTagsList(group.id);
-        const tagsElement = template.find(".tags");
-        tags.forEach((tag) => appendTagToList(tagsElement, tag, {}));
+    // Display inline tags
+    const tags = getTagsList(group.id);
+    const tagsElement = template.find(".tags");
+    tags.forEach((tag) => appendTagToList(tagsElement, tag, {}));
 
-        $("#rm_print_characters_block").prepend(template);
-        updateGroupAvatar(group);
+    const avatar = getGroupAvatar(group);
+    if (avatar) {
+        $(template).find(".avatar").replaceWith(avatar);
     }
+
+    return template;
 }
+
 function updateGroupAvatar(group) {
     $("#rm_print_characters_block .group_select").each(function () {
         if ($(this).data("id") == group.id) {
@@ -1475,7 +1485,6 @@ export async function openGroupChat(groupId, chatId) {
 
     await editGroup(groupId, true);
     await getGroupChat(groupId);
-    sortCharactersList();
 }
 
 export async function renameGroupChat(groupId, oldChatId, newChatId) {

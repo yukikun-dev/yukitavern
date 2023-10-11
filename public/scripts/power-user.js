@@ -6,13 +6,12 @@ import {
     reloadMarkdownProcessor,
     reloadCurrentChat,
     getRequestHeaders,
-    updateVisibleDivs,
     getCurrentChatId,
     printCharacters,
     setCharacterId,
     setEditedMessageId,
 } from "../script.js";
-import { favsToHotswap, isMobile } from "./RossAscends-mods.js";
+import { isMobile } from "./RossAscends-mods.js";
 import { groups, resetSelectedGroup } from "./group-chats.js";
 
 import { registerSlashCommand } from "./slash-commands.js";
@@ -24,7 +23,7 @@ export {
     collapseNewlines,
     playMessageSound,
     sortGroupMembers,
-    sortCharactersList,
+    sortEntitiesList,
     fixMarkdown,
     power_user,
     tokenizers,
@@ -907,7 +906,6 @@ function loadPowerUserSettings(settings, data) {
     $(
         `#character_sort_order option[data-order="${power_user.sort_order}"][data-field="${power_user.sort_field}"]`,
     ).prop("selected", true);
-    sortCharactersList();
     reloadMarkdownProcessor(power_user.render_formulas);
     loadMaxContextUnlocked();
     switchWaifuMode();
@@ -974,9 +972,29 @@ export function fuzzySearchCharacters(searchValue) {
     });
 
     const results = fuse.search(searchValue);
-    console.debug("Fuzzy search results for " + searchValue, results);
+    console.debug(
+        "Characters fuzzy search results for " + searchValue,
+        results,
+    );
     const indices = results.map((x) => x.refIndex);
     return indices;
+}
+
+export function fuzzySearchGroups(searchValue) {
+    const fuse = new Fuse(groups, {
+        keys: [
+            { name: "name", weight: 3 },
+            { name: "members", weight: 1 },
+        ],
+        includeScore: true,
+        ignoreLocation: true,
+        threshold: 0.2,
+    });
+
+    const results = fuse.search(searchValue);
+    console.debug("Groups fuzzy search results for " + searchValue, results);
+    const ids = results.map((x) => String(x.item?.id)).filter((x) => x);
+    return ids;
 }
 
 const sortFunc = (a, b) =>
@@ -1005,34 +1023,12 @@ const compareFunc = (first, second) => {
     }
 };
 
-function sortCharactersList() {
-    const arr1 = groups.map((x) => ({
-        item: x,
-        id: x.id,
-        selector: ".group_select",
-        attribute: "grid",
-    }));
-    const arr2 = characters.map((x, index) => ({
-        item: x,
-        id: index,
-        selector: ".character_select",
-        attribute: "chid",
-    }));
-
-    const array = [...arr1, ...arr2];
-
-    if (power_user.sort_field == undefined || array.length === 0) {
+function sortEntitiesList(entities) {
+    if (power_user.sort_field == undefined || entities.length === 0) {
         return;
     }
 
-    let orderedList = array.slice().sort((a, b) => sortFunc(a.item, b.item));
-
-    for (const item of array) {
-        $(`${item.selector}[${item.attribute}="${item.id}"]`).css({
-            order: orderedList.indexOf(item),
-        });
-    }
-    updateVisibleDivs("#rm_print_characters_block", true);
+    entities.sort((a, b) => sortFunc(a.item, b.item));
 }
 
 function sortGroupMembers(selector) {
@@ -1641,8 +1637,7 @@ $(document).ready(() => {
         power_user.sort_field = $(this).find(":selected").data("field");
         power_user.sort_order = $(this).find(":selected").data("order");
         power_user.sort_rule = $(this).find(":selected").data("rule");
-        sortCharactersList();
-        favsToHotswap();
+        printCharacters();
         saveSettingsDebounced();
     });
 
