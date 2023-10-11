@@ -93,7 +93,6 @@ const ipaddr = require("ipaddr.js");
 const json5 = require("json5");
 
 const exif = require("piexifjs");
-const webp = require("webp-converter");
 const DeviceDetector = require("device-detector-js");
 const { TextEncoder, TextDecoder } = require("util");
 const utf8Encode = new TextEncoder();
@@ -1789,17 +1788,6 @@ app.post("/importcharacter", urlencodedParser, async function (request, response
                 jsonData.name = sanitize(jsonData.data?.name || jsonData.name);
                 png_name = getPngName(jsonData.name);
 
-                if (format == "webp") {
-                    try {
-                        let convertedPath = path.join("./uploads", path.basename(uploadPath, ".webp") + ".png");
-                        await webp.dwebp(uploadPath, convertedPath, "-o");
-                        uploadPath = convertedPath;
-                    } catch {
-                        console.error("WEBP image conversion failed. Using the default character image.");
-                        uploadPath = defaultAvatarPath;
-                    }
-                }
-
                 if (jsonData.spec !== undefined) {
                     console.log("Found a v2 character file.");
                     unsetFavFlag(jsonData);
@@ -1966,36 +1954,6 @@ app.post("/exportcharacter", jsonParser, async function (request, response) {
                 let jsonObject = getCharaCardV2(json5.parse(json));
                 return response.type("json").send(jsonObject);
             } catch {
-                return response.sendStatus(400);
-            }
-        }
-        case "webp": {
-            try {
-                let json = await charaRead(filename);
-                let stringByteArray = utf8Encode.encode(json).toString();
-                let inputWebpPath = `./uploads/${Date.now()}_input.webp`;
-                let outputWebpPath = `./uploads/${Date.now()}_output.webp`;
-                let metadataPath = `./uploads/${Date.now()}_metadata.exif`;
-                let metadata = {
-                    Exif: {
-                        [exif.ExifIFD.UserComment]: stringByteArray,
-                    },
-                };
-                const exifString = exif.dump(metadata);
-                fs.writeFileSync(metadataPath, exifString, "binary");
-
-                await webp.cwebp(filename, inputWebpPath, "-q 95");
-                await webp.webpmux_add(inputWebpPath, outputWebpPath, metadataPath, "exif");
-
-                response.sendFile(outputWebpPath, { root: process.cwd() }, () => {
-                    fs.rmSync(inputWebpPath);
-                    fs.rmSync(metadataPath);
-                    fs.rmSync(outputWebpPath);
-                });
-
-                return;
-            } catch (err) {
-                console.log(err);
                 return response.sendStatus(400);
             }
         }

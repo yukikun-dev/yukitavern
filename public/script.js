@@ -6723,7 +6723,7 @@ eventSource.on(event_types.CHAT_CHANGED, displayOverrideWarnings);
 
 function importCharacter(file) {
     const ext = file.name.match(/\.(\w+)$/);
-    if (!ext || (ext[1].toLowerCase() != "json" && ext[1].toLowerCase() != "png" && ext[1] != "webp")) {
+    if (!ext || (ext[1].toLowerCase() != "json" && ext[1].toLowerCase() != "png")) {
         return;
     }
 
@@ -8728,7 +8728,7 @@ $(document).ready(function () {
     });
 
     function processDroppedFiles(files) {
-        const allowedMimeTypes = ["application/json", "image/png", "image/webp"];
+        const allowedMimeTypes = ["application/json", "image/png"];
 
         for (const file of files) {
             if (allowedMimeTypes.includes(file.type)) {
