@@ -766,6 +766,10 @@ $("document").ready(function () {
         return false;
     }
 
+    function isEditing() {
+        return $(".mes_edit_done:visible").length > 0;
+    }
+
     function isInputElementEmpty() {
         const inputElement = $("#send_textarea");
         return inputElement.val() === "";
@@ -842,7 +846,8 @@ $("document").ready(function () {
                 $(".swipe_left:last").css("display") === "flex" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none" &&
-                (!isInputElementInFocus() || isInputElementEmpty())
+                (!isInputElementInFocus() || isInputElementEmpty()) &&
+                !isEditing()
             ) {
                 $(".swipe_left:last").click();
             }
@@ -853,7 +858,8 @@ $("document").ready(function () {
                 $(".swipe_right:last").css("display") === "flex" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none" &&
-                (!isInputElementInFocus() || isInputElementEmpty())
+                (!isInputElementInFocus() || isInputElementEmpty()) &&
+                !isEditing()
             ) {
                 $(".swipe_right:last").click();
             }
