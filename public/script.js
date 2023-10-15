@@ -1351,9 +1351,6 @@ function getMessageFromTemplate({
     mes.find(".avatar img").attr("src", avatarImg);
     mes.find(".ch_name .name_text").text(characterName);
     mes.find(".mes_bias").html(bias);
-    mes.find(".timestamp")
-        .text(timestamp)
-        .attr("title", `${extra?.api ? extra.api + " - " : ""}${extra?.model ?? ""}`);
     mes.find(".mesIDDisplay").text(`#${mesId}`);
     title && mes.attr("title", title);
     timerValue && mes.find(".mes_timer").attr("title", timerTitle).text(timerValue);
@@ -1550,11 +1547,6 @@ function addOneMessage(mes, { type = "normal", insertAfter = null, scroll = true
         $("#chat")
             .find(`[mesid="${count_view_mes - 1}"]`)
             .attr("title", title);
-        $("#chat")
-            .find(`[mesid="${count_view_mes - 1}"]`)
-            .find(".timestamp")
-            .text(timestamp)
-            .attr("title", `${params.extra.api} - ${params.extra.model}`);
 
         if (mes.swipe_id == mes.swipes.length - 1) {
             $("#chat")

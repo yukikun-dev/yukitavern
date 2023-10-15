@@ -108,7 +108,6 @@
         "allow_name2_display": false,
         "hotswap_enabled": true,
         "timer_enabled": false,
-        "timestamps_enabled": true,
         "mesIDDisplay_enabled": false,
         "max_context_unlocked": false,
         "prefer_character_prompt": true,
