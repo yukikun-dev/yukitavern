@@ -696,15 +696,6 @@ $("document").ready(function () {
         }
     });
 
-    var chatbarInFocus = false;
-    $("#send_textarea").focus(function () {
-        chatbarInFocus = true;
-    });
-
-    $("#send_textarea").blur(function () {
-        chatbarInFocus = false;
-    });
-
     setTimeout(() => {
         OpenNavPanels();
     }, 300);
@@ -767,15 +758,17 @@ $("document").ready(function () {
     });
 
     function isInputElementInFocus() {
-        //return $(document.activeElement).is(":input");
-        var focused = $(":focus");
+        const focused = $(":focus");
+
         if (focused.is("input") || focused.is("textarea") || focused.prop("contenteditable") == "true") {
-            if (focused.attr("id") === "send_textarea") {
-                return false;
-            }
             return true;
         }
         return false;
+    }
+
+    function isInputElementEmpty() {
+        const inputElement = $("#send_textarea");
+        return inputElement.val() === "";
     }
 
     $(document).on("keydown", function (event) {
@@ -847,10 +840,9 @@ $("document").ready(function () {
             //swipes left
             if (
                 $(".swipe_left:last").css("display") === "flex" &&
-                $("#send_textarea").val() === "" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none" &&
-                !isInputElementInFocus()
+                (!isInputElementInFocus() || isInputElementEmpty())
             ) {
                 $(".swipe_left:last").click();
             }
@@ -859,10 +851,9 @@ $("document").ready(function () {
             //swipes right
             if (
                 $(".swipe_right:last").css("display") === "flex" &&
-                $("#send_textarea").val() === "" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none" &&
-                !isInputElementInFocus()
+                (!isInputElementInFocus() || isInputElementEmpty())
             ) {
                 $(".swipe_right:last").click();
             }
@@ -871,8 +862,8 @@ $("document").ready(function () {
         if (event.ctrlKey && event.key == "ArrowUp") {
             //edits last USER message if chatbar is empty and focused
             if (
-                $("#send_textarea").val() === "" &&
-                chatbarInFocus === true &&
+                isInputElementInFocus() &&
+                isInputElementEmpty() &&
                 ($(".swipe_right:last").css("display") === "flex" || $(".last_mes").attr("is_system") === "true") &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none"
@@ -888,10 +879,9 @@ $("document").ready(function () {
 
         if (event.key == "ArrowUp") {
             //edits last message if chatbar is empty and focused
-            //console.log('got uparrow input');
             if (
-                $("#send_textarea").val() === "" &&
-                chatbarInFocus === true &&
+                isInputElementInFocus() &&
+                isInputElementEmpty() &&
                 $(".swipe_right:last").css("display") === "flex" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none"
