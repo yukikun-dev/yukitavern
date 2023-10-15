@@ -3,7 +3,6 @@ import {
     cancelTtsPlay,
     eventSource,
     event_types,
-    isMultigenEnabled,
     is_send_press,
     saveSettingsDebounced,
 } from "../../../script.js";
@@ -117,11 +116,6 @@ async function moduleWorker() {
 
     // no characters or group selected
     if (!context.groupId && context.characterId === undefined) {
-        return;
-    }
-
-    // Multigen message is currently being generated
-    if (is_send_press && isMultigenEnabled()) {
         return;
     }
 

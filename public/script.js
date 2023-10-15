@@ -1951,10 +1951,9 @@ function appendToStoryString(value, prefix) {
 
 function isStreamingEnabled() {
     return (
-        ((main_api == "openai" && oai_settings.stream_openai) ||
-            (main_api == "textgenerationwebui" && textgenerationwebui_settings.streaming)) &&
-        !isMultigenEnabled()
-    ); // Multigen has a quasi-streaming mode which breaks the real streaming
+        (main_api == "openai" && oai_settings.stream_openai) ||
+        (main_api == "textgenerationwebui" && textgenerationwebui_settings.streaming)
+    );
 }
 
 function showStopButton() {
@@ -2225,13 +2224,6 @@ async function Generate(
     const isImpersonate = type == "impersonate";
 
     message_already_generated = isImpersonate ? `${name1}: ` : `${name2}: `;
-    // Name for the multigen prefix
-    const magName = isImpersonate ? name1 : name2;
-
-    message_already_generated = `${magName}: `;
-
-    // To trim after multigen ended
-    const magFirst = message_already_generated;
 
     const interruptedByCommand = processCommands($("#send_textarea").val(), type);
 
@@ -2251,8 +2243,8 @@ async function Generate(
         return;
     }
 
-    // Hide swipes on either multigen or real streaming
-    if (isStreamingEnabled() || isMultigenEnabled()) {
+    // Hide swipes on streaming
+    if (isStreamingEnabled()) {
         hideSwipeButtons();
     }
 
@@ -2535,11 +2527,8 @@ async function Generate(
             // Save reply does add cycle text to the prompt, so it's not needed here
             streamingProcessor && (streamingProcessor.firstMessageText = "");
             message_already_generated = continue_mag;
-            tokens_already_generated = 1; // Multigen copium
         }
 
-        // Multigen rewrites the type and I don't know why
-        const originalType = type;
         runGenerate(cyclePrompt);
 
         async function runGenerate(cycleGenerationPromt = "") {
@@ -2700,9 +2689,7 @@ async function Generate(
             let finalPromt = storyString + afterScenarioAnchor + mesExmString + mesSendString + generatedPromtCache;
 
             if (zeroDepthAnchor && zeroDepthAnchor.length) {
-                if (!isMultigenEnabled() || tokens_already_generated == 0) {
-                    finalPromt = appendZeroDepthAnchor(force_name2, zeroDepthAnchor, finalPromt);
-                }
+                finalPromt = appendZeroDepthAnchor(force_name2, zeroDepthAnchor, finalPromt);
             }
 
             finalPromt = finalPromt.replace(/\r/gm, "");
@@ -2711,11 +2698,6 @@ async function Generate(
                 finalPromt = collapseNewlines(finalPromt);
             }
             let this_amount_gen = parseInt(amount_gen); // how many tokens the AI will be requested to generate
-
-            if (isMultigenEnabled() && type !== "quiet") {
-                // if nothing has been generated yet..
-                this_amount_gen = getMultigenAmount();
-            }
 
             let thisPromptBits = [];
 
@@ -2850,53 +2832,6 @@ async function Generate(
                     let getMessage = extractMessageFromData(data);
                     let title = extractTitleFromData(data);
 
-                    //Pygmalion run again
-                    // to make it continue generating so long as it's under max_amount and hasn't signaled
-                    // an end to the character's response via typing "You:" or adding "<endoftext>"
-                    if (isMultigenEnabled() && type !== "quiet") {
-                        message_already_generated += getMessage;
-                        promptBias = "";
-
-                        let this_mes_is_name;
-                        ({ this_mes_is_name, getMessage } = extractNameFromMessage(
-                            getMessage,
-                            force_name2,
-                            isImpersonate,
-                        ));
-
-                        if (!isImpersonate) {
-                            if (tokens_already_generated == 0) {
-                                console.debug("New message");
-                                ({ type, getMessage } = saveReply(type, getMessage, this_mes_is_name, title));
-                            } else {
-                                console.debug("Should append message");
-                                ({ type, getMessage } = saveReply("append", getMessage, this_mes_is_name, title));
-                            }
-                        } else {
-                            let chunk = cleanUpMessage(message_already_generated, true, isContinue, true);
-                            let extract = extractNameFromMessage(chunk, force_name2, isImpersonate);
-                            $("#send_textarea").val(extract.getMessage).trigger("input");
-                        }
-
-                        if (shouldContinueMultigen(getMessage, isImpersonate)) {
-                            hideSwipeButtons();
-                            tokens_already_generated += this_amount_gen; // add new gen amt to any prev gen counter..
-                            getMessage = message_already_generated;
-
-                            // if any tokens left to generate
-                            if (getMultigenAmount() > 0) {
-                                runGenerate(getMessage);
-                                console.debug("returning to make generate again");
-                                return;
-                            }
-                        }
-
-                        tokens_already_generated = 0;
-                        generatedPromtCache = "";
-                        const substringStart = originalType !== "continue" ? magFirst.length : 0;
-                        getMessage = message_already_generated.substring(substringStart);
-                    }
-
                     if (isContinue) {
                         getMessage = continue_mag + getMessage;
                     }
@@ -2916,7 +2851,7 @@ async function Generate(
                             resolve(getMessage);
                         } else {
                             // Without streaming we'll be having a full message on continuation. Treat it as a multigen last chunk.
-                            if (!isMultigenEnabled() && originalType !== "continue") {
+                            if (originalType !== "continue") {
                                 ({ type, getMessage } = saveReply(type, getMessage, this_mes_is_name, title));
                             } else {
                                 ({ type, getMessage } = saveReply("appendFinal", getMessage, this_mes_is_name, title));
@@ -3178,33 +3113,6 @@ function appendZeroDepthAnchor(force_name2, zeroDepthAnchor, finalPromt) {
     finalPromt += trimmedPrompt;
 
     return finalPromt;
-}
-
-function getMultigenAmount() {
-    let this_amount_gen = parseInt(amount_gen);
-
-    if (tokens_already_generated === 0) {
-        // if the max gen setting is > 50...(
-        if (parseInt(amount_gen) >= power_user.multigen_first_chunk) {
-            // then only try to make 50 this cycle..
-            this_amount_gen = power_user.multigen_first_chunk;
-        } else {
-            // otherwise, make as much as the max amount request.
-            this_amount_gen = parseInt(amount_gen);
-        }
-    }
-    // if we already received some generated text...
-    else {
-        // if the remaining tokens to be made is less than next potential cycle count
-        if (parseInt(amount_gen) - tokens_already_generated < power_user.multigen_next_chunks) {
-            // subtract already generated amount from the desired max gen amount
-            this_amount_gen = parseInt(amount_gen) - tokens_already_generated;
-        } else {
-            // otherwise make the standard cycle amount (first 50, and 30 after that)
-            this_amount_gen = power_user.multigen_next_chunks;
-        }
-    }
-    return this_amount_gen;
 }
 
 async function DupeChar() {
@@ -3609,20 +3517,6 @@ function getGenerateUrl() {
     return generate_url;
 }
 
-function shouldContinueMultigen(getMessage, isImpersonate) {
-    // stopping name string
-    const nameString = isImpersonate ? `${name2}:` : `${name1}:`;
-    // if there is no 'You:' in the response msg
-    const doesNotContainName = message_already_generated.indexOf(nameString) === -1;
-    //if there is no <endoftext> stamp in the response msg
-    const isNotEndOfText = message_already_generated.indexOf("<|endoftext|>") === -1;
-    //if the gen'd msg is less than the max response length..
-    const notReachedMax = tokens_already_generated < parseInt(amount_gen);
-    //if we actually have gen'd text at all...
-    const msgHasText = getMessage.length > 0;
-    return doesNotContainName && isNotEndOfText && notReachedMax && msgHasText;
-}
-
 function extractNameFromMessage(getMessage, force_name2, isImpersonate) {
     const nameToTrim = isImpersonate ? name1 : name2;
     let this_mes_is_name = true;
@@ -3884,10 +3778,6 @@ function extractImageFromMessage(getMessage) {
     const title = results ? results[2] : "";
     getMessage = getMessage.replace(regex, "");
     return { getMessage, image, title };
-}
-
-export function isMultigenEnabled() {
-    return power_user.multigen && main_api == "textgenerationwebui";
 }
 
 export function activateSendButtons() {

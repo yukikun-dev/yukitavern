@@ -83,9 +83,6 @@ let power_user = {
     always_force_name2: false,
     user_prompt_bias: "",
     show_user_prompt_bias: true,
-    multigen: false,
-    multigen_first_chunk: 50,
-    multigen_next_chunks: 30,
     custom_chat_separator: "",
     markdown_escape_strings: "",
 
@@ -679,9 +676,6 @@ function loadPowerUserSettings(settings, data) {
     $("#noShadowsmode").prop("checked", power_user.noShadows);
     $("#start_reply_with").val(power_user.user_prompt_bias);
     $("#chat-show-reply-prefix-checkbox").prop("checked", power_user.show_user_prompt_bias);
-    $("#multigen").prop("checked", power_user.multigen);
-    $("#multigen_first_chunk").val(power_user.multigen_first_chunk);
-    $("#multigen_next_chunks").val(power_user.multigen_next_chunks);
     $("#play_message_sound").prop("checked", power_user.play_message_sound);
     $("#play_sound_unfocused").prop("checked", power_user.play_sound_unfocused);
     $("#never_resize_avatars").prop("checked", power_user.never_resize_avatars);
@@ -1278,11 +1272,6 @@ $(document).ready(() => {
         saveSettingsDebounced();
     });
 
-    $("#multigen").change(function () {
-        power_user.multigen = $(this).prop("checked");
-        saveSettingsDebounced();
-    });
-
     // Settings that go to local storage
     $("#fast_ui_mode").change(function () {
         power_user.fast_ui_mode = $(this).prop("checked");
@@ -1424,16 +1413,6 @@ $(document).ready(() => {
         power_user.sort_order = $(this).find(":selected").data("order");
         power_user.sort_rule = $(this).find(":selected").data("rule");
         printCharacters();
-        saveSettingsDebounced();
-    });
-
-    $("#multigen_first_chunk").on("input", function () {
-        power_user.multigen_first_chunk = Number($(this).val());
-        saveSettingsDebounced();
-    });
-
-    $("#multigen_next_chunks").on("input", function () {
-        power_user.multigen_next_chunks = Number($(this).val());
         saveSettingsDebounced();
     });
 
