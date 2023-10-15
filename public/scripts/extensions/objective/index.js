@@ -1,20 +1,6 @@
-import {
-    chat_metadata,
-    callPopup,
-    saveSettingsDebounced,
-    is_send_press,
-} from "../../../script.js";
-import {
-    getContext,
-    extension_settings,
-    saveMetadataDebounced,
-} from "../../extensions.js";
-import {
-    substituteParams,
-    eventSource,
-    event_types,
-    generateQuietPrompt,
-} from "../../../script.js";
+import { chat_metadata, callPopup, saveSettingsDebounced, is_send_press } from "../../../script.js";
+import { getContext, extension_settings, saveMetadataDebounced } from "../../extensions.js";
+import { substituteParams, eventSource, event_types, generateQuietPrompt } from "../../../script.js";
 import { registerSlashCommand } from "../../slash-commands.js";
 import { waitUntilCondition } from "../../utils.js";
 import { is_group_generating, selected_group } from "../../group-chats.js";
@@ -83,10 +69,7 @@ function substituteParamsPrompts(content) {
     content = content.replace(/{{objective}}/gi, currentObjective.description);
     content = content.replace(/{{task}}/gi, currentTask.description);
     if (currentTask.parent) {
-        content = content.replace(
-            /{{parent}}/gi,
-            currentTask.parent.description,
-        );
+        content = content.replace(/{{parent}}/gi, currentTask.parent.description);
     }
     content = substituteParams(content);
     return content;
@@ -106,9 +89,7 @@ async function generateTasks() {
     // Create tasks from generated task list
     for (const task of taskResponse.split("\n").map((x) => x.trim())) {
         if (task.match(numberedListPattern) != null) {
-            currentObjective.addTask(
-                task.replace(numberedListPattern, "").trim(),
-            );
+            currentObjective.addTask(task.replace(numberedListPattern, "").trim());
         }
     }
     updateUiTaskList();
@@ -124,10 +105,7 @@ async function generateTasks() {
             2,
         )} `,
     );
-    toastr.success(
-        `Generated ${currentObjective.children.length} tasks`,
-        "Done!",
-    );
+    toastr.success(`Generated ${currentObjective.children.length} tasks`, "Done!");
 }
 
 // Call Quiet Generate to check if a task is completed
@@ -140,11 +118,7 @@ async function checkTaskCompleted() {
     try {
         // Wait for group to finish generating
         if (selected_group) {
-            await waitUntilCondition(
-                () => is_group_generating === false,
-                1000,
-                10,
-            );
+            await waitUntilCondition(() => is_group_generating === false, 1000, 10);
         }
         // Another extension might be doing something with the chat, so wait for it to finish
         await waitUntilCondition(() => is_send_press === false, 30000, 10);
@@ -161,14 +135,10 @@ async function checkTaskCompleted() {
 
     // Check response if task complete
     if (taskResponse.includes("true")) {
-        console.info(
-            `Character determined task '${currentTask.description} is completed.`,
-        );
+        console.info(`Character determined task '${currentTask.description} is completed.`);
         currentTask.completeTask();
     } else if (!taskResponse.includes("false")) {
-        console.warn(
-            `checkTaskCompleted response did not contain true or false. taskResponse: ${taskResponse}`,
-        );
+        console.warn(`checkTaskCompleted response did not contain true or false. taskResponse: ${taskResponse}`);
     } else {
         console.debug(`Checked task completion. taskResponse: ${taskResponse}`);
     }
@@ -212,9 +182,7 @@ function setCurrentTask(taskId = null) {
     // Don't just check for a current task, check if it has data
     const description = currentTask.description || null;
     if (description) {
-        const extensionPromptText = substituteParamsPrompts(
-            objectivePrompts.currentTask,
-        );
+        const extensionPromptText = substituteParamsPrompts(objectivePrompts.currentTask);
 
         // Remove highlights
         $(".objective-task").css({ "border-color": "", "border-width": "" });
@@ -232,12 +200,7 @@ function setCurrentTask(taskId = null) {
         }
 
         // Update the extension prompt
-        context.setExtensionPrompt(
-            MODULE_NAME,
-            extensionPromptText,
-            1,
-            $("#objective-chat-depth").val(),
-        );
+        context.setExtensionPrompt(MODULE_NAME, extensionPromptText, 1, $("#objective-chat-depth").val());
         console.info(
             `Current task in context.extensionPrompts.Objective is ${JSON.stringify(
                 context.extensionPrompts.Objective,
@@ -280,12 +243,7 @@ class ObjectiveTask {
     deleteTaskButton;
     addTaskButton;
 
-    constructor({
-        id = undefined,
-        description,
-        completed = false,
-        parentId = "",
-    }) {
+    constructor({ id = undefined, description, completed = false, parentId = "" }) {
         this.description = description;
         this.parentId = parentId;
         this.children = [];
@@ -302,20 +260,14 @@ class ObjectiveTask {
     // Accepts optional index. Defaults to adding to end of list.
     addTask(description, index = null) {
         index = index != null ? index : (index = this.children.length);
-        this.children.splice(
-            index,
-            0,
-            new ObjectiveTask({ description: description, parentId: this.id }),
-        );
+        this.children.splice(index, 0, new ObjectiveTask({ description: description, parentId: this.id }));
         saveState();
     }
 
     getIndex() {
         if (this.parentId !== null) {
             const parent = getTaskById(this.parentId);
-            const index = parent.children.findIndex(
-                (task) => task.id === this.id,
-            );
+            const index = parent.children.findIndex((task) => task.id === this.id);
             if (index === -1) {
                 throw `getIndex failed: Task '${this.description}' not found in parent task '${parent.description}'`;
             }
@@ -338,9 +290,7 @@ class ObjectiveTask {
             }
             if (all_completed) {
                 parent.completed = true;
-                console.info(
-                    `Parent task '${parent.description}' completed after all child tasks complated.`,
-                );
+                console.info(`Parent task '${parent.description}' completed after all child tasks complated.`);
             } else {
                 parent.completed = false;
             }
@@ -350,9 +300,7 @@ class ObjectiveTask {
     // Complete the current task, setting next task to next incomplete task
     completeTask() {
         this.completed = true;
-        console.info(
-            `Task successfully completed: ${JSON.stringify(this.description)}`,
-        );
+        console.info(`Task successfully completed: ${JSON.stringify(this.description)}`);
         this.checkParentComplete();
         setCurrentTask();
         updateUiTaskList();
@@ -388,25 +336,12 @@ class ObjectiveTask {
         }
 
         // Add event listeners and set properties
-        $(`#objective-task-complete-${this.id}`).prop(
-            "checked",
-            this.completed,
-        );
-        $(`#objective-task-complete-${this.id}`).on("click", () =>
-            this.onCompleteClick(),
-        );
-        $(`#objective-task-description-${this.id}`).on("keyup", () =>
-            this.onDescriptionUpdate(),
-        );
-        $(`#objective-task-description-${this.id}`).on("focusout", () =>
-            this.onDescriptionFocusout(),
-        );
-        $(`#objective-task-delete-${this.id}`).on("click", () =>
-            this.onDeleteClick(),
-        );
-        $(`#objective-task-add-${this.id}`).on("click", () =>
-            this.onAddClick(),
-        );
+        $(`#objective-task-complete-${this.id}`).prop("checked", this.completed);
+        $(`#objective-task-complete-${this.id}`).on("click", () => this.onCompleteClick());
+        $(`#objective-task-description-${this.id}`).on("keyup", () => this.onDescriptionUpdate());
+        $(`#objective-task-description-${this.id}`).on("focusout", () => this.onDescriptionFocusout());
+        $(`#objective-task-delete-${this.id}`).on("click", () => this.onDeleteClick());
+        $(`#objective-task-add-${this.id}`).on("click", () => this.onAddClick());
         this.branchButton.on("click", () => this.onBranchClick());
     }
 
@@ -504,14 +439,10 @@ function onEditPromptClick() {
         objectivePrompts.createTask = $("#objective-prompt-generate").val();
     });
     $("#objective-prompt-check").on("input", () => {
-        objectivePrompts.checkTaskCompleted = $(
-            "#objective-prompt-check",
-        ).val();
+        objectivePrompts.checkTaskCompleted = $("#objective-prompt-check").val();
     });
     $("#objective-prompt-extension-prompt").on("input", () => {
-        objectivePrompts.currentTask = $(
-            "#objective-prompt-extension-prompt",
-        ).val();
+        objectivePrompts.currentTask = $("#objective-prompt-extension-prompt").val();
     });
 
     // Handle new
@@ -533,10 +464,7 @@ function onEditPromptClick() {
     $("#objective-custom-prompt-select").on("change", loadCustomPrompt);
 }
 async function newCustomPrompt() {
-    const customPromptName = await callPopup(
-        "<h3>Custom Prompt name:</h3>",
-        "input",
-    );
+    const customPromptName = await callPopup("<h3>Custom Prompt name:</h3>", "input");
 
     if (customPromptName == "") {
         toastr.warning("Please set custom prompt name to save.");
@@ -547,34 +475,24 @@ async function newCustomPrompt() {
         return;
     }
     extension_settings.objective.customPrompts[customPromptName] = {};
-    Object.assign(
-        extension_settings.objective.customPrompts[customPromptName],
-        objectivePrompts,
-    );
+    Object.assign(extension_settings.objective.customPrompts[customPromptName], objectivePrompts);
     saveSettingsDebounced();
     populateCustomPrompts();
 }
 
 function saveCustomPrompt() {
-    const customPromptName = $("#objective-custom-prompt-select")
-        .find(":selected")
-        .val();
+    const customPromptName = $("#objective-custom-prompt-select").find(":selected").val();
     if (customPromptName == "default") {
         toastr.error("Cannot save over default prompt");
         return;
     }
-    Object.assign(
-        extension_settings.objective.customPrompts[customPromptName],
-        objectivePrompts,
-    );
+    Object.assign(extension_settings.objective.customPrompts[customPromptName], objectivePrompts);
     saveSettingsDebounced();
     populateCustomPrompts();
 }
 
 function deleteCustomPrompt() {
-    const customPromptName = $("#objective-custom-prompt-select")
-        .find(":selected")
-        .val();
+    const customPromptName = $("#objective-custom-prompt-select").find(":selected").val();
 
     if (customPromptName == "default") {
         toastr.error("Cannot delete default prompt");
@@ -587,13 +505,8 @@ function deleteCustomPrompt() {
 }
 
 function loadCustomPrompt() {
-    const optionSelected = $("#objective-custom-prompt-select")
-        .find(":selected")
-        .val();
-    Object.assign(
-        objectivePrompts,
-        extension_settings.objective.customPrompts[optionSelected],
-    );
+    const optionSelected = $("#objective-custom-prompt-select").find(":selected").val();
+    Object.assign(objectivePrompts, extension_settings.objective.customPrompts[optionSelected]);
 
     $("#objective-prompt-generate").val(objectivePrompts.createTask);
     $("#objective-prompt-check").val(objectivePrompts.checkTaskCompleted);
@@ -736,10 +649,7 @@ function onCheckFrequencyInput() {
 }
 
 function onHideTasksInput() {
-    $("#objective-tasks").prop(
-        "hidden",
-        $("#objective-hide-tasks").prop("checked"),
-    );
+    $("#objective-tasks").prop("hidden", $("#objective-hide-tasks").prop("checked"));
     saveState();
 }
 
@@ -780,8 +690,7 @@ function loadSettings() {
     // Migrate existing settings
     if (currentChatId in extension_settings.objective) {
         // TODO: Remove this soon
-        chat_metadata["objective"] =
-            extension_settings.objective[currentChatId];
+        chat_metadata["objective"] = extension_settings.objective[currentChatId];
         delete extension_settings.objective[currentChatId];
     }
 
@@ -817,9 +726,7 @@ function loadSettings() {
     } else {
         // Load Objectives and Tasks (Normal path)
         if (chat_metadata.objective.taskTree) {
-            taskTree = loadTaskChildrenRecurse(
-                chat_metadata.objective.taskTree,
-            );
+            taskTree = loadTaskChildrenRecurse(chat_metadata.objective.taskTree);
         }
     }
 
@@ -839,17 +746,9 @@ function loadSettings() {
     $("#objective-text").text(taskTree.description);
     updateUiTaskList();
     $("#objective-chat-depth").val(chat_metadata["objective"].chatDepth);
-    $("#objective-check-frequency").val(
-        chat_metadata["objective"].checkFrequency,
-    );
-    $("#objective-hide-tasks").prop(
-        "checked",
-        chat_metadata["objective"].hideTasks,
-    );
-    $("#objective-tasks").prop(
-        "hidden",
-        $("#objective-hide-tasks").prop("checked"),
-    );
+    $("#objective-check-frequency").val(chat_metadata["objective"].checkFrequency);
+    $("#objective-hide-tasks").prop("checked", chat_metadata["objective"].hideTasks);
+    $("#objective-tasks").prop("hidden", $("#objective-hide-tasks").prop("checked"));
     setCurrentTask();
 }
 
@@ -927,11 +826,7 @@ jQuery(() => {
         lastMessageWasSwipe = true;
     });
     eventSource.on(event_types.MESSAGE_RECEIVED, () => {
-        if (
-            currentChatId == undefined ||
-            jQuery.isEmptyObject(currentTask) ||
-            lastMessageWasSwipe
-        ) {
+        if (currentChatId == undefined || jQuery.isEmptyObject(currentTask) || lastMessageWasSwipe) {
             lastMessageWasSwipe = false;
             return;
         }
@@ -946,12 +841,5 @@ jQuery(() => {
         $("#objective-counter").text(checkCounter);
     });
 
-    registerSlashCommand(
-        "taskcheck",
-        checkTaskCompleted,
-        [],
-        " – checks if the current task is completed",
-        true,
-        true,
-    );
+    registerSlashCommand("taskcheck", checkTaskCompleted, [], " – checks if the current task is completed", true, true);
 });

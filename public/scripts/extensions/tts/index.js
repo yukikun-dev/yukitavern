@@ -3,17 +3,10 @@ import {
     cancelTtsPlay,
     eventSource,
     event_types,
-    isMultigenEnabled,
     is_send_press,
     saveSettingsDebounced,
 } from "../../../script.js";
-import {
-    ModuleWorkerWrapper,
-    doExtrasFetch,
-    extension_settings,
-    getApiUrl,
-    getContext,
-} from "../../extensions.js";
+import { ModuleWorkerWrapper, doExtrasFetch, extension_settings, getApiUrl, getContext } from "../../extensions.js";
 import { escapeRegex, getStringHash } from "../../utils.js";
 import { EdgeTtsProvider } from "./edge.js";
 import { ElevenLabsTtsProvider } from "./elevenlabs.js";
@@ -39,8 +32,7 @@ export function getPreviewString(lang) {
         "en-US": "The quick brown fox jumps over the lazy dog",
         "en-GB": "Sphinx of black quartz, judge my vow",
         "fr-FR": "Portez ce vieux whisky au juge blond qui fume",
-        "de-DE":
-            "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich",
+        "de-DE": "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich",
         "it-IT": "Pranzo d'acqua fa volti sghembi",
         "es-ES": "Quiere la boca exhausta vid, kiwi, piña y fugaz jamón",
         "es-MX": "Fabio me exige, sin tapujos, que añada cerveza al whisky",
@@ -55,29 +47,24 @@ export function getPreviewString(lang) {
         "tr-TR": "Pijamalı hasta yağız şoföre çabucak güvendi",
         "nl-NL": "De waard heeft een kalfje en een pinkje opgegeten",
         "sv-SE": "Yxskaftbud, ge vårbygd, zinkqvarn",
-        "da-DK":
-            "Quizdeltagerne spiste jordbær med fløde, mens cirkusklovnen Walther spillede på xylofon",
+        "da-DK": "Quizdeltagerne spiste jordbær med fløde, mens cirkusklovnen Walther spillede på xylofon",
         "ja-JP":
             "いろはにほへと　ちりぬるを　わかよたれそ　つねならむ　うゐのおくやま　けふこえて　あさきゆめみし　ゑひもせす",
         "ko-KR": "가나다라마바사아자차카타파하",
         "zh-CN": "我能吞下玻璃而不伤身体",
         "ro-RO": "Muzicologă în bej vând whisky și tequila, preț fix",
         "bg-BG": "Щъркелите се разпръснаха по цялото небе",
-        "el-GR":
-            "Ταχίστη αλώπηξ βαφής ψημένη γη, δρασκελίζει υπέρ νωθρού κυνός",
+        "el-GR": "Ταχίστη αλώπηξ βαφής ψημένη γη, δρασκελίζει υπέρ νωθρού κυνός",
         "fi-FI": "Voi veljet, miksi juuri teille myin nämä vehkeet?",
         "he-IL": 'הקצינים צעקו: "כל הכבוד לצבא הצבאות!"',
         "id-ID": "Jangkrik itu memang enak, apalagi kalau digoreng",
-        "ms-MY":
-            "Muzik penyanyi wanita itu menggambarkan kehidupan yang penuh dengan duka nestapa",
+        "ms-MY": "Muzik penyanyi wanita itu menggambarkan kehidupan yang penuh dengan duka nestapa",
         "th-TH": "เป็นไงบ้างครับ ผมชอบกินข้าวผัดกระเพราหมูกรอบ",
         "vi-VN": "Cô bé quàng khăn đỏ đang ngồi trên bãi cỏ xanh",
         "ar-SA": "أَبْجَدِيَّة عَرَبِيَّة",
-        "hi-IN":
-            "श्वेता ने श्वेता के श्वेते हाथों में श्वेता का श्वेता चावल पकड़ा",
+        "hi-IN": "श्वेता ने श्वेता के श्वेते हाथों में श्वेता का श्वेता चावल पकड़ा",
     };
-    const fallbackPreview =
-        "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet";
+    const fallbackPreview = "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet";
 
     return previewStrings[lang] ?? fallbackPreview;
 }
@@ -132,11 +119,6 @@ async function moduleWorker() {
         return;
     }
 
-    // Multigen message is currently being generated
-    if (is_send_press && isMultigenEnabled()) {
-        return;
-    }
-
     // Chat changed
     if (context.chatId !== lastChatId) {
         currentMessageNumber = context.chat.length ? context.chat.length : 0;
@@ -149,9 +131,7 @@ async function moduleWorker() {
 
     // There's no new messages
     let diff = lastMessageNumber - currentMessageNumber;
-    let hashNew = getStringHash(
-        (chat.length && chat[chat.length - 1].mes) ?? "",
-    );
+    let hashNew = getStringHash((chat.length && chat[chat.length - 1].mes) ?? "");
 
     if (diff == 0 && hashNew === lastMessageHash) {
         return;
@@ -170,10 +150,7 @@ async function moduleWorker() {
     }
 
     // Don't generate if message doesn't have a display text
-    if (
-        extension_settings.tts.narrate_translated_only &&
-        !message?.extra?.display_text
-    ) {
+    if (extension_settings.tts.narrate_translated_only && !message?.extra?.display_text) {
         return;
     }
 
@@ -181,9 +158,7 @@ async function moduleWorker() {
     lastMessageHash = hashNew;
     currentMessageNumber = lastMessageNumber;
 
-    console.debug(
-        `Adding message from ${message.name} for TTS processing: "${message.mes}"`,
-    );
+    console.debug(`Adding message from ${message.name} for TTS processing: "${message.mes}"`);
     ttsJobQueue.push(message);
 }
 
@@ -308,14 +283,12 @@ async function onTtsVoicesClick() {
             <div class="voice_preview">
                 <span class="voice_lang">${voice.lang || ""}</span>
                 <b class="voice_name">${voice.name}</b>
-                <i onclick="tts_preview('${
-                    voice.voice_id
-                }')" class="fa-solid fa-play"></i>
+                <i onclick="tts_preview('${voice.voice_id}')" class="fa-solid fa-play"></i>
             </div>`;
             if (voice.preview_url) {
-                popupText += `<audio id="${voice.voice_id}" src="${
-                    voice.preview_url
-                }" data-disabled="${voice.preview_url == false}"></audio>`;
+                popupText += `<audio id="${voice.voice_id}" src="${voice.preview_url}" data-disabled="${
+                    voice.preview_url == false
+                }"></audio>`;
             }
         }
     } catch {
@@ -360,9 +333,7 @@ function addAudioControl() {
             <div id="tts_media_control" class="extensionsMenuExtensionButton "/></div>
             TTS Playback
         </div>`);
-    $("#ttsExtensionMenuItem")
-        .attr("title", "TTS play/pause")
-        .on("click", onAudioControlClicked);
+    $("#ttsExtensionMenuItem").attr("title", "TTS play/pause").on("click", onAudioControlClicked);
     audioControl = document.getElementById("tts_media_control");
     updateUiAudioPlayState();
 }
@@ -381,10 +352,7 @@ function completeCurrentAudioJob() {
  */
 async function addAudioJob(response) {
     const audioData = await response.blob();
-    if (
-        !audioData.type in
-        ["audio/mpeg", "audio/wav", "audio/x-wav", "audio/wave", "audio/webm"]
-    ) {
+    if (!audioData.type in ["audio/mpeg", "audio/wav", "audio/x-wav", "audio/wave", "audio/webm"]) {
         throw `TTS received HTTP response with invalid data format. Expecting audio/mpeg, got ${audioData.type}`;
     }
     audioJobQueue.push(audioData);
@@ -425,10 +393,7 @@ function saveLastValues() {
     lastGroupId = context.groupId;
     lastCharacterId = context.characterId;
     lastChatId = context.chatId;
-    lastMessageHash = getStringHash(
-        (context.chat.length && context.chat[context.chat.length - 1].mes) ??
-            "",
-    );
+    lastMessageHash = getStringHash((context.chat.length && context.chat[context.chat.length - 1].mes) ?? "");
 }
 
 async function tts(text, voiceId, char) {
@@ -446,9 +411,7 @@ async function processTtsQueue() {
 
     console.debug("New message found, running TTS");
     currentTtsJob = ttsJobQueue.shift();
-    let text = extension_settings.tts.narrate_translated_only
-        ? currentTtsJob?.extra?.display_text
-        : currentTtsJob.mes;
+    let text = extension_settings.tts.narrate_translated_only ? currentTtsJob?.extra?.display_text : currentTtsJob.mes;
     text = extension_settings.tts.narrate_dialogues_only
         ? text.replace(/\*[^\*]*?(\*|$)/g, "").trim() // remove asterisks content
         : text.replaceAll("*", "").trim(); // remove just the asterisks
@@ -482,9 +445,7 @@ async function processTtsQueue() {
         const voice = await ttsProvider.getVoice(voiceMap[char]);
         const voiceId = voice.voice_id;
         if (voiceId == null) {
-            toastr.error(
-                `Specified voice for ${char} was not found. Check the TTS extension settings.`,
-            );
+            toastr.error(`Specified voice for ${char} was not found. Check the TTS extension settings.`);
             throw `Unable to attain voiceId for ${char}`;
         }
         tts(text, voiceId, char);
@@ -511,22 +472,10 @@ function loadSettings() {
         Object.assign(extension_settings.tts, defaultSettings);
     }
     $("#tts_enabled").prop("checked", extension_settings.tts.enabled);
-    $("#tts_narrate_dialogues").prop(
-        "checked",
-        extension_settings.tts.narrate_dialogues_only,
-    );
-    $("#tts_narrate_quoted").prop(
-        "checked",
-        extension_settings.tts.narrate_quoted_only,
-    );
-    $("#tts_auto_generation").prop(
-        "checked",
-        extension_settings.tts.auto_generation,
-    );
-    $("#tts_narrate_translated_only").prop(
-        "checked",
-        extension_settings.tts.narrate_translated_only,
-    );
+    $("#tts_narrate_dialogues").prop("checked", extension_settings.tts.narrate_dialogues_only);
+    $("#tts_narrate_quoted").prop("checked", extension_settings.tts.narrate_quoted_only);
+    $("#tts_auto_generation").prop("checked", extension_settings.tts.auto_generation);
+    $("#tts_narrate_translated_only").prop("checked", extension_settings.tts.narrate_translated_only);
     $("body").toggleClass("tts", extension_settings.tts.enabled);
 }
 
@@ -548,9 +497,7 @@ function setTtsStatus(status, success) {
 
 function parseVoiceMap(voiceMapString) {
     let parsedVoiceMap = {};
-    for (const [charName, voiceId] of voiceMapString
-        .split(",")
-        .map((s) => s.split(":"))) {
+    for (const [charName, voiceId] of voiceMapString.split(",").map((s) => s.split(":"))) {
         if (charName && voiceId) {
             parsedVoiceMap[charName.trim()] = voiceId.trim();
         }
@@ -596,11 +543,7 @@ function onApplyClick() {
             extension_settings.tts[ttsProviderName] = ttsProvider.settings;
             saveSettingsDebounced();
             setTtsStatus("Successfully applied settings", true);
-            console.info(
-                `Saved settings ${ttsProviderName} ${JSON.stringify(
-                    ttsProvider.settings,
-                )}`,
-            );
+            console.info(`Saved settings ${ttsProviderName} ${JSON.stringify(ttsProvider.settings)}`);
         })
         .catch((error) => {
             console.error(error);
@@ -615,30 +558,22 @@ function onEnableClick() {
 }
 
 function onAutoGenerationClick() {
-    extension_settings.tts.auto_generation = $("#tts_auto_generation").prop(
-        "checked",
-    );
+    extension_settings.tts.auto_generation = $("#tts_auto_generation").prop("checked");
     saveSettingsDebounced();
 }
 
 function onNarrateDialoguesClick() {
-    extension_settings.tts.narrate_dialogues_only = $(
-        "#tts_narrate_dialogues",
-    ).prop("checked");
+    extension_settings.tts.narrate_dialogues_only = $("#tts_narrate_dialogues").prop("checked");
     saveSettingsDebounced();
 }
 
 function onNarrateQuotedClick() {
-    extension_settings.tts.narrate_quoted_only = $("#tts_narrate_quoted").prop(
-        "checked",
-    );
+    extension_settings.tts.narrate_quoted_only = $("#tts_narrate_quoted").prop("checked");
     saveSettingsDebounced();
 }
 
 function onNarrateTranslatedOnlyClick() {
-    extension_settings.tts.narrate_translated_only = $(
-        "#tts_narrate_translated_only",
-    ).prop("checked");
+    extension_settings.tts.narrate_translated_only = $("#tts_narrate_translated_only").prop("checked");
     saveSettingsDebounced();
 }
 
@@ -661,9 +596,7 @@ function loadTtsProvider(provider) {
     // Init provider settings
     $("#tts_provider_settings").append(ttsProvider.settingsHtml);
     if (!(ttsProviderName in extension_settings.tts)) {
-        console.warn(
-            `Provider ${ttsProviderName} not in Extension Settings, initiatilizing provider in settings`,
-        );
+        console.warn(`Provider ${ttsProviderName} not in Extension Settings, initiatilizing provider in settings`);
         extension_settings.tts[ttsProviderName] = {};
     }
 
@@ -694,11 +627,7 @@ function onTtsProviderSettingsInput() {
 
     extension_settings.tts[ttsProviderName] = ttsProvider.setttings;
     saveSettingsDebounced();
-    console.info(
-        `Saved settings ${ttsProviderName} ${JSON.stringify(
-            ttsProvider.settings,
-        )}`,
-    );
+    console.info(`Saved settings ${ttsProviderName} ${JSON.stringify(ttsProvider.settings)}`);
 }
 
 $(document).ready(function () {
@@ -760,17 +689,12 @@ $(document).ready(function () {
         $("#tts_enabled").on("click", onEnableClick);
         $("#tts_narrate_dialogues").on("click", onNarrateDialoguesClick);
         $("#tts_narrate_quoted").on("click", onNarrateQuotedClick);
-        $("#tts_narrate_translated_only").on(
-            "click",
-            onNarrateTranslatedOnlyClick,
-        );
+        $("#tts_narrate_translated_only").on("click", onNarrateTranslatedOnlyClick);
         $("#tts_auto_generation").on("click", onAutoGenerationClick);
         $("#tts_voices").on("click", onTtsVoicesClick);
         $("#tts_provider_settings").on("input", onTtsProviderSettingsInput);
         for (const provider in ttsProviders) {
-            $("#tts_provider").append(
-                $("<option />").val(provider).text(provider),
-            );
+            $("#tts_provider").append($("<option />").val(provider).text(provider));
         }
         $("#tts_provider").on("change", onTtsProviderChange);
         $(document).on("click", ".mes_narrate", onNarrateOneMessage);

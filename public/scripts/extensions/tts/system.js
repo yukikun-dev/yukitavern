@@ -17,10 +17,7 @@ export { SystemTtsProvider };
 var speechUtteranceChunker = function (utt, settings, callback) {
     settings = settings || {};
     var newUtt;
-    var txt =
-        settings && settings.offset !== undefined
-            ? utt.text.substring(settings.offset)
-            : utt.text;
+    var txt = settings && settings.offset !== undefined ? utt.text.substring(settings.offset) : utt.text;
     if (utt.voice && utt.voice.voiceURI === "native") {
         // Not part of the spec
         newUtt = utt;
@@ -48,11 +45,7 @@ var speechUtteranceChunker = function (utt, settings, callback) {
         );
         var chunkArr = txt.match(pattRegex);
 
-        if (
-            chunkArr == null ||
-            chunkArr[0] === undefined ||
-            chunkArr[0].length <= 2
-        ) {
+        if (chunkArr == null || chunkArr[0] === undefined || chunkArr[0].length <= 2) {
             //call once all text has been spoken...
             if (callback !== undefined) {
                 callback();
@@ -158,12 +151,8 @@ class SystemTtsProvider {
             }
         }
 
-        $("#system_tts_rate").val(
-            this.settings.rate || this.defaultSettings.rate,
-        );
-        $("#system_tts_pitch").val(
-            this.settings.pitch || this.defaultSettings.pitch,
-        );
+        $("#system_tts_rate").val(this.settings.rate || this.defaultSettings.rate);
+        $("#system_tts_pitch").val(this.settings.pitch || this.defaultSettings.pitch);
         $("#system_tts_pitch_output").text(this.settings.pitch);
         $("#system_tts_rate_output").text(this.settings.rate);
         console.info("Settings loaded");
@@ -183,11 +172,7 @@ class SystemTtsProvider {
 
         return speechSynthesis
             .getVoices()
-            .sort(
-                (a, b) =>
-                    a.lang.localeCompare(b.lang) ||
-                    a.name.localeCompare(b.name),
-            )
+            .sort((a, b) => a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name))
             .map((x) => ({
                 name: x.name,
                 voice_id: x.voiceURI,
@@ -201,9 +186,7 @@ class SystemTtsProvider {
             throw "Speech synthesis API is not supported";
         }
 
-        const voice = speechSynthesis
-            .getVoices()
-            .find((x) => x.voiceURI === voiceId);
+        const voice = speechSynthesis.getVoices().find((x) => x.voiceURI === voiceId);
 
         if (!voice) {
             throw `TTS Voice name ${voiceName} not found`;

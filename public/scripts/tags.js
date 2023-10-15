@@ -4,19 +4,18 @@ import {
     this_chid,
     callPopup,
     menu_type,
-    updateVisibleDivs,
     getCharacters,
-    updateCharacterCount,
+    entitiesFilter,
 } from "../script.js";
+import { FILTER_TYPES } from "./filters.js";
 
-import { selected_group } from "./group-chats.js";
+import { groupCandidatesFilter, selected_group } from "./group-chats.js";
 
 export {
     tags,
     tag_map,
     loadTagsSettings,
     printTagFilters,
-    isElementTagged,
     getTagsList,
     appendTagToList,
     createTagMapFromList,
@@ -25,18 +24,11 @@ export {
 };
 
 const random_id = () => Math.round(Date.now() * Math.random()).toString();
-const TAG_LOGIC_AND = true; // switch to false to use OR logic for combining tags
-const CHARACTER_SELECTOR = "#rm_print_characters_block > div";
-const GROUP_MEMBER_SELECTOR = "#rm_group_add_members > div";
 const CHARACTER_FILTER_SELECTOR = "#rm_characters_block .rm_tag_filter";
 const GROUP_FILTER_SELECTOR = "#rm_group_chats_block .rm_tag_filter";
 
-function getCharacterSelector(listSelector) {
-    if ($(listSelector).is(GROUP_FILTER_SELECTOR)) {
-        return GROUP_MEMBER_SELECTOR;
-    }
-
-    return CHARACTER_SELECTOR;
+function getFilterHelper(listSelector) {
+    return $(listSelector).is(GROUP_FILTER_SELECTOR) ? groupCandidatesFilter : entitiesFilter;
 }
 
 export const tag_filter_types = {
@@ -93,49 +85,25 @@ const DEFAULT_TAGS = [
 let tags = [];
 let tag_map = {};
 
-function applyFavFilter(characterSelector) {
+function applyFavFilter(filterHelper) {
     const isSelected = $(this).hasClass("selected");
     const displayFavoritesOnly = !isSelected;
-
     $(this).toggleClass("selected", displayFavoritesOnly);
-    $(characterSelector).removeClass("hiddenByFav");
 
-    $(characterSelector).each(function () {
-        if (displayFavoritesOnly) {
-            if ($(this).find(".ch_fav").length !== 0) {
-                const shouldBeDisplayed = $(this)
-                    .find(".ch_fav")
-                    .val()
-                    .toLowerCase()
-                    .includes(true);
-                $(this).toggleClass("hiddenByFav", !shouldBeDisplayed);
-            }
-        }
-    });
-    updateCharacterCount(characterSelector);
-    updateVisibleDivs("#rm_print_characters_block", true);
+    filterHelper.setFilterData(FILTER_TYPES.FAV, displayFavoritesOnly);
 }
 
-function filterByGroups(characterSelector) {
+function filterByGroups(filterHelper) {
     const isSelected = $(this).hasClass("selected");
     const displayGroupsOnly = !isSelected;
     $(this).toggleClass("selected", displayGroupsOnly);
-    $(characterSelector).removeClass("hiddenByGroup");
 
-    $(characterSelector).each((_, element) => {
-        $(element).toggleClass(
-            "hiddenByGroup",
-            displayGroupsOnly && !$(element).hasClass("group_select"),
-        );
-    });
-    updateCharacterCount(characterSelector);
-    updateVisibleDivs("#rm_print_characters_block", true);
+    filterHelper.setFilterData(FILTER_TYPES.GROUP, displayGroupsOnly);
 }
 
 function loadTagsSettings(settings) {
     tags = settings.tags !== undefined ? settings.tags : DEFAULT_TAGS;
-    tag_map =
-        settings.tag_map !== undefined ? settings.tag_map : Object.create(null);
+    tag_map = settings.tag_map !== undefined ? settings.tag_map : Object.create(null);
 }
 
 function renameTagKey(oldKey, newKey) {
@@ -231,8 +199,7 @@ function findTag(request, resolve, listSelector) {
         .map((t) => t.name)
         .sort();
     const needle = request.term.toLowerCase();
-    const hasExactMatch =
-        haystack.findIndex((x) => x.toLowerCase() == needle) !== -1;
+    const hasExactMatch = haystack.findIndex((x) => x.toLowerCase() == needle) !== -1;
     const result = haystack.filter((x) => x.toLowerCase().includes(needle));
 
     if (request.term && !hasExactMatch) {
@@ -269,9 +236,7 @@ function selectTag(event, ui, listSelector) {
 function getExistingTags(new_tags) {
     let existing_tags = [];
     for (let tag of new_tags) {
-        let foundTag = tags.find(
-            (t) => t.name.toLowerCase() === tag.toLowerCase(),
-        );
+        let foundTag = tags.find((t) => t.name.toLowerCase() === tag.toLowerCase());
         if (foundTag) {
             existing_tags.push(foundTag.name);
         }
@@ -280,21 +245,14 @@ function getExistingTags(new_tags) {
 }
 
 async function importTags(imported_char) {
-    let imported_tags = imported_char.tags.filter(
-        (t) => t !== "ROOT" && t !== "TAVERN",
-    );
+    let imported_tags = imported_char.tags.filter((t) => t !== "ROOT" && t !== "TAVERN");
     let existingTags = await getExistingTags(imported_tags);
     //make this case insensitive
     let newTags = imported_tags.filter(
-        (t) =>
-            !existingTags.some(
-                (existingTag) => existingTag.toLowerCase() === t.toLowerCase(),
-            ),
+        (t) => !existingTags.some((existingTag) => existingTag.toLowerCase() === t.toLowerCase()),
     );
     let selected_tags = "";
-    const existingTagsString = existingTags.length
-        ? ": " + existingTags.join(", ")
-        : "";
+    const existingTagsString = existingTags.length ? ": " + existingTags.join(", ") : "";
     if (newTags.length === 0) {
         await callPopup(
             `<h3>Importing Tags For ${imported_char.name}</h3><p>${existingTags.length} existing tags have been found${existingTagsString}.</p>`,
@@ -344,16 +302,10 @@ function createNewTag(tagName) {
     return tag;
 }
 
-function appendTagToList(
-    listElement,
-    tag,
-    { removable, selectable, action, isGeneralList },
-) {
+function appendTagToList(listElement, tag, { removable, selectable, action, isGeneralList }) {
     if (!listElement) {
         return;
     }
-
-    const characterSelector = getCharacterSelector($(listElement));
 
     let tagElement = $("#tag_template .tag").clone();
     tagElement.attr("id", tag.id);
@@ -370,31 +322,22 @@ function appendTagToList(
     }
 
     if (tag.icon) {
-        tagElement
-            .find(".tag_name")
-            .text("")
-            .attr("title", tag.name)
-            .addClass(tag.icon);
+        tagElement.find(".tag_name").text("").attr("title", tag.name).addClass(tag.icon);
     }
 
     if (tag.excluded) {
         isGeneralList
             ? $(tagElement).addClass("excluded")
-            : $(listElement)
-                  .closest(".character_select, .group_select")
-                  .addClass("hiddenByTag");
+            : $(listElement).closest(".character_select, .group_select").addClass("hiddenByTag");
     }
 
     if (selectable) {
-        tagElement.on("click", () =>
-            onTagFilterClick.bind(tagElement)(listElement, characterSelector),
-        );
+        tagElement.on("click", () => onTagFilterClick.bind(tagElement)(listElement, characterSelector));
     }
 
     if (action) {
-        tagElement.on("click", () =>
-            action.bind(tagElement)(characterSelector),
-        );
+        const filter = getFilterHelper($(listElement));
+        tagElement.on("click", () => action.bind(tagElement)(filter));
         tagElement.addClass("actionable");
     }
     if (action && tag.id === 2) {
@@ -404,14 +347,14 @@ function appendTagToList(
     $(listElement).append(tagElement);
 }
 
-function onTagFilterClick(listElement, characterSelector) {
+function onTagFilterClick(listElement) {
     let excludeTag;
     if ($(this).hasClass("selected")) {
         $(this).removeClass("selected");
         $(this).addClass("excluded");
         excludeTag = true;
     } else if ($(this).hasClass("excluded")) {
-        $(this).removeClass("excluded");
+        $(this).removeClass("excludentitiesFilter,ed");
         excludeTag = false;
     } else {
         $(this).addClass("selected");
@@ -428,7 +371,6 @@ function onTagFilterClick(listElement, characterSelector) {
         }
     }
 
-    // TODO: Overhaul this somehow to use settings tag IDs instead
     const tagIds = [
         ...$(listElement)
             .find(".tag.selected:not(.actionable)")
@@ -439,53 +381,15 @@ function onTagFilterClick(listElement, characterSelector) {
             .find(".tag.excluded:not(.actionable)")
             .map((_, el) => $(el).attr("id")),
     ];
-    $(characterSelector).each((_, element) =>
-        applyFilterToElement(tagIds, excludedTagIds, element),
-    );
-    updateCharacterCount(characterSelector);
-    updateVisibleDivs("#rm_print_characters_block", true);
-}
-
-function applyFilterToElement(tagIds, excludedTagIds, element) {
-    const tagFlags = tagIds.map((tagId) => isElementTagged(element, tagId));
-    const trueFlags = tagFlags.filter((x) => x);
-    const isTagged = TAG_LOGIC_AND
-        ? tagFlags.length === trueFlags.length
-        : trueFlags.length > 0;
-
-    const excludedTagFlags = excludedTagIds.map((tagId) =>
-        isElementTagged(element, tagId),
-    );
-    const isExcluded = excludedTagFlags.includes(true);
-
-    if (isExcluded) {
-        $(element).addClass("hiddenByTag");
-    } else if (tagIds.length > 0 && !isTagged) {
-        $(element).addClass("hiddenByTag");
-    } else {
-        $(element).removeClass("hiddenByTag");
-    }
-}
-
-function isElementTagged(element, tagId) {
-    const isGroup = $(element).hasClass("group_select");
-    const isCharacter =
-        $(element).hasClass("character_select") ||
-        $(element).hasClass("group_member");
-    const idAttr = isGroup ? "grid" : "chid";
-    const elementId = $(element).attr(idAttr);
-    const lookupValue = isCharacter ? characters[elementId].avatar : elementId;
-    const isTagged =
-        Array.isArray(tag_map[lookupValue]) &&
-        tag_map[lookupValue].includes(tagId);
-    return isTagged;
+    const filterHelper = getFilterHelper($(listElement));
+    filterHelper.setFilterData(FILTER_TYPES.TAG, {
+        excluded: excludedTagIds,
+        selected: tagIds,
+    });
 }
 
 function printTagFilters(type = tag_filter_types.character) {
-    const FILTER_SELECTOR =
-        type === tag_filter_types.character
-            ? CHARACTER_FILTER_SELECTOR
-            : GROUP_FILTER_SELECTOR;
+    const FILTER_SELECTOR = type === tag_filter_types.character ? CHARACTER_FILTER_SELECTOR : GROUP_FILTER_SELECTOR;
     const selectedTagIds = [
         ...$(FILTER_SELECTOR)
             .find(".tag.selected")
@@ -606,9 +510,7 @@ function onViewTagsListClick() {
     $(list).append("<h3>Tags</h3><i>Click on the tag name to edit it.</i><br>");
     $(list).append("<i>Click on color box to assign new color.</i><br><br>");
 
-    for (const tag of tags
-        .slice()
-        .sort((a, b) => a?.name?.localeCompare(b?.name))) {
+    for (const tag of tags.slice().sort((a, b) => a?.name?.localeCompare(b?.name))) {
         const count = everything.filter((x) => x == tag.id).length;
         const template = $("#tag_view_template .tag_view_item").clone();
         template.attr("id", tag.id);
@@ -627,11 +529,9 @@ function onViewTagsListClick() {
         list.appendChild(template.get(0));
 
         setTimeout(function () {
-            document
-                .querySelector(`.tag-color[id="${colorPickerId}"`)
-                .addEventListener("change", (evt) => {
-                    onTagColorize(evt);
-                });
+            document.querySelector(`.tag-color[id="${colorPickerId}"`).addEventListener("change", (evt) => {
+                onTagColorize(evt);
+            });
         }, 100);
 
         $(colorPickerId).color = tag.color;
@@ -668,11 +568,7 @@ function onTagColorize(evt) {
     console.debug(evt);
     const id = $(evt.target).closest(".tag_view_item").attr("id");
     const newColor = evt.detail.rgba;
-    $(evt.target)
-        .parent()
-        .parent()
-        .find(".tag_view_name")
-        .css("background-color", newColor);
+    $(evt.target).parent().parent().find(".tag_view_name").css("background-color", newColor);
     $(`.tag[id="${id}"]`).css("background-color", newColor);
     const tag = tags.find((x) => x.id === id);
     tag.color = newColor;

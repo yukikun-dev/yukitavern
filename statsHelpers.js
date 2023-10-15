@@ -49,22 +49,9 @@ function timestampToMoment(timestamp) {
         return timestamp;
     }
 
-    const pattern1 =
-        /(\d{4})-(\d{1,2})-(\d{1,2}) @(\d{1,2})h (\d{1,2})m (\d{1,2})s (\d{1,3})ms/;
-    const replacement1 = (
-        match,
-        year,
-        month,
-        day,
-        hour,
-        minute,
-        second,
-        millisecond,
-    ) => {
-        return `${year}-${month.padStart(2, "0")}-${day.padStart(
-            2,
-            "0",
-        )}T${hour.padStart(2, "0")}:${minute.padStart(
+    const pattern1 = /(\d{4})-(\d{1,2})-(\d{1,2}) @(\d{1,2})h (\d{1,2})m (\d{1,2})s (\d{1,3})ms/;
+    const replacement1 = (match, year, month, day, hour, minute, second, millisecond) => {
+        return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${hour.padStart(2, "0")}:${minute.padStart(
             2,
             "0",
         )}:${second.padStart(2, "0")}.${millisecond.padStart(3, "0")}Z`;
@@ -91,17 +78,10 @@ function timestampToMoment(timestamp) {
             "December",
         ];
         const monthNum = monthNames.indexOf(month) + 1;
-        const hour24 =
-            meridiem.toLowerCase() === "pm"
-                ? (parseInt(hour, 10) % 12) + 12
-                : parseInt(hour, 10) % 12;
-        return `${year}-${monthNum.toString().padStart(2, "0")}-${day.padStart(
-            2,
-            "0",
-        )}T${hour24.toString().padStart(2, "0")}:${minute.padStart(
-            2,
-            "0",
-        )}:00Z`;
+        const hour24 = meridiem.toLowerCase() === "pm" ? (parseInt(hour, 10) % 12) + 12 : parseInt(hour, 10) % 12;
+        return `${year}-${monthNum.toString().padStart(2, "0")}-${day.padStart(2, "0")}T${hour24
+            .toString()
+            .padStart(2, "0")}:${minute.padStart(2, "0")}:00Z`;
     };
     const isoTimestamp2 = timestamp.replace(pattern2, replacement2);
     if (!isNaN(new Date(isoTimestamp2))) {
@@ -124,9 +104,7 @@ async function collectAndCreateStats(chatsPath, charactersPath) {
 
     const pngFiles = files.filter((file) => file.endsWith(".png"));
 
-    let processingPromises = pngFiles.map((file, index) =>
-        calculateStats(chatsPath, file, index),
-    );
+    let processingPromises = pngFiles.map((file, index) => calculateStats(chatsPath, file, index));
     const statsArr = await Promise.all(processingPromises);
 
     let finalStats = {};
@@ -256,11 +234,7 @@ const calculateStats = (chatsPath, item) => {
         const chats = fs.readdirSync(char_dir);
         if (Array.isArray(chats) && chats.length) {
             for (const chat of chats) {
-                const result = calculateTotalGenTimeAndWordCount(
-                    char_dir,
-                    chat,
-                    uniqueGenStartTimes,
-                );
+                const result = calculateTotalGenTimeAndWordCount(char_dir, chat, uniqueGenStartTimes);
                 stats.total_gen_time += result.totalGenTime || 0;
                 stats.user_word_count += result.userWordCount || 0;
                 stats.non_user_word_count += result.nonUserWordCount || 0;
@@ -270,14 +244,8 @@ const calculateStats = (chatsPath, item) => {
 
                 const chatStat = fs.statSync(path.join(char_dir, chat));
                 stats.chat_size += chatStat.size;
-                stats.date_last_chat = Math.max(
-                    stats.date_last_chat,
-                    Math.floor(chatStat.mtimeMs),
-                );
-                stats.date_first_chat = Math.min(
-                    stats.date_first_chat,
-                    result.firstChatTime,
-                );
+                stats.date_last_chat = Math.max(stats.date_last_chat, Math.floor(chatStat.mtimeMs));
+                stats.date_first_chat = Math.min(stats.date_first_chat, result.firstChatTime);
             }
         }
     }
@@ -310,11 +278,7 @@ function setCharStats(stats) {
  * @returns {Object} - An object containing the total generation time, user word count, and non-user word count.
  * @throws Will throw an error if the file cannot be read or parsed.
  */
-function calculateTotalGenTimeAndWordCount(
-    char_dir,
-    chat,
-    uniqueGenStartTimes,
-) {
+function calculateTotalGenTimeAndWordCount(char_dir, chat, uniqueGenStartTimes) {
     let filepath = path.join(char_dir, chat);
     let lines = readAndParseFile(filepath);
 
@@ -331,10 +295,7 @@ function calculateTotalGenTimeAndWordCount(
             try {
                 let json = JSON.parse(line);
                 if (json.mes) {
-                    let hash = crypto
-                        .createHash("sha256")
-                        .update(json.mes)
-                        .digest("hex");
+                    let hash = crypto.createHash("sha256").update(json.mes).digest("hex");
                     if (uniqueGenStartTimes.has(hash)) {
                         continue;
                     }
@@ -344,10 +305,7 @@ function calculateTotalGenTimeAndWordCount(
                 }
 
                 if (json.gen_started && json.gen_finished) {
-                    let genTime = calculateGenTime(
-                        json.gen_started,
-                        json.gen_finished,
-                    );
+                    let genTime = calculateGenTime(json.gen_started, json.gen_finished);
                     totalGenTime += genTime;
 
                     if (json.swipes && !json.swipe_info) {
@@ -358,9 +316,7 @@ function calculateTotalGenTimeAndWordCount(
 
                 if (json.mes) {
                     let wordCount = countWordsInString(json.mes);
-                    json.is_user
-                        ? (userWordCount += wordCount)
-                        : (nonUserWordCount += wordCount);
+                    json.is_user ? (userWordCount += wordCount) : (nonUserWordCount += wordCount);
                     json.is_user ? userMsgCount++ : nonUserMsgCount++;
                 }
 
@@ -371,9 +327,7 @@ function calculateTotalGenTimeAndWordCount(
                         let swipeText = json.swipes[i];
 
                         let wordCount = countWordsInString(swipeText);
-                        json.is_user
-                            ? (userWordCount += wordCount)
-                            : (nonUserWordCount += wordCount);
+                        json.is_user ? (userWordCount += wordCount) : (nonUserWordCount += wordCount);
                         json.is_user ? userMsgCount++ : nonUserMsgCount++;
                     }
                 }
@@ -383,10 +337,7 @@ function calculateTotalGenTimeAndWordCount(
                         // Start from the second swipe
                         let swipe = json.swipe_info[i];
                         if (swipe.gen_started && swipe.gen_finished) {
-                            totalGenTime += calculateGenTime(
-                                swipe.gen_started,
-                                swipe.gen_finished,
-                            );
+                            totalGenTime += calculateGenTime(swipe.gen_started, swipe.gen_finished);
                         }
                     }
                 }
@@ -394,10 +345,7 @@ function calculateTotalGenTimeAndWordCount(
                 // If this is the first user message, set the first chat time
                 if (json.is_user) {
                     //get min between firstChatTime and timestampToMoment(json.send_date)
-                    firstChatTime = Math.min(
-                        timestampToMoment(json.send_date),
-                        firstChatTime,
-                    );
+                    firstChatTime = Math.min(timestampToMoment(json.send_date), firstChatTime);
                 }
             } catch (error) {
                 console.error(`Error parsing line ${line}: ${error}`);

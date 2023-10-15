@@ -26,9 +26,7 @@ class WhisperSttProvider {
     loadSettings(settings) {
         // Populate Provider UI given input settings
         if (Object.keys(settings).length == 0) {
-            console.debug(
-                DEBUG_PREFIX + "Using default Whisper STT extension settings",
-            );
+            console.debug(DEBUG_PREFIX + "Using default Whisper STT extension settings");
         }
 
         // Only accept keys defined in defaultSettings
@@ -58,18 +56,12 @@ class WhisperSttProvider {
         });
 
         if (!apiResult.ok) {
-            toastr.error(
-                apiResult.statusText,
-                "STT Generation Failed (Whisper)",
-                {
-                    timeOut: 10000,
-                    extendedTimeOut: 20000,
-                    preventDuplicates: true,
-                },
-            );
-            throw new Error(
-                `HTTP ${apiResult.status}: ${await apiResult.text()}`,
-            );
+            toastr.error(apiResult.statusText, "STT Generation Failed (Whisper)", {
+                timeOut: 10000,
+                extendedTimeOut: 20000,
+                preventDuplicates: true,
+            });
+            throw new Error(`HTTP ${apiResult.status}: ${await apiResult.text()}`);
         }
 
         const result = await apiResult.json();

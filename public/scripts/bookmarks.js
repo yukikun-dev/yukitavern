@@ -44,9 +44,7 @@ async function getExistingChatNames() {
 
         if (response.ok) {
             const data = await response.json();
-            return Object.values(data).map((x) =>
-                x.file_name.replace(".jsonl", ""),
-            );
+            return Object.values(data).map((x) => x.file_name.replace(".jsonl", ""));
         }
     }
 }
@@ -79,15 +77,9 @@ function getMainChatName() {
         // groups didn't support bookmarks before chat metadata was introduced
         else if (selected_group) {
             return null;
-        } else if (
-            characters[this_chid].chat &&
-            characters[this_chid].chat.includes(bookmarkNameToken)
-        ) {
-            const tokenIndex =
-                characters[this_chid].chat.lastIndexOf(bookmarkNameToken);
-            chat_metadata["main_chat"] = characters[this_chid].chat
-                .substring(0, tokenIndex)
-                .trim();
+        } else if (characters[this_chid].chat && characters[this_chid].chat.includes(bookmarkNameToken)) {
+            const tokenIndex = characters[this_chid].chat.lastIndexOf(bookmarkNameToken);
+            chat_metadata["main_chat"] = characters[this_chid].chat.substring(0, tokenIndex).trim();
             return chat_metadata["main_chat"];
         }
     }
@@ -166,9 +158,7 @@ async function createNewBookmark(mesId) {
         return;
     }
 
-    const mainChat = selected_group
-        ? groups?.find((x) => x.id == selected_group)?.chat_id
-        : characters[this_chid].chat;
+    const mainChat = selected_group ? groups?.find((x) => x.id == selected_group)?.chat_id : characters[this_chid].chat;
     const newMetadata = { main_chat: mainChat };
 
     if (selected_group) {
@@ -181,11 +171,9 @@ async function createNewBookmark(mesId) {
     $(`.mes[mesid="${mesId}"]`).attr("bookmark_link", name);
 
     await saveChatConditional();
-    toastr.success(
-        "Click the bookmark icon in the last message to open the checkpoint chat.",
-        "Bookmark created",
-        { timeOut: 10000 },
-    );
+    toastr.success("Click the bookmark icon in the last message to open the checkpoint chat.", "Bookmark created", {
+        timeOut: 10000,
+    });
 }
 
 async function backToMainChat() {
@@ -215,10 +203,7 @@ async function convertSoloToGroupChat() {
     const character = characters[this_chid];
 
     // Populate group required fields
-    const name = getUniqueName(
-        `Group: ${character.name}`,
-        (y) => groups.findIndex((x) => x.name === y) !== -1,
-    );
+    const name = getUniqueName(`Group: ${character.name}`, (y) => groups.findIndex((x) => x.name === y) !== -1);
     const avatar = getThumbnailUrl("avatar", character.avatar);
     const chatName = humanizedDateTime();
     const chats = [chatName];

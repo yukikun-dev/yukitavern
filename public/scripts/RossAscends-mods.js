@@ -17,24 +17,17 @@ import {
     active_character,
     setActiveGroup,
     setActiveCharacter,
+    getEntitiesList,
+    getThumbnailUrl,
+    selectCharacterById,
 } from "../script.js";
 
 import { characterStatsHandler } from "./stats.js";
 
 import { power_user, send_on_enter_options } from "./power-user.js";
 
-import {
-    LoadLocal,
-    SaveLocal,
-    CheckLocal,
-    LoadLocalBool,
-} from "./f-localStorage.js";
-import {
-    selected_group,
-    is_group_generating,
-    getGroupAvatar,
-    groups,
-} from "./group-chats.js";
+import { LoadLocal, SaveLocal, CheckLocal, LoadLocalBool } from "./f-localStorage.js";
+import { selected_group, is_group_generating, getGroupAvatar, groups } from "./group-chats.js";
 import { SECRET_KEYS, secret_state } from "./secrets.js";
 import { sortByCssOrder, debounce, delay } from "./utils.js";
 import { chat_completion_sources, oai_settings } from "./openai.js";
@@ -166,13 +159,7 @@ async function getDeviceInfo() {
 }
 
 export function isMobile() {
-    const mobileTypes = [
-        "smartphone",
-        "tablet",
-        "phablet",
-        "feature phone",
-        "portable media player",
-    ];
+    const mobileTypes = ["smartphone", "tablet", "phablet", "feature phone", "portable media player"];
     return mobileTypes.includes(deviceInfo?.device?.type);
 }
 
@@ -201,13 +188,9 @@ export function humanizedDateTime() {
     let humanMonth = baseDate.getMonth() + 1;
     let humanDate = baseDate.getDate();
     let humanHour = (baseDate.getHours() < 10 ? "0" : "") + baseDate.getHours();
-    let humanMinute =
-        (baseDate.getMinutes() < 10 ? "0" : "") + baseDate.getMinutes();
-    let humanSecond =
-        (baseDate.getSeconds() < 10 ? "0" : "") + baseDate.getSeconds();
-    let humanMillisecond =
-        (baseDate.getMilliseconds() < 10 ? "0" : "") +
-        baseDate.getMilliseconds();
+    let humanMinute = (baseDate.getMinutes() < 10 ? "0" : "") + baseDate.getMinutes();
+    let humanSecond = (baseDate.getSeconds() < 10 ? "0" : "") + baseDate.getSeconds();
+    let humanMillisecond = (baseDate.getMilliseconds() < 10 ? "0" : "") + baseDate.getMilliseconds();
     let HumanizedDateTime =
         humanYear +
         "-" +
@@ -258,17 +241,7 @@ export function getMessageTimeStamp() {
     if (hours === 0) {
         hours = 12;
     }
-    const formattedDate =
-        month +
-        " " +
-        day +
-        ", " +
-        year +
-        " " +
-        hours +
-        ":" +
-        minutes +
-        meridiem;
+    const formattedDate = month + " " + day + ", " + year + " " + hours + ":" + minutes + meridiem;
     return formattedDate;
 }
 
@@ -365,9 +338,7 @@ export function RA_CountCharTokens() {
                 characters[this_chid].personality,
                 characters[this_chid].scenario,
                 // add examples to permanent if they are pinned
-                power_user.pin_examples
-                    ? characters[this_chid].mes_example
-                    : "",
+                power_user.pin_examples ? characters[this_chid].mes_example : "",
             ]
                 .join("\n")
                 .replace(/\r/gm, "")
@@ -379,17 +350,11 @@ export function RA_CountCharTokens() {
         }
     }
     //label rm_stats_button with a tooltip indicating stats
-    $("#result_info")
-        .html(`<small>${count_tokens} Tokens (${perm_tokens} Permanent)</small>
+    $("#result_info").html(`<small>${count_tokens} Tokens (${perm_tokens} Permanent)</small>
 
     <i title='Click for stats!' class="fa-solid fa-circle-info rm_stats_button"></i>`);
     // display the counted tokens
-    const tokenLimit = Math.max(
-        (main_api !== "openai"
-            ? max_context
-            : oai_settings.openai_max_context) / 2,
-        1024,
-    );
+    const tokenLimit = Math.max((main_api !== "openai" ? max_context : oai_settings.openai_max_context) / 2, 1024);
     if (count_tokens < tokenLimit && perm_tokens < tokenLimit) {
     } else {
         $("#result_info").html(`
@@ -418,19 +383,15 @@ export function RA_CountCharTokens() {
 async function RA_autoloadchat() {
     if (document.getElementById("CharID0") !== null) {
         // active character is the name, we should look it up in the character list and get the id
-        let active_character_id = Object.keys(characters).find(
-            (key) => characters[key].avatar === active_character,
-        );
+        let active_character_id = Object.keys(characters).find((key) => characters[key].avatar === active_character);
 
-        var charToAutoLoad = document.getElementById(
-            "CharID" + active_character_id,
-        );
-        let groupToAutoLoad = document.querySelector(
-            `.group_select[grid="${active_group}"]`,
-        );
-        if (charToAutoLoad != null) {
-            $(charToAutoLoad).click();
-        } else if (groupToAutoLoad != null) {
+        if (active_character_id !== null) {
+            selectCharacterById(String(active_character_id));
+        }
+
+        let groupToAutoLoad = document.querySelector(`.group_select[grid="${active_group}"]`);
+
+        if (groupToAutoLoad != null) {
             $(groupToAutoLoad).click();
         }
 
@@ -441,50 +402,54 @@ async function RA_autoloadchat() {
 }
 
 export async function favsToHotswap() {
-    const selector = [
-        "#rm_print_characters_block .character_select",
-        "#rm_print_characters_block .group_select",
-    ].join(",");
+    const entities = getEntitiesList({ doFilter: false });
     const container = $("#right-nav-panel .hotswap");
     const template = $("#hotswap_template .hotswapAvatar");
     container.empty();
     const maxCount = 6;
     let count = 0;
 
-    $(selector)
-        .sort(sortByCssOrder)
-        .each(function () {
-            if ($(this).hasClass("is_fav") && count < maxCount) {
-                const isCharacter = $(this).hasClass("character_select");
-                const isGroup = $(this).hasClass("group_select");
-                const grid = Number($(this).attr("grid"));
-                const chid = Number($(this).attr("chid"));
-                let thisHotSwapSlot = template.clone();
-                thisHotSwapSlot.toggleClass("character_select", isCharacter);
-                thisHotSwapSlot.toggleClass("group_select", isGroup);
-                thisHotSwapSlot.attr("grid", isGroup ? grid : "");
-                thisHotSwapSlot.attr("chid", isCharacter ? chid : "");
-                thisHotSwapSlot.data("id", isGroup ? grid : chid);
-                thisHotSwapSlot.attr("title", "");
+    for (const entity of entities) {
+        if (count >= maxCount) {
+            break;
+        }
 
-                if (isGroup) {
-                    const group = groups.find((x) => x.id === grid);
-                    const avatar = getGroupAvatar(group);
-                    $(thisHotSwapSlot).find("img").replaceWith(avatar);
-                }
+        const isFavorite = entity.item.fav || entity.item.fav == "true";
 
-                if (isCharacter) {
-                    const avatarUrl = $(this).find("img").attr("src");
-                    $(thisHotSwapSlot).find("img").attr("src", avatarUrl);
-                }
+        if (!isFavorite) {
+            continue;
+        }
 
-                $(thisHotSwapSlot).css("cursor", "pointer");
-                container.append(thisHotSwapSlot);
-                count++;
-            }
-        });
+        const isCharacter = entity.type === "character";
+        const isGroup = entity.type === "group";
 
-    //console.log('about to check for leftover selectors...')
+        const grid = isGroup ? entity.id : "";
+        const chid = isCharacter ? entity.id : "";
+
+        let slot = template.clone();
+        slot.toggleClass("character_select", isCharacter);
+        slot.toggleClass("group_select", isGroup);
+        slot.attr("grid", isGroup ? grid : "");
+        slot.attr("chid", isCharacter ? chid : "");
+        slot.data("id", isGroup ? grid : chid);
+        slot.attr("title", "");
+
+        if (isGroup) {
+            const group = groups.find((x) => x.id === grid);
+            const avatar = getGroupAvatar(group);
+            $(slot).find("img").replaceWith(avatar);
+        }
+
+        if (isCharacter) {
+            const avatarUrl = getThumbnailUrl("avatar", entity.item.avatar);
+            $(slot).find("img").attr("src", avatarUrl);
+        }
+
+        $(slot).css("cursor", "pointer");
+        container.append(slot);
+        count++;
+    }
+
     // there are 6 slots in total,
     if (count < maxCount) {
         //if any are left over
@@ -492,8 +457,6 @@ export async function favsToHotswap() {
         for (let i = 1; i <= leftOverSlots; i++) {
             container.append(template.clone());
         }
-    } else {
-        //console.log(`count was ${count} so no need to knock off any selectors!`);
     }
 }
 
@@ -504,20 +467,13 @@ function RA_checkOnlineStatus() {
         $("#send_form").addClass("no-connection"); //entire input form area is red when not connected
         $("#send_but").css("display", "none"); //send button is hidden when not connected;
         $("#API-status-top").removeClass("fa-plug");
-        $("#API-status-top").addClass(
-            "fa-plug-circle-exclamation redOverlayGlow",
-        );
+        $("#API-status-top").addClass("fa-plug-circle-exclamation redOverlayGlow");
         connection_made = false;
     } else {
         if (online_status !== undefined && online_status !== "no_connection") {
-            $("#send_textarea").attr(
-                "placeholder",
-                `Type a message, or /? for command list`,
-            ); //on connect, placeholder tells user to type message
+            $("#send_textarea").attr("placeholder", `Type a message, or /? for command list`); //on connect, placeholder tells user to type message
             $("#send_form").removeClass("no-connection");
-            $("#API-status-top").removeClass(
-                "fa-plug-circle-exclamation redOverlayGlow",
-            );
+            $("#API-status-top").removeClass("fa-plug-circle-exclamation redOverlayGlow");
             $("#API-status-top").addClass("fa-plug");
             connection_made = true;
             retry_delay = 100;
@@ -537,32 +493,21 @@ function RA_autoconnect(PrevApi) {
         setTimeout(RA_autoconnect, 100);
         return;
     }
-    if (
-        online_status === "no_connection" &&
-        LoadLocalBool("AutoConnectEnabled")
-    ) {
+    if (online_status === "no_connection" && LoadLocalBool("AutoConnectEnabled")) {
         switch (main_api) {
             case "textgenerationwebui":
-                if (
-                    api_server_textgenerationwebui &&
-                    isUrlOrAPIKey(api_server_textgenerationwebui)
-                ) {
+                if (api_server_textgenerationwebui && isUrlOrAPIKey(api_server_textgenerationwebui)) {
                     $("#api_button_textgenerationwebui").click();
                 }
                 break;
             case "openai":
                 if (
-                    ((secret_state[SECRET_KEYS.OPENAI] ||
-                        oai_settings.reverse_proxy) &&
-                        oai_settings.chat_completion_source ==
-                            chat_completion_sources.OPENAI) ||
-                    ((secret_state[SECRET_KEYS.CLAUDE] ||
-                        oai_settings.reverse_proxy) &&
-                        oai_settings.chat_completion_source ==
-                            chat_completion_sources.CLAUDE) ||
+                    ((secret_state[SECRET_KEYS.OPENAI] || oai_settings.reverse_proxy) &&
+                        oai_settings.chat_completion_source == chat_completion_sources.OPENAI) ||
+                    ((secret_state[SECRET_KEYS.CLAUDE] || oai_settings.reverse_proxy) &&
+                        oai_settings.chat_completion_source == chat_completion_sources.CLAUDE) ||
                     (secret_state[SECRET_KEYS.OPENROUTER] &&
-                        oai_settings.chat_completion_source ==
-                            chat_completion_sources.OPENROUTER)
+                        oai_settings.chat_completion_source == chat_completion_sources.OPENROUTER)
                 ) {
                     $("#api_button_openai").click();
                 }
@@ -590,28 +535,19 @@ function isUrlOrAPIKey(string) {
 function OpenNavPanels() {
     if (deviceInfo.device.type === "desktop") {
         //auto-open R nav if locked and previously open
-        if (
-            LoadLocalBool("NavLockOn") == true &&
-            LoadLocalBool("NavOpened") == true
-        ) {
+        if (LoadLocalBool("NavLockOn") == true && LoadLocalBool("NavOpened") == true) {
             //console.log("RA -- clicking right nav to open");
             $("#rightNavDrawerIcon").click();
         }
 
         //auto-open L nav if locked and previously open
-        if (
-            LoadLocalBool("LNavLockOn") == true &&
-            LoadLocalBool("LNavOpened") == true
-        ) {
+        if (LoadLocalBool("LNavLockOn") == true && LoadLocalBool("LNavOpened") == true) {
             console.debug("RA -- clicking left nav to open");
             $("#leftNavDrawerIcon").click();
         }
 
         //auto-open WI if locked and previously open
-        if (
-            LoadLocalBool("WINavLockOn") == true &&
-            LoadLocalBool("WINavOpened") == true
-        ) {
+        if (LoadLocalBool("WINavLockOn") == true && LoadLocalBool("WINavOpened") == true) {
             console.debug("RA -- clicking WI to open");
             $("#WIDrawerIcon").click();
         }
@@ -628,10 +564,7 @@ $("document").ready(function () {
 
     // read the state of AutoConnect and AutoLoadChat.
     $(AutoConnectCheckbox).prop("checked", LoadLocalBool("AutoConnectEnabled"));
-    $(AutoLoadChatCheckbox).prop(
-        "checked",
-        LoadLocalBool("AutoLoadChatEnabled"),
-    );
+    $(AutoLoadChatCheckbox).prop("checked", LoadLocalBool("AutoLoadChatEnabled"));
 
     setTimeout(function () {
         if (LoadLocalBool("AutoLoadChatEnabled") == true) {
@@ -661,10 +594,7 @@ $("document").ready(function () {
             //console.log('removing pin class from right nav');
             $(RightNavPanel).removeClass("pinnedOpen");
 
-            if (
-                $(RightNavPanel).hasClass("openDrawer") &&
-                $(".openDrawer").length > 1
-            ) {
+            if ($(RightNavPanel).hasClass("openDrawer") && $(".openDrawer").length > 1) {
                 $(RightNavPanel).slideToggle(200, "swing");
                 //$(rightNavDrawerIcon).toggleClass('openIcon closedIcon');
                 $(RightNavPanel).toggleClass("openDrawer closedDrawer");
@@ -680,10 +610,7 @@ $("document").ready(function () {
             //console.log('removing pin class from Left nav');
             $(LeftNavPanel).removeClass("pinnedOpen");
 
-            if (
-                $(LeftNavPanel).hasClass("openDrawer") &&
-                $(".openDrawer").length > 1
-            ) {
+            if ($(LeftNavPanel).hasClass("openDrawer") && $(".openDrawer").length > 1) {
                 $(LeftNavPanel).slideToggle(200, "swing");
                 //$(leftNavDrawerIcon).toggleClass('openIcon closedIcon');
                 $(LeftNavPanel).toggleClass("openDrawer closedDrawer");
@@ -700,10 +627,7 @@ $("document").ready(function () {
             console.debug("removing pin class from WI");
             $(WorldInfo).removeClass("pinnedOpen");
 
-            if (
-                $(WorldInfo).hasClass("openDrawer") &&
-                $(".openDrawer").length > 1
-            ) {
+            if ($(WorldInfo).hasClass("openDrawer") && $(".openDrawer").length > 1) {
                 console.debug("closing WI after lock removal");
                 $(WorldInfo).slideToggle(200, "swing");
                 //$(WorldInfoDrawerIcon).toggleClass('openIcon closedIcon');
@@ -772,15 +696,6 @@ $("document").ready(function () {
         }
     });
 
-    var chatbarInFocus = false;
-    $("#send_textarea").focus(function () {
-        chatbarInFocus = true;
-    });
-
-    $("#send_textarea").blur(function () {
-        chatbarInFocus = false;
-    });
-
     setTimeout(() => {
         OpenNavPanels();
     }, 300);
@@ -790,10 +705,7 @@ $("document").ready(function () {
         SaveLocal("AutoConnectEnabled", $(AutoConnectCheckbox).prop("checked"));
     });
     $(AutoLoadChatCheckbox).on("change", function () {
-        SaveLocal(
-            "AutoLoadChatEnabled",
-            $(AutoLoadChatCheckbox).prop("checked"),
-        );
+        SaveLocal("AutoLoadChatEnabled", $(AutoLoadChatCheckbox).prop("checked"));
     });
 
     $(SelectedCharacterTab).click(function () {
@@ -846,19 +758,17 @@ $("document").ready(function () {
     });
 
     function isInputElementInFocus() {
-        //return $(document.activeElement).is(":input");
-        var focused = $(":focus");
-        if (
-            focused.is("input") ||
-            focused.is("textarea") ||
-            focused.prop("contenteditable") == "true"
-        ) {
-            if (focused.attr("id") === "send_textarea") {
-                return false;
-            }
+        const focused = $(":focus");
+
+        if (focused.is("input") || focused.is("textarea") || focused.prop("contenteditable") == "true") {
             return true;
         }
         return false;
+    }
+
+    function isInputElementEmpty() {
+        const inputElement = $("#send_textarea");
+        return inputElement.val() === "";
     }
 
     $(document).on("keydown", function (event) {
@@ -870,13 +780,7 @@ $("document").ready(function () {
         //Enter to send when send_textarea in focus
         if ($(":focus").attr("id") === "send_textarea") {
             const sendOnEnter = shouldSendOnEnter();
-            if (
-                !event.shiftKey &&
-                !event.ctrlKey &&
-                event.key == "Enter" &&
-                is_send_press == false &&
-                sendOnEnter
-            ) {
+            if (!event.shiftKey && !event.ctrlKey && event.key == "Enter" && is_send_press == false && sendOnEnter) {
                 event.preventDefault();
                 Generate();
             }
@@ -894,10 +798,7 @@ $("document").ready(function () {
             if (contextLine.length !== 0) {
                 $("#chat").animate(
                     {
-                        scrollTop:
-                            contextLine.offset().top -
-                            $("#chat").offset().top +
-                            $("#chat").scrollTop(),
+                        scrollTop: contextLine.offset().top - $("#chat").offset().top + $("#chat").scrollTop(),
                     },
                     300,
                 );
@@ -939,10 +840,9 @@ $("document").ready(function () {
             //swipes left
             if (
                 $(".swipe_left:last").css("display") === "flex" &&
-                $("#send_textarea").val() === "" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none" &&
-                !isInputElementInFocus()
+                (!isInputElementInFocus() || isInputElementEmpty())
             ) {
                 $(".swipe_left:last").click();
             }
@@ -951,10 +851,9 @@ $("document").ready(function () {
             //swipes right
             if (
                 $(".swipe_right:last").css("display") === "flex" &&
-                $("#send_textarea").val() === "" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none" &&
-                !isInputElementInFocus()
+                (!isInputElementInFocus() || isInputElementEmpty())
             ) {
                 $(".swipe_right:last").click();
             }
@@ -963,20 +862,15 @@ $("document").ready(function () {
         if (event.ctrlKey && event.key == "ArrowUp") {
             //edits last USER message if chatbar is empty and focused
             if (
-                $("#send_textarea").val() === "" &&
-                chatbarInFocus === true &&
-                ($(".swipe_right:last").css("display") === "flex" ||
-                    $(".last_mes").attr("is_system") === "true") &&
+                isInputElementInFocus() &&
+                isInputElementEmpty() &&
+                ($(".swipe_right:last").css("display") === "flex" || $(".last_mes").attr("is_system") === "true") &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none"
             ) {
-                const isUserMesList = document.querySelectorAll(
-                    'div[is_user="true"]',
-                );
+                const isUserMesList = document.querySelectorAll('div[is_user="true"]');
                 const lastIsUserMes = isUserMesList[isUserMesList.length - 1];
-                const editMes = lastIsUserMes.querySelector(
-                    ".mes_block .mes_edit",
-                );
+                const editMes = lastIsUserMes.querySelector(".mes_block .mes_edit");
                 if (editMes !== null) {
                     $(editMes).trigger("click");
                 }
@@ -985,10 +879,9 @@ $("document").ready(function () {
 
         if (event.key == "ArrowUp") {
             //edits last message if chatbar is empty and focused
-            //console.log('got uparrow input');
             if (
-                $("#send_textarea").val() === "" &&
-                chatbarInFocus === true &&
+                isInputElementInFocus() &&
+                isInputElementEmpty() &&
                 $(".swipe_right:last").css("display") === "flex" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none"
@@ -1025,21 +918,12 @@ $("document").ready(function () {
                 return;
             }
 
-            if (
-                $(".drawer-content")
-                    .not("#WorldInfo")
-                    .not("#left-nav-panel")
-                    .not("#right-nav-panel")
-                    .is(":visible")
-            ) {
+            if ($(".drawer-content").not("#WorldInfo").not("#left-nav-panel").not("#right-nav-panel").is(":visible")) {
                 let visibleDrawerContent = $(".drawer-content:visible")
                     .not("#WorldInfo")
                     .not("#left-nav-panel")
                     .not("#right-nav-panel");
-                $(visibleDrawerContent)
-                    .parent()
-                    .find(".drawer-icon")
-                    .trigger("click");
+                $(visibleDrawerContent).parent().find(".drawer-icon").trigger("click");
                 return;
             }
 

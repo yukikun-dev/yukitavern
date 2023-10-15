@@ -16,11 +16,7 @@ export function CheckLocal() {
     console.log("----------local storage---------");
     var i;
     for (i = 0; i < localStorage.length; i++) {
-        console.log(
-            localStorage.key(i) +
-                " : " +
-                localStorage.getItem(localStorage.key(i)),
-        );
+        console.log(localStorage.key(i) + " : " + localStorage.getItem(localStorage.key(i)));
     }
     console.log("------------------------------");
 }

@@ -49,28 +49,16 @@ function calculateTotalStats() {
     for (let stats of Object.values(charStats)) {
         totalStats.total_gen_time += verifyStatValue(stats.total_gen_time);
         totalStats.user_msg_count += verifyStatValue(stats.user_msg_count);
-        totalStats.non_user_msg_count += verifyStatValue(
-            stats.non_user_msg_count,
-        );
+        totalStats.non_user_msg_count += verifyStatValue(stats.non_user_msg_count);
         totalStats.user_word_count += verifyStatValue(stats.user_word_count);
-        totalStats.non_user_word_count += verifyStatValue(
-            stats.non_user_word_count,
-        );
-        totalStats.total_swipe_count += verifyStatValue(
-            stats.total_swipe_count,
-        );
+        totalStats.non_user_word_count += verifyStatValue(stats.non_user_word_count);
+        totalStats.total_swipe_count += verifyStatValue(stats.total_swipe_count);
 
         if (verifyStatValue(stats.date_last_chat) != 0) {
-            totalStats.date_last_chat = Math.max(
-                totalStats.date_last_chat,
-                stats.date_last_chat,
-            );
+            totalStats.date_last_chat = Math.max(totalStats.date_last_chat, stats.date_last_chat);
         }
         if (verifyStatValue(stats.date_first_chat) != 0) {
-            totalStats.date_first_chat = Math.min(
-                totalStats.date_first_chat,
-                stats.date_first_chat,
-            );
+            totalStats.date_first_chat = Math.min(totalStats.date_first_chat, stats.date_first_chat);
         }
     }
 
@@ -100,9 +88,7 @@ function createHtml(statsType, stats) {
     let timeStirng = humanizeGenTime(stats.total_gen_time);
     let chatAge = "Never";
     if (stats.date_first_chat < Date.now()) {
-        chatAge = moment
-            .duration(stats.date_last_chat - stats.date_first_chat)
-            .humanize();
+        chatAge = moment.duration(stats.date_last_chat - stats.date_first_chat).humanize();
     }
 
     // Create popup HTML with stats
@@ -114,10 +100,7 @@ function createHtml(statsType, stats) {
     }
     html += createStatBlock("Chat Time", timeStirng);
     html += createStatBlock("User Messages", stats.user_msg_count);
-    html += createStatBlock(
-        "Character Messages",
-        stats.non_user_msg_count - stats.total_swipe_count,
-    );
+    html += createStatBlock("Character Messages", stats.non_user_msg_count - stats.total_swipe_count);
     html += createStatBlock("User Words", stats.user_word_count);
     html += createStatBlock("Character Words", stats.non_user_word_count);
     html += createStatBlock("Swipes", stats.total_swipe_count);
@@ -268,10 +251,7 @@ async function statMesProcess(line, type, characters, this_chid, oldMesssage) {
         };
     }
 
-    stat.total_gen_time += calculateGenTime(
-        line.gen_started,
-        line.gen_finished,
-    );
+    stat.total_gen_time += calculateGenTime(line.gen_started, line.gen_finished);
     if (line.is_user) {
         if (type != "append" && type != "continue" && type != "appendFinal") {
             stat.user_msg_count++;
@@ -296,17 +276,8 @@ async function statMesProcess(line, type, characters, this_chid, oldMesssage) {
         stat.total_swipe_count++;
     }
     stat.date_last_chat = Date.now();
-    stat.date_first_chat = Math.min(
-        stat.date_first_chat ?? new Date("9999-12-31T23:59:59.999Z").getTime(),
-        Date.now(),
-    );
+    stat.date_first_chat = Math.min(stat.date_first_chat ?? new Date("9999-12-31T23:59:59.999Z").getTime(), Date.now());
     updateStats();
 }
 
-export {
-    userStatsHandler,
-    characterStatsHandler,
-    getStats,
-    statMesProcess,
-    charStats,
-};
+export { userStatsHandler, characterStatsHandler, getStats, statMesProcess, charStats };

@@ -6,13 +6,12 @@ import {
     reloadMarkdownProcessor,
     reloadCurrentChat,
     getRequestHeaders,
-    updateVisibleDivs,
     getCurrentChatId,
     printCharacters,
     setCharacterId,
     setEditedMessageId,
 } from "../script.js";
-import { favsToHotswap, isMobile } from "./RossAscends-mods.js";
+import { isMobile } from "./RossAscends-mods.js";
 import { groups, resetSelectedGroup } from "./group-chats.js";
 
 import { registerSlashCommand } from "./slash-commands.js";
@@ -24,7 +23,7 @@ export {
     collapseNewlines,
     playMessageSound,
     sortGroupMembers,
-    sortCharactersList,
+    sortEntitiesList,
     fixMarkdown,
     power_user,
     tokenizers,
@@ -84,9 +83,6 @@ let power_user = {
     always_force_name2: false,
     user_prompt_bias: "",
     show_user_prompt_bias: true,
-    multigen: false,
-    multigen_first_chunk: 50,
-    multigen_next_chunks: 30,
     custom_chat_separator: "",
     markdown_escape_strings: "",
 
@@ -108,15 +104,9 @@ let power_user = {
     blur_strength: 10,
     shadow_width: 2,
 
-    main_text_color: `${getComputedStyle(document.documentElement)
-        .getPropertyValue("--SmartThemeBodyColor")
-        .trim()}`,
-    italics_text_color: `${getComputedStyle(document.documentElement)
-        .getPropertyValue("--SmartThemeEmColor")
-        .trim()}`,
-    quote_text_color: `${getComputedStyle(document.documentElement)
-        .getPropertyValue("--SmartThemeQuoteColor")
-        .trim()}`,
+    main_text_color: `${getComputedStyle(document.documentElement).getPropertyValue("--SmartThemeBodyColor").trim()}`,
+    italics_text_color: `${getComputedStyle(document.documentElement).getPropertyValue("--SmartThemeEmColor").trim()}`,
+    quote_text_color: `${getComputedStyle(document.documentElement).getPropertyValue("--SmartThemeQuoteColor").trim()}`,
     blur_tint_color: `${getComputedStyle(document.documentElement)
         .getPropertyValue("--SmartThemeBlurTintColor")
         .trim()}`,
@@ -126,9 +116,7 @@ let power_user = {
     bot_mes_blur_tint_color: `${getComputedStyle(document.documentElement)
         .getPropertyValue("--SmartThemeBotMesBlurTintColor")
         .trim()}`,
-    shadow_color: `${getComputedStyle(document.documentElement)
-        .getPropertyValue("--SmartThemeShadowColor")
-        .trim()}`,
+    shadow_color: `${getComputedStyle(document.documentElement).getPropertyValue("--SmartThemeShadowColor").trim()}`,
 
     waifuMode: false,
     noShadows: false,
@@ -148,7 +136,6 @@ let power_user = {
     //removeXML: false,
     hotswap_enabled: true,
     timer_enabled: true,
-    timestamps_enabled: true,
     mesIDDisplay_enabled: false,
     max_context_unlocked: false,
     prefer_character_prompt: true,
@@ -196,7 +183,6 @@ const storage_keys = {
 
     hotswap_enabled: "HotswapEnabled",
     timer_enabled: "TimerEnabled",
-    timestamps_enabled: "TimestampsEnabled",
     mesIDDisplay_enabled: "mesIDDisplayEnabled",
 };
 
@@ -252,9 +238,7 @@ function fixMarkdown(text) {
             "$1$4",
         );
         newText =
-            newText.slice(0, matches[i].index) +
-            replacementText +
-            newText.slice(matches[i].index + matchText.length);
+            newText.slice(0, matches[i].index) + replacementText + newText.slice(matches[i].index + matchText.length);
     }
 
     return newText;
@@ -272,16 +256,6 @@ function switchTimer() {
     power_user.timer_enabled = value === null ? true : value == "true";
     $("body").toggleClass("no-timer", !power_user.timer_enabled);
     $("#messageTimerEnabled").prop("checked", power_user.timer_enabled);
-}
-
-function switchTimestamps() {
-    const value = localStorage.getItem(storage_keys.timestamps_enabled);
-    power_user.timestamps_enabled = value === null ? true : value == "true";
-    $("body").toggleClass("no-timestamps", !power_user.timestamps_enabled);
-    $("#messageTimestampsEnabled").prop(
-        "checked",
-        power_user.timestamps_enabled,
-    );
 }
 
 function switchMesIDDisplay() {
@@ -340,17 +314,9 @@ function noShadows() {
 }
 
 function applyAvatarStyle() {
-    power_user.avatar_style = Number(
-        localStorage.getItem(storage_keys.avatar_style) ?? avatar_styles.ROUND,
-    );
-    $("body").toggleClass(
-        "big-avatars",
-        power_user.avatar_style === avatar_styles.RECTANGULAR,
-    );
-    $(`input[name="avatar_style"][value="${power_user.avatar_style}"]`).prop(
-        "checked",
-        true,
-    );
+    power_user.avatar_style = Number(localStorage.getItem(storage_keys.avatar_style) ?? avatar_styles.ROUND);
+    $("body").toggleClass("big-avatars", power_user.avatar_style === avatar_styles.RECTANGULAR);
+    $(`input[name="avatar_style"][value="${power_user.avatar_style}"]`).prop("checked", true);
 }
 
 function applyChatDisplay() {
@@ -360,10 +326,7 @@ function applyChatDisplay() {
     }
     console.debug(`applyChatDisplay: applying ${power_user.chat_display}`);
 
-    $(`#chat_display option[value=${power_user.chat_display}]`).attr(
-        "selected",
-        true,
-    );
+    $(`#chat_display option[value=${power_user.chat_display}]`).attr("selected", true);
 
     switch (power_user.chat_display) {
         case 0: {
@@ -388,9 +351,7 @@ function applyChatDisplay() {
 }
 
 function applyChatWidth() {
-    power_user.chat_width = Number(
-        localStorage.getItem(storage_keys.chat_width) ?? 50,
-    );
+    power_user.chat_width = Number(localStorage.getItem(storage_keys.chat_width) ?? 50);
     let r = document.documentElement;
     r.style.setProperty("--sheldWidth", `${power_user.chat_width}vw`);
     $("#chat_width_slider").val(power_user.chat_width);
@@ -398,31 +359,19 @@ function applyChatWidth() {
 
 async function applyThemeColor(type) {
     if (type === "main") {
-        document.documentElement.style.setProperty(
-            "--SmartThemeBodyColor",
-            power_user.main_text_color,
-        );
+        document.documentElement.style.setProperty("--SmartThemeBodyColor", power_user.main_text_color);
     }
     if (type === "italics") {
-        document.documentElement.style.setProperty(
-            "--SmartThemeEmColor",
-            power_user.italics_text_color,
-        );
+        document.documentElement.style.setProperty("--SmartThemeEmColor", power_user.italics_text_color);
     }
     if (type === "quote") {
-        document.documentElement.style.setProperty(
-            "--SmartThemeQuoteColor",
-            power_user.quote_text_color,
-        );
+        document.documentElement.style.setProperty("--SmartThemeQuoteColor", power_user.quote_text_color);
     }
     /*     if (type === 'fastUIBG') {
             document.documentElement.style.setProperty('--SmartThemeFastUIBGColor', power_user.fastui_bg_color);
         } */
     if (type === "blurTint") {
-        document.documentElement.style.setProperty(
-            "--SmartThemeBlurTintColor",
-            power_user.blur_tint_color,
-        );
+        document.documentElement.style.setProperty("--SmartThemeBlurTintColor", power_user.blur_tint_color);
     }
     if (type === "userMesBlurTint") {
         document.documentElement.style.setProperty(
@@ -437,45 +386,27 @@ async function applyThemeColor(type) {
         );
     }
     if (type === "shadow") {
-        document.documentElement.style.setProperty(
-            "--SmartThemeShadowColor",
-            power_user.shadow_color,
-        );
+        document.documentElement.style.setProperty("--SmartThemeShadowColor", power_user.shadow_color);
     }
 }
 
 async function applyBlurStrength() {
-    power_user.blur_strength = Number(
-        localStorage.getItem(storage_keys.blur_strength) ?? 1,
-    );
-    document.documentElement.style.setProperty(
-        "--blurStrength",
-        power_user.blur_strength,
-    );
+    power_user.blur_strength = Number(localStorage.getItem(storage_keys.blur_strength) ?? 1);
+    document.documentElement.style.setProperty("--blurStrength", power_user.blur_strength);
     $("#blur_strength_counter").text(power_user.blur_strength);
     $("#blur_strength").val(power_user.blur_strength);
 }
 
 async function applyShadowWidth() {
-    power_user.shadow_width = Number(
-        localStorage.getItem(storage_keys.shadow_width) ?? 2,
-    );
-    document.documentElement.style.setProperty(
-        "--shadowWidth",
-        power_user.shadow_width,
-    );
+    power_user.shadow_width = Number(localStorage.getItem(storage_keys.shadow_width) ?? 2);
+    document.documentElement.style.setProperty("--shadowWidth", power_user.shadow_width);
     $("#shadow_width_counter").text(power_user.shadow_width);
     $("#shadow_width").val(power_user.shadow_width);
 }
 
 async function applyFontScale() {
-    power_user.font_scale = Number(
-        localStorage.getItem(storage_keys.font_scale) ?? 1,
-    );
-    document.documentElement.style.setProperty(
-        "--fontScale",
-        power_user.font_scale,
-    );
+    power_user.font_scale = Number(localStorage.getItem(storage_keys.font_scale) ?? 1);
+    document.documentElement.style.setProperty("--fontScale", power_user.font_scale);
     $("#font_scale_counter").text(power_user.font_scale);
     $("#font_scale").val(power_user.font_scale);
 }
@@ -526,80 +457,56 @@ async function applyTheme(name) {
         {
             key: "blur_strength",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.blur_strength,
-                    power_user.blur_strength,
-                );
+                localStorage.setItem(storage_keys.blur_strength, power_user.blur_strength);
                 await applyBlurStrength();
             },
         },
         {
             key: "shadow_width",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.shadow_width,
-                    power_user.shadow_width,
-                );
+                localStorage.setItem(storage_keys.shadow_width, power_user.shadow_width);
                 await applyShadowWidth();
             },
         },
         {
             key: "font_scale",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.font_scale,
-                    power_user.font_scale,
-                );
+                localStorage.setItem(storage_keys.font_scale, power_user.font_scale);
                 await applyFontScale();
             },
         },
         {
             key: "fast_ui_mode",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.fast_ui_mode,
-                    power_user.fast_ui_mode,
-                );
+                localStorage.setItem(storage_keys.fast_ui_mode, power_user.fast_ui_mode);
                 switchUiMode();
             },
         },
         {
             key: "waifuMode",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.waifuMode,
-                    power_user.waifuMode,
-                );
+                localStorage.setItem(storage_keys.waifuMode, power_user.waifuMode);
                 switchWaifuMode();
             },
         },
         {
             key: "chat_display",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.chat_display,
-                    power_user.chat_display,
-                );
+                localStorage.setItem(storage_keys.chat_display, power_user.chat_display);
                 applyChatDisplay();
             },
         },
         {
             key: "avatar_style",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.avatar_style,
-                    power_user.avatar_style,
-                );
+                localStorage.setItem(storage_keys.avatar_style, power_user.avatar_style);
                 applyAvatarStyle();
             },
         },
         {
             key: "noShadows",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.noShadows,
-                    power_user.noShadows,
-                );
+                localStorage.setItem(storage_keys.noShadows, power_user.noShadows);
                 noShadows();
             },
         },
@@ -611,50 +518,28 @@ async function applyTheme(name) {
                     power_user.chat_width = 50;
                 }
 
-                localStorage.setItem(
-                    storage_keys.chat_width,
-                    power_user.chat_width,
-                );
+                localStorage.setItem(storage_keys.chat_width, power_user.chat_width);
                 applyChatWidth();
             },
         },
         {
             key: "timer_enabled",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.timer_enabled,
-                    power_user.timer_enabled,
-                );
+                localStorage.setItem(storage_keys.timer_enabled, power_user.timer_enabled);
                 switchTimer();
-            },
-        },
-        {
-            key: "timestamps_enabled",
-            action: async () => {
-                localStorage.setItem(
-                    storage_keys.timestamps_enabled,
-                    power_user.timestamps_enabled,
-                );
-                switchTimestamps();
             },
         },
         {
             key: "mesIDDisplay_enabled",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.mesIDDisplay_enabled,
-                    power_user.mesIDDisplay_enabled,
-                );
+                localStorage.setItem(storage_keys.mesIDDisplay_enabled, power_user.mesIDDisplay_enabled);
                 switchMesIDDisplay();
             },
         },
         {
             key: "hotswap_enabled",
             action: async () => {
-                localStorage.setItem(
-                    storage_keys.hotswap_enabled,
-                    power_user.hotswap_enabled,
-                );
+                localStorage.setItem(storage_keys.hotswap_enabled, power_user.hotswap_enabled);
                 switchHotswap();
             },
         },
@@ -688,7 +573,6 @@ applyShadowWidth();
 noShadows();
 switchHotswap();
 switchTimer();
-switchTimestamps();
 switchMesIDDisplay();
 
 function loadPowerUserSettings(settings, data) {
@@ -706,31 +590,17 @@ function loadPowerUserSettings(settings, data) {
     const noShadows = localStorage.getItem(storage_keys.noShadows);
     const hotswap = localStorage.getItem(storage_keys.hotswap_enabled);
     const timer = localStorage.getItem(storage_keys.timer_enabled);
-    const timestamps = localStorage.getItem(storage_keys.timestamps_enabled);
-    const mesIDDisplay = localStorage.getItem(
-        storage_keys.mesIDDisplay_enabled,
-    );
+    const mesIDDisplay = localStorage.getItem(storage_keys.mesIDDisplay_enabled);
     power_user.fast_ui_mode = fastUi === null ? true : fastUi == "true";
     power_user.noShadows = noShadows === null ? false : noShadows == "true";
     power_user.hotswap_enabled = hotswap === null ? true : hotswap == "true";
     power_user.timer_enabled = timer === null ? true : timer == "true";
-    power_user.timestamps_enabled =
-        timestamps === null ? true : timestamps == "true";
-    power_user.mesIDDisplay_enabled =
-        mesIDDisplay === null ? true : mesIDDisplay == "true";
-    power_user.avatar_style = Number(
-        localStorage.getItem(storage_keys.avatar_style) ?? avatar_styles.ROUND,
-    );
+    power_user.mesIDDisplay_enabled = mesIDDisplay === null ? true : mesIDDisplay == "true";
+    power_user.avatar_style = Number(localStorage.getItem(storage_keys.avatar_style) ?? avatar_styles.ROUND);
     //power_user.chat_display = Number(localStorage.getItem(storage_keys.chat_display) ?? chat_styles.DEFAULT);
-    power_user.chat_width = Number(
-        localStorage.getItem(storage_keys.chat_width) ?? 50,
-    );
-    power_user.font_scale = Number(
-        localStorage.getItem(storage_keys.font_scale) ?? 1,
-    );
-    power_user.blur_strength = Number(
-        localStorage.getItem(storage_keys.blur_strength) ?? 10,
-    );
+    power_user.chat_width = Number(localStorage.getItem(storage_keys.chat_width) ?? 50);
+    power_user.font_scale = Number(localStorage.getItem(storage_keys.font_scale) ?? 1);
+    power_user.blur_strength = Number(localStorage.getItem(storage_keys.blur_strength) ?? 10);
 
     if (power_user.chat_display === "") {
         power_user.chat_display = chat_styles.DEFAULT;
@@ -750,76 +620,33 @@ function loadPowerUserSettings(settings, data) {
     $("#auto_swipe").prop("checked", power_user.auto_swipe);
     $("#auto_swipe_minimum_length").val(power_user.auto_swipe_minimum_length);
     $("#auto_swipe_blacklist").val(power_user.auto_swipe_blacklist.join(", "));
-    $("#auto_swipe_blacklist_threshold").val(
-        power_user.auto_swipe_blacklist_threshold,
-    );
+    $("#auto_swipe_blacklist_threshold").val(power_user.auto_swipe_blacklist_threshold);
     $("#custom_stopping_strings").val(power_user.custom_stopping_strings);
-    $("#custom_stopping_strings_macro").prop(
-        "checked",
-        power_user.custom_stopping_strings_macro,
-    );
+    $("#custom_stopping_strings_macro").prop("checked", power_user.custom_stopping_strings_macro);
     $("#fuzzy_search_checkbox").prop("checked", power_user.fuzzy_search);
-    $("#persona_show_notifications").prop(
-        "checked",
-        power_user.persona_show_notifications,
-    );
+    $("#persona_show_notifications").prop("checked", power_user.persona_show_notifications);
     $("#encode_tags").prop("checked", power_user.encode_tags);
     $("#lazy_load").val(Number(power_user.lazy_load));
 
     $("#console_log_prompts").prop("checked", power_user.console_log_prompts);
-    $("#auto_fix_generated_markdown").prop(
-        "checked",
-        power_user.auto_fix_generated_markdown,
-    );
-    $("#auto_scroll_chat_to_bottom").prop(
-        "checked",
-        power_user.auto_scroll_chat_to_bottom,
-    );
-    $(`#tokenizer option[value="${power_user.tokenizer}"]`).attr(
-        "selected",
-        true,
-    );
-    $(`#send_on_enter option[value=${power_user.send_on_enter}]`).attr(
-        "selected",
-        true,
-    );
+    $("#auto_fix_generated_markdown").prop("checked", power_user.auto_fix_generated_markdown);
+    $("#auto_scroll_chat_to_bottom").prop("checked", power_user.auto_scroll_chat_to_bottom);
+    $(`#tokenizer option[value="${power_user.tokenizer}"]`).attr("selected", true);
+    $(`#send_on_enter option[value=${power_user.send_on_enter}]`).attr("selected", true);
     $("#import_card_tags").prop("checked", power_user.import_card_tags);
     $("#confirm_message_delete").prop(
         "checked",
-        power_user.confirm_message_delete !== undefined
-            ? !!power_user.confirm_message_delete
-            : true,
+        power_user.confirm_message_delete !== undefined ? !!power_user.confirm_message_delete : true,
     );
     $("#spoiler_free_mode").prop("checked", power_user.spoiler_free_mode);
-    $("#collapse-newlines-checkbox").prop(
-        "checked",
-        power_user.collapse_newlines,
-    );
+    $("#collapse-newlines-checkbox").prop("checked", power_user.collapse_newlines);
     $("#pin-examples-checkbox").prop("checked", power_user.pin_examples);
-    $("#disable-description-formatting-checkbox").prop(
-        "checked",
-        power_user.disable_description_formatting,
-    );
-    $("#disable-scenario-formatting-checkbox").prop(
-        "checked",
-        power_user.disable_scenario_formatting,
-    );
-    $("#disable-personality-formatting-checkbox").prop(
-        "checked",
-        power_user.disable_personality_formatting,
-    );
-    $("#always-force-name2-checkbox").prop(
-        "checked",
-        power_user.always_force_name2,
-    );
-    $("#disable-examples-formatting-checkbox").prop(
-        "checked",
-        power_user.disable_examples_formatting,
-    );
-    $("#disable-start-formatting-checkbox").prop(
-        "checked",
-        power_user.disable_start_formatting,
-    );
+    $("#disable-description-formatting-checkbox").prop("checked", power_user.disable_description_formatting);
+    $("#disable-scenario-formatting-checkbox").prop("checked", power_user.disable_scenario_formatting);
+    $("#disable-personality-formatting-checkbox").prop("checked", power_user.disable_personality_formatting);
+    $("#always-force-name2-checkbox").prop("checked", power_user.always_force_name2);
+    $("#disable-examples-formatting-checkbox").prop("checked", power_user.disable_examples_formatting);
+    $("#disable-start-formatting-checkbox").prop("checked", power_user.disable_start_formatting);
     $("#trim_sentences_checkbox").prop("checked", power_user.trim_sentences);
     $("#include_newline_checkbox").prop("checked", power_user.include_newline);
     $("#render_formulas").prop("checked", power_user.render_formulas);
@@ -829,46 +656,22 @@ function loadPowerUserSettings(settings, data) {
     $("#waifuMode").prop("checked", power_user.waifuMode);
     $("#noShadowsmode").prop("checked", power_user.noShadows);
     $("#start_reply_with").val(power_user.user_prompt_bias);
-    $("#chat-show-reply-prefix-checkbox").prop(
-        "checked",
-        power_user.show_user_prompt_bias,
-    );
-    $("#multigen").prop("checked", power_user.multigen);
-    $("#multigen_first_chunk").val(power_user.multigen_first_chunk);
-    $("#multigen_next_chunks").val(power_user.multigen_next_chunks);
+    $("#chat-show-reply-prefix-checkbox").prop("checked", power_user.show_user_prompt_bias);
     $("#play_message_sound").prop("checked", power_user.play_message_sound);
     $("#play_sound_unfocused").prop("checked", power_user.play_sound_unfocused);
     $("#never_resize_avatars").prop("checked", power_user.never_resize_avatars);
-    $("#show_card_avatar_urls").prop(
-        "checked",
-        power_user.show_card_avatar_urls,
-    );
+    $("#show_card_avatar_urls").prop("checked", power_user.show_card_avatar_urls);
     $("#auto_save_msg_edits").prop("checked", power_user.auto_save_msg_edits);
     $("#allow_name1_display").prop("checked", power_user.allow_name1_display);
     $("#allow_name2_display").prop("checked", power_user.allow_name2_display);
     //$("#removeXML").prop("checked", power_user.removeXML);
     $("#hotswapEnabled").prop("checked", power_user.hotswap_enabled);
     $("#messageTimerEnabled").prop("checked", power_user.timer_enabled);
-    $("#messageTimestampsEnabled").prop(
-        "checked",
-        power_user.timestamps_enabled,
-    );
     $("#mesIDDisplayEnabled").prop("checked", power_user.mesIDDisplay_enabled);
-    $("#prefer_character_prompt").prop(
-        "checked",
-        power_user.prefer_character_prompt,
-    );
-    $("#prefer_character_jailbreak").prop(
-        "checked",
-        power_user.prefer_character_jailbreak,
-    );
-    $(`input[name="avatar_style"][value="${power_user.avatar_style}"]`).prop(
-        "checked",
-        true,
-    );
-    $(`#chat_display option[value=${power_user.chat_display}]`)
-        .attr("selected", true)
-        .trigger("change");
+    $("#prefer_character_prompt").prop("checked", power_user.prefer_character_prompt);
+    $("#prefer_character_jailbreak").prop("checked", power_user.prefer_character_jailbreak);
+    $(`input[name="avatar_style"][value="${power_user.avatar_style}"]`).prop("checked", true);
+    $(`#chat_display option[value=${power_user.chat_display}]`).attr("selected", true).trigger("change");
     $("#chat_width_slider").val(power_user.chat_width);
     $("#token_padding").val(power_user.token_padding);
 
@@ -886,14 +689,8 @@ function loadPowerUserSettings(settings, data) {
     $("#quote-color-picker").attr("color", power_user.quote_text_color);
     //$("#fastui-bg-color-picker").attr('color', power_user.fastui_bg_color);
     $("#blur-tint-color-picker").attr("color", power_user.blur_tint_color);
-    $("#user-mes-blur-tint-color-picker").attr(
-        "color",
-        power_user.user_mes_blur_tint_color,
-    );
-    $("#bot-mes-blur-tint-color-picker").attr(
-        "color",
-        power_user.bot_mes_blur_tint_color,
-    );
+    $("#user-mes-blur-tint-color-picker").attr("color", power_user.user_mes_blur_tint_color);
+    $("#bot-mes-blur-tint-color-picker").attr("color", power_user.bot_mes_blur_tint_color);
     $("#shadow-color-picker").attr("color", power_user.shadow_color);
 
     for (const theme of themes) {
@@ -907,7 +704,6 @@ function loadPowerUserSettings(settings, data) {
     $(
         `#character_sort_order option[data-order="${power_user.sort_order}"][data-field="${power_user.sort_field}"]`,
     ).prop("selected", true);
-    sortCharactersList();
     reloadMarkdownProcessor(power_user.render_formulas);
     loadMaxContextUnlocked();
     switchWaifuMode();
@@ -943,9 +739,7 @@ function loadMaxContextUnlocked() {
 
 function switchMaxContextSize() {
     const element = $("#max_context");
-    const maxValue = power_user.max_context_unlocked
-        ? MAX_CONTEXT_UNLOCKED
-        : MAX_CONTEXT_DEFAULT;
+    const maxValue = power_user.max_context_unlocked ? MAX_CONTEXT_UNLOCKED : MAX_CONTEXT_DEFAULT;
     element.attr("max", maxValue);
     const value = Number(element.val());
 
@@ -974,13 +768,29 @@ export function fuzzySearchCharacters(searchValue) {
     });
 
     const results = fuse.search(searchValue);
-    console.debug("Fuzzy search results for " + searchValue, results);
+    console.debug("Characters fuzzy search results for " + searchValue, results);
     const indices = results.map((x) => x.refIndex);
     return indices;
 }
 
-const sortFunc = (a, b) =>
-    power_user.sort_order == "asc" ? compareFunc(a, b) : compareFunc(b, a);
+export function fuzzySearchGroups(searchValue) {
+    const fuse = new Fuse(groups, {
+        keys: [
+            { name: "name", weight: 3 },
+            { name: "members", weight: 1 },
+        ],
+        includeScore: true,
+        ignoreLocation: true,
+        threshold: 0.2,
+    });
+
+    const results = fuse.search(searchValue);
+    console.debug("Groups fuzzy search results for " + searchValue, results);
+    const ids = results.map((x) => String(x.item?.id)).filter((x) => x);
+    return ids;
+}
+
+const sortFunc = (a, b) => (power_user.sort_order == "asc" ? compareFunc(a, b) : compareFunc(b, a));
 const compareFunc = (first, second) => {
     if (power_user.sort_order == "random") {
         return Math.random() > 0.5 ? 1 : -1;
@@ -998,41 +808,17 @@ const compareFunc = (first, second) => {
             return a < b ? -1 : 1; // Sort non-boolean values normally
         default:
             return typeof first[power_user.sort_field] == "string"
-                ? first[power_user.sort_field].localeCompare(
-                      second[power_user.sort_field],
-                  )
+                ? first[power_user.sort_field].localeCompare(second[power_user.sort_field])
                 : first[power_user.sort_field] - second[power_user.sort_field];
     }
 };
 
-function sortCharactersList() {
-    const arr1 = groups.map((x) => ({
-        item: x,
-        id: x.id,
-        selector: ".group_select",
-        attribute: "grid",
-    }));
-    const arr2 = characters.map((x, index) => ({
-        item: x,
-        id: index,
-        selector: ".character_select",
-        attribute: "chid",
-    }));
-
-    const array = [...arr1, ...arr2];
-
-    if (power_user.sort_field == undefined || array.length === 0) {
+function sortEntitiesList(entities) {
+    if (power_user.sort_field == undefined || entities.length === 0) {
         return;
     }
 
-    let orderedList = array.slice().sort((a, b) => sortFunc(a.item, b.item));
-
-    for (const item of array) {
-        $(`${item.selector}[${item.attribute}="${item.id}"]`).css({
-            order: orderedList.indexOf(item),
-        });
-    }
-    updateVisibleDivs("#rm_print_characters_block", true);
+    entities.sort((a, b) => sortFunc(a.item, b.item));
 }
 
 function sortGroupMembers(selector) {
@@ -1076,7 +862,6 @@ async function saveTheme() {
         noShadows: power_user.noShadows,
         chat_width: power_user.chat_width,
         timer_enabled: power_user.timer_enabled,
-        timestamps_enabled: power_user.timestamps_enabled,
         mesIDDisplay_enabled: power_user.mesIDDisplay_enabled,
         hotswap_enabled: power_user.hotswap_enabled,
     };
@@ -1129,9 +914,7 @@ async function doMesCut(_, text) {
     console.debug(`was asked to cut message id #${text}`);
     //reject invalid args or no args
     if ((text && isNaN(text)) || !text) {
-        toastr.error(
-            `Must enter a single number only, non-number characters disallowed.`,
-        );
+        toastr.error(`Must enter a single number only, non-number characters disallowed.`);
         return;
     }
 
@@ -1144,9 +927,7 @@ async function doMesCut(_, text) {
     }
 
     setEditedMessageId(mesIDToCut);
-    mesToCut
-        .find(".mes_edit_delete")
-        .trigger("click", { fromSlashCommand: true });
+    mesToCut.find(".mes_edit_delete").trigger("click", { fromSlashCommand: true });
 }
 
 async function doDelMode(_, text) {
@@ -1213,10 +994,7 @@ function setAvgBG() {
         var rgb = getAverageRGB(bgimg);
         //console.log(`average color of the bg is:`)
         //console.log(rgb);
-        $("#blur-tint-color-picker").attr(
-            "color",
-            "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + ")",
-        );
+        $("#blur-tint-color-picker").attr("color", "rgb(" + rgb.r + "," + rgb.g + "," + rgb.b + ")");
 
         const backgroundColorString = $("#blur-tint-color-picker")
             .attr("color")
@@ -1226,10 +1004,7 @@ function setAvgBG() {
             .replace(")", "]"); //[50, 120, 200, 1]; // Example background color
         const backgroundColorArray = JSON.parse(backgroundColorString); //[200, 200, 200, 1]
         console.log(backgroundColorArray);
-        $("#main-text-color-picker").attr(
-            "color",
-            getReadableTextColor(backgroundColorArray),
-        );
+        $("#main-text-color-picker").attr("color", getReadableTextColor(backgroundColorArray));
         console.log($("#main-text-color-picker").attr("color")); // Output: 'rgba(0, 47, 126, 1)'
     };
 
@@ -1264,10 +1039,8 @@ function setAvgBG() {
             return defaultRGB;
         }
 
-        height = canvas.height =
-            imgEl.naturalHeight || imgEl.offsetHeight || imgEl.height;
-        width = canvas.width =
-            imgEl.naturalWidth || imgEl.offsetWidth || imgEl.width;
+        height = canvas.height = imgEl.naturalHeight || imgEl.offsetHeight || imgEl.height;
+        width = canvas.width = imgEl.naturalWidth || imgEl.offsetWidth || imgEl.width;
         context.drawImage(imgEl, 0, 0);
 
         try {
@@ -1352,16 +1125,10 @@ function setAvgBG() {
         const complementaryLuminance = l > 0.5 ? 0.2 : 0.8;
 
         // Convert complementary color back to RGB
-        const [rNew, gNew, bNew] = hslToRgb(
-            complementaryHue,
-            complementarySaturation,
-            complementaryLuminance,
-        );
+        const [rNew, gNew, bNew] = hslToRgb(complementaryHue, complementarySaturation, complementaryLuminance);
 
         // Return the text color in RGBA format
-        return `rgba(${rNew.toFixed(0)}, ${gNew.toFixed(0)}, ${bNew.toFixed(
-            0,
-        )}, 1)`;
+        return `rgba(${rNew.toFixed(0)}, ${gNew.toFixed(0)}, ${bNew.toFixed(0)}, 1)`;
     }
 }
 
@@ -1484,18 +1251,10 @@ $(document).ready(() => {
         saveSettingsDebounced();
     });
 
-    $("#multigen").change(function () {
-        power_user.multigen = $(this).prop("checked");
-        saveSettingsDebounced();
-    });
-
     // Settings that go to local storage
     $("#fast_ui_mode").change(function () {
         power_user.fast_ui_mode = $(this).prop("checked");
-        localStorage.setItem(
-            storage_keys.fast_ui_mode,
-            power_user.fast_ui_mode,
-        );
+        localStorage.setItem(storage_keys.fast_ui_mode, power_user.fast_ui_mode);
         switchUiMode();
     });
 
@@ -1513,10 +1272,7 @@ $(document).ready(() => {
 
     $(`input[name="avatar_style"]`).on("input", function (e) {
         power_user.avatar_style = Number(e.target.value);
-        localStorage.setItem(
-            storage_keys.avatar_style,
-            power_user.avatar_style,
-        );
+        localStorage.setItem(storage_keys.avatar_style, power_user.avatar_style);
         applyAvatarStyle();
     });
 
@@ -1544,20 +1300,14 @@ $(document).ready(() => {
     $(`input[name="blur_strength"]`).on("input", async function (e) {
         power_user.blur_strength = Number(e.target.value);
         $("#blur_strength_counter").text(power_user.blur_strength);
-        localStorage.setItem(
-            storage_keys.blur_strength,
-            power_user.blur_strength,
-        );
+        localStorage.setItem(storage_keys.blur_strength, power_user.blur_strength);
         await applyBlurStrength();
     });
 
     $(`input[name="shadow_width"]`).on("input", async function (e) {
         power_user.shadow_width = Number(e.target.value);
         $("#shadow_width_counter").text(power_user.shadow_width);
-        localStorage.setItem(
-            storage_keys.shadow_width,
-            power_user.shadow_width,
-        );
+        localStorage.setItem(storage_keys.shadow_width, power_user.shadow_width);
         await applyShadowWidth();
     });
 
@@ -1641,18 +1391,7 @@ $(document).ready(() => {
         power_user.sort_field = $(this).find(":selected").data("field");
         power_user.sort_order = $(this).find(":selected").data("order");
         power_user.sort_rule = $(this).find(":selected").data("rule");
-        sortCharactersList();
-        favsToHotswap();
-        saveSettingsDebounced();
-    });
-
-    $("#multigen_first_chunk").on("input", function () {
-        power_user.multigen_first_chunk = Number($(this).val());
-        saveSettingsDebounced();
-    });
-
-    $("#multigen_next_chunks").on("input", function () {
-        power_user.multigen_next_chunks = Number($(this).val());
+        printCharacters();
         saveSettingsDebounced();
     });
 
@@ -1667,10 +1406,7 @@ $(document).ready(() => {
             .split(",")
             .map((str) => str.trim())
             .filter((str) => str);
-        console.log(
-            "power_user.auto_swipe_blacklist",
-            power_user.auto_swipe_blacklist,
-        );
+        console.log("power_user.auto_swipe_blacklist", power_user.auto_swipe_blacklist);
         saveSettingsDebounced();
     });
 
@@ -1772,40 +1508,21 @@ $(document).ready(() => {
     $("#messageTimerEnabled").on("input", function () {
         const value = !!$(this).prop("checked");
         power_user.timer_enabled = value;
-        localStorage.setItem(
-            storage_keys.timer_enabled,
-            power_user.timer_enabled,
-        );
+        localStorage.setItem(storage_keys.timer_enabled, power_user.timer_enabled);
         switchTimer();
-    });
-
-    $("#messageTimestampsEnabled").on("input", function () {
-        const value = !!$(this).prop("checked");
-        power_user.timestamps_enabled = value;
-        localStorage.setItem(
-            storage_keys.timestamps_enabled,
-            power_user.timestamps_enabled,
-        );
-        switchTimestamps();
     });
 
     $("#mesIDDisplayEnabled").on("input", function () {
         const value = !!$(this).prop("checked");
         power_user.mesIDDisplay_enabled = value;
-        localStorage.setItem(
-            storage_keys.mesIDDisplay_enabled,
-            power_user.mesIDDisplay_enabled,
-        );
+        localStorage.setItem(storage_keys.mesIDDisplay_enabled, power_user.mesIDDisplay_enabled);
         switchMesIDDisplay();
     });
 
     $("#hotswapEnabled").on("input", function () {
         const value = !!$(this).prop("checked");
         power_user.hotswap_enabled = value;
-        localStorage.setItem(
-            storage_keys.hotswap_enabled,
-            power_user.hotswap_enabled,
-        );
+        localStorage.setItem(storage_keys.hotswap_enabled, power_user.hotswap_enabled);
         switchHotswap();
     });
 
@@ -1889,30 +1606,9 @@ $(document).ready(() => {
         browser_has_focus = false;
     });
 
-    registerSlashCommand(
-        "vn",
-        toggleWaifu,
-        [],
-        " – swaps Visual Novel Mode On/Off",
-        false,
-        true,
-    );
-    registerSlashCommand(
-        "newchat",
-        doNewChat,
-        ["newchat"],
-        " – start a new chat with current character",
-        true,
-        true,
-    );
-    registerSlashCommand(
-        "random",
-        doRandomChat,
-        ["random"],
-        " – start a new chat with a random character",
-        true,
-        true,
-    );
+    registerSlashCommand("vn", toggleWaifu, [], " – swaps Visual Novel Mode On/Off", false, true);
+    registerSlashCommand("newchat", doNewChat, ["newchat"], " – start a new chat with current character", true, true);
+    registerSlashCommand("random", doRandomChat, ["random"], " – start a new chat with a random character", true, true);
     registerSlashCommand(
         "delmode",
         doDelMode,
@@ -1929,12 +1625,5 @@ $(document).ready(() => {
         true,
         true,
     );
-    registerSlashCommand(
-        "bgcol",
-        setAvgBG,
-        [],
-        " – WIP test of auto-bg avg coloring",
-        true,
-        true,
-    );
+    registerSlashCommand("bgcol", setAvgBG, [], " – WIP test of auto-bg avg coloring", true, true);
 });

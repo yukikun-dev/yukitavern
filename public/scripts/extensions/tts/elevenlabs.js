@@ -40,12 +40,8 @@ class ElevenLabsTtsProvider {
     onSettingsChange() {
         // Update dynamically
         this.settings.stability = $("#elevenlabs_tts_stability").val();
-        this.settings.similarity_boost = $(
-            "#elevenlabs_tts_similarity_boost",
-        ).val();
-        this.settings.multilingual = $("#elevenlabs_tts_multilingual").prop(
-            "checked",
-        );
+        this.settings.similarity_boost = $("#elevenlabs_tts_similarity_boost").val();
+        this.settings.multilingual = $("#elevenlabs_tts_multilingual").prop("checked");
     }
 
     loadSettings(settings) {
@@ -66,9 +62,7 @@ class ElevenLabsTtsProvider {
         }
 
         $("#elevenlabs_tts_stability").val(this.settings.stability);
-        $("#elevenlabs_tts_similarity_boost").val(
-            this.settings.similarity_boost,
-        );
+        $("#elevenlabs_tts_similarity_boost").val(this.settings.similarity_boost);
         $("#elevenlabs_tts_api_key").val(this.settings.apiKey);
         $("#tts_auto_generation").prop("checked", this.settings.multilingual);
         console.info("Settings loaded");
@@ -100,9 +94,7 @@ class ElevenLabsTtsProvider {
         if (this.voices.length == 0) {
             this.voices = await this.fetchTtsVoiceIds();
         }
-        const match = this.voices.filter(
-            (elevenVoice) => elevenVoice.name == voiceName,
-        )[0];
+        const match = this.voices.filter((elevenVoice) => elevenVoice.name == voiceName)[0];
         if (!match) {
             throw `TTS Voice name ${voiceName} not found in ElevenLabs account`;
         }
@@ -117,9 +109,7 @@ class ElevenLabsTtsProvider {
             console.debug(`Found existing TTS generation with id ${historyId}`);
             response = await this.fetchTtsFromHistory(historyId);
         } else {
-            console.debug(
-                `No existing TTS generation found, requesting new generation`,
-            );
+            console.debug(`No existing TTS generation found, requesting new generation`);
             response = await this.fetchTtsGeneration(text, voiceId);
         }
         return response;
@@ -135,9 +125,7 @@ class ElevenLabsTtsProvider {
             const text = history.text;
             const itemId = history.history_item_id;
             if (message === text && history.voice_id == voiceId) {
-                console.info(
-                    `Existing TTS history item ${itemId} found: ${text} `,
-                );
+                console.info(`Existing TTS history item ${itemId} found: ${text} `);
                 return itemId;
             }
         }
@@ -155,9 +143,7 @@ class ElevenLabsTtsProvider {
             headers: headers,
         });
         if (!response.ok) {
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         const responseJson = await response.json();
         return responseJson.voices;
@@ -167,16 +153,11 @@ class ElevenLabsTtsProvider {
         const headers = {
             "xi-api-key": this.settings.apiKey,
         };
-        const response = await fetch(
-            `https://api.elevenlabs.io/v1/voices/settings/default`,
-            {
-                headers: headers,
-            },
-        );
+        const response = await fetch(`https://api.elevenlabs.io/v1/voices/settings/default`, {
+            headers: headers,
+        });
         if (!response.ok) {
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         return response.json();
     }
@@ -187,46 +168,34 @@ class ElevenLabsTtsProvider {
             model = "eleven_multilingual_v1";
         }
         console.info(`Generating new TTS for voice_id ${voiceId}`);
-        const response = await fetch(
-            `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-            {
-                method: "POST",
-                headers: {
-                    "xi-api-key": this.settings.apiKey,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    model: model,
-                    text: text,
-                    voice_settings: this.settings,
-                }),
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+            method: "POST",
+            headers: {
+                "xi-api-key": this.settings.apiKey,
+                "Content-Type": "application/json",
             },
-        );
+            body: JSON.stringify({
+                model: model,
+                text: text,
+                voice_settings: this.settings,
+            }),
+        });
         if (!response.ok) {
             toastr.error(response.statusText, "TTS Generation Failed");
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         return response;
     }
 
     async fetchTtsFromHistory(history_item_id) {
-        console.info(
-            `Fetched existing TTS with history_item_id ${history_item_id}`,
-        );
-        const response = await fetch(
-            `https://api.elevenlabs.io/v1/history/${history_item_id}/audio`,
-            {
-                headers: {
-                    "xi-api-key": this.settings.apiKey,
-                },
+        console.info(`Fetched existing TTS with history_item_id ${history_item_id}`);
+        const response = await fetch(`https://api.elevenlabs.io/v1/history/${history_item_id}/audio`, {
+            headers: {
+                "xi-api-key": this.settings.apiKey,
             },
-        );
+        });
         if (!response.ok) {
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         return response;
     }
@@ -239,9 +208,7 @@ class ElevenLabsTtsProvider {
             headers: headers,
         });
         if (!response.ok) {
-            throw new Error(
-                `HTTP ${response.status}: ${await response.text()}`,
-            );
+            throw new Error(`HTTP ${response.status}: ${await response.text()}`);
         }
         const responseJson = await response.json();
         return responseJson.history;

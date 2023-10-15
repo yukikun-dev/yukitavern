@@ -1,15 +1,7 @@
-import {
-    saveSettingsDebounced,
-    callPopup,
-    getRequestHeaders,
-} from "../../../script.js";
+import { saveSettingsDebounced, callPopup, getRequestHeaders } from "../../../script.js";
 import { getContext, extension_settings } from "../../extensions.js";
 import { initScrollHeight, resetScrollHeight } from "../../utils.js";
-import {
-    executeSlashCommands,
-    getSlashCommandsHelp,
-    registerSlashCommand,
-} from "../../slash-commands.js";
+import { executeSlashCommands, getSlashCommandsHelp, registerSlashCommand } from "../../slash-commands.js";
 
 export { MODULE_NAME };
 
@@ -41,9 +33,9 @@ async function updateQuickReplyPresetList() {
         if (presets !== undefined) {
             presets.forEach((item, i) => {
                 $("#quickReplyPresets").append(
-                    `<option value='${item.name}'${
-                        selected_preset.includes(item.name) ? " selected" : ""
-                    }>${item.name}</option>`,
+                    `<option value='${item.name}'${selected_preset.includes(item.name) ? " selected" : ""}>${
+                        item.name
+                    }</option>`,
                 );
             });
         }
@@ -61,8 +53,7 @@ async function loadSettings(type) {
     // If the user has an old version of the extension, update it
     if (!Array.isArray(extension_settings.quickReply.quickReplySlots)) {
         extension_settings.quickReply.quickReplySlots = [];
-        extension_settings.quickReply.numberOfSlots =
-            defaultSettings.numberOfSlots;
+        extension_settings.quickReply.numberOfSlots = defaultSettings.numberOfSlots;
 
         for (let i = 1; i <= extension_settings.quickReply.numberOfSlots; i++) {
             extension_settings.quickReply.quickReplySlots.push({
@@ -88,28 +79,19 @@ async function loadSettings(type) {
             .trigger("input");
     }
 
-    $("#quickReplyEnabled").prop(
-        "checked",
-        extension_settings.quickReply.quickReplyEnabled,
-    );
-    $("#quickReplyNumberOfSlots").val(
-        extension_settings.quickReply.numberOfSlots,
-    );
+    $("#quickReplyEnabled").prop("checked", extension_settings.quickReply.quickReplyEnabled);
+    $("#quickReplyNumberOfSlots").val(extension_settings.quickReply.numberOfSlots);
 }
 
 function onQuickReplyInput(id) {
-    extension_settings.quickReply.quickReplySlots[id - 1].mes = $(
-        `#quickReply${id}Mes`,
-    ).val();
+    extension_settings.quickReply.quickReplySlots[id - 1].mes = $(`#quickReply${id}Mes`).val();
     $(`#quickReply${id}`).attr("title", $(`#quickReply${id}Mes`).val());
     resetScrollHeight($(`#quickReply${id}Mes`));
     saveSettingsDebounced();
 }
 
 function onQuickReplyLabelInput(id) {
-    extension_settings.quickReply.quickReplySlots[id - 1].label = $(
-        `#quickReply${id}Label`,
-    ).val();
+    extension_settings.quickReply.quickReplySlots[id - 1].label = $(`#quickReply${id}Label`).val();
     $(`#quickReply${id}`).text($(`#quickReply${id}Label`).val());
     saveSettingsDebounced();
 }
@@ -126,8 +108,7 @@ async function onQuickReplyEnabledInput() {
 }
 
 async function sendQuickReply(index) {
-    const prompt =
-        extension_settings.quickReply.quickReplySlots[index]?.mes || "";
+    const prompt = extension_settings.quickReply.quickReplySlots[index]?.mes || "";
 
     if (!prompt) {
         console.warn(`Quick reply slot ${index} is empty! Aborting.`);
@@ -143,10 +124,8 @@ function addQuickReplyBar() {
     let quickReplyButtonHtml = "";
 
     for (let i = 0; i < extension_settings.quickReply.numberOfSlots; i++) {
-        let quickReplyMes =
-            extension_settings.quickReply.quickReplySlots[i]?.mes || "";
-        let quickReplyLabel =
-            extension_settings.quickReply.quickReplySlots[i]?.label || "";
+        let quickReplyMes = extension_settings.quickReply.quickReplySlots[i]?.mes || "";
+        let quickReplyLabel = extension_settings.quickReply.quickReplySlots[i]?.label || "";
         quickReplyButtonHtml += `<div title="${quickReplyMes}" class="quickReplyButton" data-index="${i}" id="quickReply${
             i + 1
         }">${quickReplyLabel}</div>`;
@@ -170,9 +149,7 @@ function addQuickReplyBar() {
 
 async function moduleWorker() {
     if (extension_settings.quickReply.quickReplyEnabled === true) {
-        $("#quickReplyBar").toggle(
-            getContext().onlineStatus !== "no_connection",
-        );
+        $("#quickReplyBar").toggle(getContext().onlineStatus !== "no_connection");
     }
     if (extension_settings.quickReply.selectedPreset) {
         selected_preset = extension_settings.quickReply.selectedPreset;
@@ -180,10 +157,7 @@ async function moduleWorker() {
 }
 
 async function saveQuickReplyPreset() {
-    const name = await callPopup(
-        "Enter a name for the Quick Reply Preset:",
-        "input",
-    );
+    const name = await callPopup("Enter a name for the Quick Reply Preset:", "input");
 
     if (!name) {
         return;
@@ -215,10 +189,7 @@ async function saveQuickReplyPreset() {
             $("#quickReplyPresets").append(option);
         } else {
             presets[quickReplyPresetIndex] = quickReplyPreset;
-            $(`#quickReplyPresets option[value="${name}"]`).attr(
-                "selected",
-                true,
-            );
+            $(`#quickReplyPresets option[value="${name}"]`).attr("selected", true);
         }
         saveSettingsDebounced();
     } else {
@@ -291,11 +262,7 @@ function generateQuickReplyElements() {
     $(".quickReplySettings .inline-drawer-toggle")
         .off("click")
         .on("click", function () {
-            for (
-                let i = 1;
-                i <= extension_settings.quickReply.numberOfSlots;
-                i++
-            ) {
+            for (let i = 1; i <= extension_settings.quickReply.numberOfSlots; i++) {
                 initScrollHeight($(`#quickReply${i}Mes`));
             }
         });
@@ -305,9 +272,7 @@ async function applyQuickReplyPreset(name) {
     const quickReplyPreset = presets.find((x) => x.name == name);
 
     if (!quickReplyPreset) {
-        toastr.warning(
-            `error, QR preset '${name}' not found. Confirm you are using proper case sensitivity!`,
-        );
+        toastr.warning(`error, QR preset '${name}' not found. Confirm you are using proper case sensitivity!`);
         return;
     }
 
@@ -383,10 +348,7 @@ jQuery(async () => {
     $("#extensions_settings2").append(settingsHtml);
 
     $("#quickReplyEnabled").on("input", onQuickReplyEnabledInput);
-    $("#quickReplyNumberOfSlotsApply").on(
-        "click",
-        onQuickReplyNumberOfSlotsInput,
-    );
+    $("#quickReplyNumberOfSlotsApply").on("click", onQuickReplyNumberOfSlotsInput);
     $("#quickReplyPresetSaveButton").on("click", saveQuickReplyPreset);
 
     $("#quickReplyPresets").on("change", async function () {
@@ -401,14 +363,7 @@ jQuery(async () => {
 });
 
 $(document).ready(() => {
-    registerSlashCommand(
-        "qr",
-        doQR,
-        [],
-        "- requires number argument, activates the specified QuickReply",
-        true,
-        true,
-    );
+    registerSlashCommand("qr", doQR, [], "- requires number argument, activates the specified QuickReply", true, true);
     registerSlashCommand(
         "qrset",
         doQRPresetSwitch,

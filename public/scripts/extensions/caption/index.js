@@ -1,10 +1,5 @@
 import { getBase64Async } from "../../utils.js";
-import {
-    getContext,
-    getApiUrl,
-    doExtrasFetch,
-    extension_settings,
-} from "../../extensions.js";
+import { getContext, getApiUrl, doExtrasFetch, extension_settings } from "../../extensions.js";
 import { callPopup, saveSettingsDebounced } from "../../../script.js";
 export { MODULE_NAME };
 
@@ -37,9 +32,7 @@ async function setSpinnerIcon() {
 
 async function sendCaptionedMessage(caption, image) {
     const context = getContext();
-    let messageText = `[${context.name1} sends ${
-        context.name2 ?? ""
-    } a picture that contains: ${caption}]`;
+    let messageText = `[${context.name1} sends ${context.name2 ?? ""} a picture that contains: ${caption}]`;
 
     if (extension_settings.caption.refine_mode) {
         messageText = await callPopup(
@@ -95,9 +88,7 @@ async function onSelectImage(e) {
         if (apiResult.ok) {
             const data = await apiResult.json();
             const caption = data.caption;
-            const imageToSave = data.thumbnail
-                ? `data:image/jpeg;base64,${data.thumbnail}`
-                : base64Img;
+            const imageToSave = data.thumbnail ? `data:image/jpeg;base64,${data.thumbnail}` : base64Img;
             await sendCaptionedMessage(caption, imageToSave);
         }
     } catch (error) {
@@ -109,9 +100,7 @@ async function onSelectImage(e) {
 }
 
 function onRefineModeInput() {
-    extension_settings.caption.refine_mode = $("#caption_refine_mode").prop(
-        "checked",
-    );
+    extension_settings.caption.refine_mode = $("#caption_refine_mode").prop("checked");
     saveSettingsDebounced();
 }
 
@@ -161,10 +150,7 @@ jQuery(function () {
     addSendPictureButton();
     setImageIcon();
     moduleWorker();
-    $("#caption_refine_mode").prop(
-        "checked",
-        !!extension_settings.caption.refine_mode,
-    );
+    $("#caption_refine_mode").prop("checked", !!extension_settings.caption.refine_mode);
     $("#caption_refine_mode").on("input", onRefineModeInput);
     setInterval(moduleWorker, UPDATE_INTERVAL);
 });

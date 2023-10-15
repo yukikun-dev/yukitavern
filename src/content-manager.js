@@ -23,10 +23,7 @@ function checkForNewContent() {
             }
 
             contentLog.push(contentItem.filename);
-            const contentPath = path.join(
-                contentDirectory,
-                contentItem.filename,
-            );
+            const contentPath = path.join(contentDirectory, contentItem.filename);
 
             if (!fs.existsSync(contentPath)) {
                 console.log(`Content file ${contentItem.filename} is missing`);
@@ -36,22 +33,14 @@ function checkForNewContent() {
             const contentTarget = getTargetByType(contentItem.type);
 
             if (!contentTarget) {
-                console.log(
-                    `Content file ${contentItem.filename} has unknown type ${contentItem.type}`,
-                );
+                console.log(`Content file ${contentItem.filename} has unknown type ${contentItem.type}`);
                 continue;
             }
 
-            const targetPath = path.join(
-                process.cwd(),
-                contentTarget,
-                contentItem.filename,
-            );
+            const targetPath = path.join(process.cwd(), contentTarget, contentItem.filename);
 
             if (fs.existsSync(targetPath)) {
-                console.log(
-                    `Content file ${contentItem.filename} already exists in ${contentTarget}`,
-                );
+                console.log(`Content file ${contentItem.filename} already exists in ${contentTarget}`);
                 continue;
             }
 
@@ -59,9 +48,7 @@ function checkForNewContent() {
                 recursive: true,
                 force: false,
             });
-            console.log(
-                `Content file ${contentItem.filename} copied to ${contentTarget}`,
-            );
+            console.log(`Content file ${contentItem.filename} copied to ${contentTarget}`);
         }
 
         fs.writeFileSync(contentLogPath, contentLog.join("\n"));

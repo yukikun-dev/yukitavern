@@ -1,9 +1,4 @@
-import {
-    characters,
-    getCharacters,
-    handleDeleteCharacter,
-    callPopup,
-} from "../../../script.js";
+import { characters, getCharacters, handleDeleteCharacter, callPopup } from "../../../script.js";
 
 let is_bulk_edit = false;
 
@@ -66,9 +61,7 @@ async function onDeleteButtonClick() {
         await getCharacters();
 
         //chid should be the key of the character with the given avatar
-        const chid = Object.keys(characters).find(
-            (key) => characters[key].avatar === avatar,
-        );
+        const chid = Object.keys(characters).find((key) => characters[key].avatar === avatar);
         console.log(`Deleting character with chid ${chid}`);
         await deleteCharacter(chid);
     }
@@ -97,9 +90,7 @@ function addButtons() {
 function enableBulkSelect() {
     $("#rm_print_characters_block .character_select").each((i, el) => {
         const character = $(el).text();
-        const checkbox = $(
-            "<input type='checkbox' class='bulk_select_checkbox'>",
-        );
+        const checkbox = $("<input type='checkbox' class='bulk_select_checkbox'>");
         checkbox.on("change", () => {
             // Do something when the checkbox is changed
         });

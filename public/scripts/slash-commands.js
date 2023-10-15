@@ -24,10 +24,7 @@ import {
 } from "../script.js";
 import { humanizedDateTime } from "./RossAscends-mods.js";
 import { resetSelectedGroup } from "./group-chats.js";
-import {
-    getRegexedString,
-    regex_placement,
-} from "./extensions/regex/engine.js";
+import { getRegexedString, regex_placement } from "./extensions/regex/engine.js";
 import { chat_styles, power_user } from "./power-user.js";
 export { executeSlashCommands, registerSlashCommand, getSlashCommandsHelp };
 
@@ -37,14 +34,7 @@ class SlashCommandParser {
         this.helpStrings = [];
     }
 
-    addCommand(
-        command,
-        callback,
-        aliases,
-        helpString = "",
-        interruptsGeneration = false,
-        purgeFromMessage = true,
-    ) {
+    addCommand(command, callback, aliases, helpString = "", interruptsGeneration = false, purgeFromMessage = true) {
         const fnObj = {
             callback,
             helpString,
@@ -52,9 +42,7 @@ class SlashCommandParser {
             purgeFromMessage,
         };
 
-        if (
-            [command, ...aliases].some((x) => this.commands.hasOwnProperty(x))
-        ) {
+        if ([command, ...aliases].some((x) => this.commands.hasOwnProperty(x))) {
             console.trace("WARN: Duplicate slash command registered!");
         }
 
@@ -68,9 +56,7 @@ class SlashCommandParser {
 
         let stringBuilder = `<span class="monospace">/${command}</span> ${helpString} `;
         if (Array.isArray(aliases) && aliases.length) {
-            let aliasesString = `(aliases: ${aliases
-                .map((x) => `<span class="monospace">/${x}</span>`)
-                .join(", ")})`;
+            let aliasesString = `(aliases: ${aliases.map((x) => `<span class="monospace">/${x}</span>`).join(", ")})`;
             stringBuilder += aliasesString;
         }
         this.helpStrings.push(stringBuilder);
@@ -79,10 +65,7 @@ class SlashCommandParser {
     parse(text) {
         const excludedFromRegex = ["sendas"];
         const firstSpace = text.indexOf(" ");
-        const command =
-            firstSpace !== -1
-                ? text.substring(1, firstSpace)
-                : text.substring(1);
+        const command = firstSpace !== -1 ? text.substring(1, firstSpace) : text.substring(1);
         const args = firstSpace !== -1 ? text.substring(firstSpace + 1) : "";
         const argObj = {};
         let unnamedArg;
@@ -104,10 +87,7 @@ class SlashCommandParser {
 
             // Excluded commands format in their own function
             if (!excludedFromRegex.includes(command)) {
-                unnamedArg = getRegexedString(
-                    unnamedArg,
-                    regex_placement.SLASH_COMMAND,
-                );
+                unnamedArg = getRegexedString(unnamedArg, regex_placement.SLASH_COMMAND);
             }
         }
 
@@ -123,9 +103,7 @@ class SlashCommandParser {
     }
 
     getHelpString() {
-        const listItems = this.helpStrings
-            .map((x) => `<li>${x}</li>`)
-            .join("\n");
+        const listItems = this.helpStrings.map((x) => `<li>${x}</li>`).join("\n");
         return `<p>Slash commands:</p><ol>${listItems}</ol>`;
     }
 }
@@ -134,14 +112,7 @@ const parser = new SlashCommandParser();
 const registerSlashCommand = parser.addCommand.bind(parser);
 const getSlashCommandsHelp = parser.getHelpString.bind(parser);
 
-parser.addCommand(
-    "help",
-    helpCommandCallback,
-    ["?"],
-    " – displays this help message",
-    true,
-    true,
-);
+parser.addCommand("help", helpCommandCallback, ["?"], " – displays this help message", true, true);
 parser.addCommand(
     "name",
     setNameCallback,
@@ -222,22 +193,8 @@ parser.addCommand(
     true,
     true,
 );
-parser.addCommand(
-    "flat",
-    setFlatModeCallback,
-    ["default"],
-    " – sets the message style to flat chat mode",
-    true,
-    true,
-);
-parser.addCommand(
-    "continue",
-    continueChatCallback,
-    ["cont"],
-    " – continues the last message in the chat",
-    true,
-    true,
-);
+parser.addCommand("flat", setFlatModeCallback, ["default"], " – sets the message style to flat chat mode", true, true);
+parser.addCommand("continue", continueChatCallback, ["cont"], " – continues the last message in the chat", true, true);
 parser.addCommand(
     "go",
     goToCharacterCallback,
@@ -321,16 +278,10 @@ async function deleteMessagesByNameCallback(_, name) {
 }
 
 function findCharacterIndex(name) {
-    const matchTypes = [
-        (a, b) => a === b,
-        (a, b) => a.startsWith(b),
-        (a, b) => a.includes(b),
-    ];
+    const matchTypes = [(a, b) => a === b, (a, b) => a.startsWith(b), (a, b) => a.includes(b)];
 
     for (const matchType of matchTypes) {
-        const index = characters.findIndex((x) =>
-            matchType(x.name.toLowerCase(), name.toLowerCase()),
-        );
+        const index = characters.findIndex((x) => matchType(x.name.toLowerCase(), name.toLowerCase()));
         if (index !== -1) {
             return index;
         }
@@ -440,9 +391,7 @@ async function sendMessageAs(_, text) {
 
     const parts = text.split("\n");
     if (parts.length <= 1) {
-        toastr.warning(
-            "Both character name and message are required. Separate them with a new line.",
-        );
+        toastr.warning("Both character name and message are required. Separate them with a new line.");
         return;
     }
 
@@ -625,9 +574,7 @@ function executeSlashCommands(text) {
         }
     }
 
-    const newText = lines
-        .filter((x) => linesToRemove.indexOf(x) === -1)
-        .join("\n");
+    const newText = lines.filter((x) => linesToRemove.indexOf(x) === -1).join("\n");
 
     return { interrupt, newText };
 }

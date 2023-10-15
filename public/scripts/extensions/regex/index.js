@@ -15,43 +15,29 @@ async function saveRegexScript(regexScript, existingScriptIndex) {
 
     // Is the script name undefined or empty?
     if (!regexScript.scriptName) {
-        toastr.error(
-            `Could not save regex script: The script name was undefined or empty!`,
-        );
+        toastr.error(`Could not save regex script: The script name was undefined or empty!`);
         return;
     }
 
     if (existingScriptIndex === -1) {
         // Does the script name already exist?
-        if (
-            extension_settings.regex.find(
-                (e) => e.scriptName === regexScript.scriptName,
-            )
-        ) {
-            toastr.error(
-                `Could not save regex script: A script with name ${regexScript.scriptName} already exists.`,
-            );
+        if (extension_settings.regex.find((e) => e.scriptName === regexScript.scriptName)) {
+            toastr.error(`Could not save regex script: A script with name ${regexScript.scriptName} already exists.`);
             return;
         }
     } else {
         // Does the script name already exist somewhere else?
         // (If this fails, make it a .filter().map() to index array)
-        const foundIndex = extension_settings.regex.findIndex(
-            (e) => e.scriptName === regexScript.scriptName,
-        );
+        const foundIndex = extension_settings.regex.findIndex((e) => e.scriptName === regexScript.scriptName);
         if (foundIndex !== existingScriptIndex && foundIndex !== -1) {
-            toastr.error(
-                `Could not save regex script: A script with name ${regexScript.scriptName} already exists.`,
-            );
+            toastr.error(`Could not save regex script: A script with name ${regexScript.scriptName} already exists.`);
             return;
         }
     }
 
     // Is a find regex present?
     if (regexScript.findRegex.length === 0) {
-        toastr.warning(
-            `This regex script will not work, but was saved anyway: A find regex isn't present.`,
-        );
+        toastr.warning(`This regex script will not work, but was saved anyway: A find regex isn't present.`);
     }
 
     // Is there someplace to place results?
@@ -80,9 +66,7 @@ async function saveRegexScript(regexScript, existingScriptIndex) {
 async function deleteRegexScript({ existingId }) {
     let scriptName = $(`#${existingId}`).find(".regex_script_name").text();
 
-    const existingScriptIndex = extension_settings.regex.findIndex(
-        (script) => script.scriptName === scriptName,
-    );
+    const existingScriptIndex = extension_settings.regex.findIndex((script) => script.scriptName === scriptName);
     if (!existingScriptIndex || existingScriptIndex !== -1) {
         extension_settings.regex.splice(existingScriptIndex, 1);
 
@@ -94,9 +78,7 @@ async function deleteRegexScript({ existingId }) {
 async function loadRegexScripts() {
     $("#saved_regex_scripts").empty();
 
-    const scriptTemplate = $(
-        await $.get("scripts/extensions/regex/scriptTemplate.html"),
-    );
+    const scriptTemplate = $(await $.get("scripts/extensions/regex/scriptTemplate.html"));
 
     extension_settings.regex.forEach((script) => {
         // Have to clone here
@@ -120,65 +102,36 @@ async function onRegexEditorOpenClick(existingId) {
     // If an ID exists, fill in all the values
     let existingScriptIndex = -1;
     if (existingId) {
-        const existingScriptName = $(`#${existingId}`)
-            .find(".regex_script_name")
-            .text();
-        existingScriptIndex = extension_settings.regex.findIndex(
-            (script) => script.scriptName === existingScriptName,
-        );
+        const existingScriptName = $(`#${existingId}`).find(".regex_script_name").text();
+        existingScriptIndex = extension_settings.regex.findIndex((script) => script.scriptName === existingScriptName);
         if (existingScriptIndex !== -1) {
-            const existingScript =
-                extension_settings.regex[existingScriptIndex];
+            const existingScript = extension_settings.regex[existingScriptIndex];
             if (existingScript.scriptName) {
-                editorHtml
-                    .find(`.regex_script_name`)
-                    .val(existingScript.scriptName);
+                editorHtml.find(`.regex_script_name`).val(existingScript.scriptName);
             } else {
-                toastr.error(
-                    "This script doesn't have a name! Please delete it.",
-                );
+                toastr.error("This script doesn't have a name! Please delete it.");
                 return;
             }
 
             editorHtml.find(`.find_regex`).val(existingScript.findRegex || "");
-            editorHtml
-                .find(`.regex_replace_string`)
-                .val(existingScript.replaceString || "");
-            editorHtml
-                .find(`.regex_trim_strings`)
-                .val(existingScript.trimStrings?.join("\n") || []);
-            editorHtml
-                .find(`input[name="disabled"]`)
-                .prop("checked", existingScript.disabled ?? false);
-            editorHtml
-                .find(`input[name="only_format_display"]`)
-                .prop("checked", existingScript.markdownOnly ?? false);
-            editorHtml
-                .find(`input[name="run_on_edit"]`)
-                .prop("checked", existingScript.runOnEdit ?? false);
-            editorHtml
-                .find(`input[name="substitute_regex"]`)
-                .prop("checked", existingScript.substituteRegex ?? false);
-            editorHtml
-                .find(`select[name="replace_strategy_select"]`)
-                .val(existingScript.replaceStrategy ?? 0);
+            editorHtml.find(`.regex_replace_string`).val(existingScript.replaceString || "");
+            editorHtml.find(`.regex_trim_strings`).val(existingScript.trimStrings?.join("\n") || []);
+            editorHtml.find(`input[name="disabled"]`).prop("checked", existingScript.disabled ?? false);
+            editorHtml.find(`input[name="only_format_display"]`).prop("checked", existingScript.markdownOnly ?? false);
+            editorHtml.find(`input[name="run_on_edit"]`).prop("checked", existingScript.runOnEdit ?? false);
+            editorHtml.find(`input[name="substitute_regex"]`).prop("checked", existingScript.substituteRegex ?? false);
+            editorHtml.find(`select[name="replace_strategy_select"]`).val(existingScript.replaceStrategy ?? 0);
 
             existingScript.placement.forEach((element) => {
-                editorHtml
-                    .find(`input[name="replace_position"][value="${element}"]`)
-                    .prop("checked", true);
+                editorHtml.find(`input[name="replace_position"][value="${element}"]`).prop("checked", true);
             });
         }
     } else {
-        editorHtml
-            .find(`input[name="only_format_display"]`)
-            .prop("checked", true);
+        editorHtml.find(`input[name="only_format_display"]`).prop("checked", true);
 
         editorHtml.find(`input[name="run_on_edit"]`).prop("checked", true);
 
-        editorHtml
-            .find(`input[name="replace_position"][value="1"]`)
-            .prop("checked", true);
+        editorHtml.find(`input[name="replace_position"][value="1"]`).prop("checked", true);
     }
 
     const popupResult = await callPopup(editorHtml, "confirm", undefined, {
@@ -205,22 +158,11 @@ async function onRegexEditorOpenClick(existingId) {
                     .get()
                     .filter((e) => e !== NaN) || [],
             disabled: editorHtml.find(`input[name="disabled"]`).prop("checked"),
-            markdownOnly: editorHtml
-                .find(`input[name="only_format_display"]`)
-                .prop("checked"),
-            runOnEdit: editorHtml
-                .find(`input[name="run_on_edit"]`)
-                .prop("checked"),
-            substituteRegex: editorHtml
-                .find(`input[name="substitute_regex"]`)
-                .prop("checked"),
+            markdownOnly: editorHtml.find(`input[name="only_format_display"]`).prop("checked"),
+            runOnEdit: editorHtml.find(`input[name="run_on_edit"]`).prop("checked"),
+            substituteRegex: editorHtml.find(`input[name="substitute_regex"]`).prop("checked"),
             replaceStrategy:
-                parseInt(
-                    editorHtml
-                        .find(`select[name="replace_strategy_select"]`)
-                        .find(`:selected`)
-                        .val(),
-                ) ?? 0,
+                parseInt(editorHtml.find(`select[name="replace_strategy_select"]`).find(`:selected`).val()) ?? 0,
         };
 
         saveRegexScript(newRegexScript, existingScriptIndex);
@@ -237,12 +179,8 @@ function migrateSettings() {
         if (script.placement.includes(regex_placement.MD_DISPLAY)) {
             script.placement =
                 script.placement.length === 1
-                    ? Object.values(regex_placement).filter(
-                          (e) => e !== regex_placement.MD_DISPLAY,
-                      )
-                    : (script.placement = script.placement.filter(
-                          (e) => e !== regex_placement.MD_DISPLAY,
-                      ));
+                    ? Object.values(regex_placement).filter((e) => e !== regex_placement.MD_DISPLAY)
+                    : (script.placement = script.placement.filter((e) => e !== regex_placement.MD_DISPLAY));
 
             script.markdownOnly = true;
 
@@ -255,9 +193,7 @@ function migrateSettings() {
             script.placement =
                 script.placement.length === 1
                     ? [regex_placement.SLASH_COMMAND]
-                    : (script.placement = script.placement.filter(
-                          (e) => e !== 4,
-                      ));
+                    : (script.placement = script.placement.filter((e) => e !== 4));
 
             performSave = true;
         }
@@ -292,12 +228,8 @@ jQuery(async () => {
             $("#saved_regex_scripts")
                 .children()
                 .each(function () {
-                    const scriptName = $(this)
-                        .find(".regex_script_name")
-                        .text();
-                    const existingScript = extension_settings.regex.find(
-                        (e) => e.scriptName === scriptName,
-                    );
+                    const scriptName = $(this).find(".regex_script_name").text();
+                    const existingScript = extension_settings.regex.find((e) => e.scriptName === scriptName);
                     if (existingScript) {
                         newScripts.push(existingScript);
                     }

@@ -21,9 +21,7 @@ async function moduleWorker() {
 }
 
 function onLockBackgroundClick() {
-    const bgImage = window.getComputedStyle(
-        document.getElementById("bg1"),
-    ).backgroundImage;
+    const bgImage = window.getComputedStyle(document.getElementById("bg1")).backgroundImage;
 
     // Extract the URL from the CSS string
     const urlRegex = /url\((['"])?(.*?)\1\)/;
@@ -98,9 +96,7 @@ async function autoBackgroundCommand() {
         .map((x) => ({ element: x, text: x.innerText.trim() }))
         .filter((x) => x.text.length > 0);
     if (options.length == 0) {
-        toastr.warning(
-            'No backgrounds to choose from. Please upload some images to the "backgrounds" folder.',
-        );
+        toastr.warning('No backgrounds to choose from. Please upload some images to the "backgrounds" folder.');
         return;
     }
 

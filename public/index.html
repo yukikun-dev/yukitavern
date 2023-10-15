@@ -29,16 +29,17 @@
     <script src="scripts/jquery.ui.touch-punch.min.js"></script>
     <script src="scripts/showdown.min.js"></script>
     <script src="scripts/showdown-katex.min.js"></script>
-    <script src="scripts/popper.js"></script>
+    <script src="scripts/popper.min.js"></script>
     <script src="scripts/purify.min.js"></script>
     <script src="scripts/highlight.min.js"></script>
     <script src="scripts/moment.min.js"></script>
     <script src="scripts/cropper.min.js"></script>
     <script src="scripts/jquery-cropper.min.js"></script>
     <script src="scripts/toastr.min.js"></script>
-    <script src="scripts/fuse.js"></script>
+    <script src="scripts/fuse.min.js"></script>
     <script src="scripts/select2.min.js"></script>
     <script src="scripts/seedrandom.min.js"></script>
+    <script src="scripts/pagination.js"></script>
     <script type="module" src="scripts/eventemitter.js"></script>
     <script type="module" src="scripts/power-user.js"></script>
     <script type="module" src="scripts/swiped-events.js"></script>
@@ -59,7 +60,7 @@
     <script type="module" src="scripts/extensions.js"></script>
     <script type="module" src="scripts/authors-note.js"></script>
     <script type="module" src="scripts/preset-manager.js"></script>
-    <script type="text/javascript" src="scripts/toolcool-color-picker.js"></script>
+    <script type="text/javascript" src="scripts/toolcool-color-picker.min.js"></script>
 
     <title>yukitavern</title>
 </head>
@@ -281,18 +282,6 @@
                                         <span >
                                             Alternative server URL (leave empty to use the default value).<br>
                                         </span>
-                                        <div id="ReverseProxyWarningMessage" class="reverse_proxy_warning">
-                                            <b >
-                                                Remove your real OAI API Key from the API panel BEFORE typing anything
-                                                into this box.
-                                            </b>
-                                            <hr>
-                                            <b >
-                                                We cannot provide support for problems encountered while using an
-                                                unofficial OpenAI proxy.
-
-                                            </b>
-                                        </div>
                                     </div>
                                     <div class="wide100p">
                                         <input id="openai_reverse_proxy" type="text" class="text_pole" placeholder="https://api.openai.com/v1" maxlength="100" />
@@ -749,16 +738,6 @@
                                         </div>
                                     </div>
                                     <div class="range-block">
-                                        <label title="Use OAI knowledge base to enhance definitions for public figures and known fictional characters"  class="checkbox_label widthFreeExpand">
-                                            <input id="enhance_definitions" type="checkbox" /><span >
-                                                Enhance Definitions</span>
-                                        </label>
-                                        <div class="toggle-description justifyLeft" >
-                                            Use OAI knowledge base to enhance definitions for public figures and known
-                                            fictional characters
-                                        </div>
-                                    </div>
-                                    <div class="range-block">
                                         <label for="wrap_in_quotes" title="Wrap user messages in quotes before sending"  class="checkbox_label widthFreeExpand">
                                             <input id="wrap_in_quotes" type="checkbox" /><span >
                                                 Wrap in Quotes</span>
@@ -1041,11 +1020,6 @@
                                 <input id="api_key_openai" name="api_key_openai" class="text_pole flex1" maxlength="500" value="" type="text" autocomplete="off">
                                 <div title="Clear your API key"  class="menu_button fa-solid fa-circle-xmark clear-api-key" data-key="api_key_openai"></div>
                             </div>
-                            <div id="ReverseProxyWarningMessage2" class="reverse_proxy_warning">
-                                <b >
-                                    Use "Proxy password" field instead. This input will be ignored.
-                                </b>
-                            </div>
                             <div data-for="api_key_openai" class="neutral_warning">
                                 For privacy reasons, your API key will be hidden after you reload the page.
                             </div>
@@ -1320,30 +1294,6 @@
                                     Replace Macro in Custom Stopping Strings
                                 </span>
                             </label>
-                        </div>
-                        <div>
-                            <h4>
-                                <span >Multigen</span>
-                                <a href="https://docs.yukitavern.app/usage/core-concepts/advancedformatting/#multigen" class="notes-link" target="_blank">
-                                    <span class="note-link-span">?</span>
-                                </a>
-                            </h4>
-                            <label class="checkbox_label" for="multigen">
-                                <input id="multigen" type="checkbox" />
-                                <span >
-                                    Enabled
-                                </span>
-                            </label>
-                            <div class="multigen_settings_block">
-                                <label for="multigen_1st_chunk">
-                                    <small><span >First chunk (tokens)</span></small>
-                                    <input id="multigen_first_chunk" type="number" class="text_pole textarea_compact" min="1" max="512" />
-                                </label>
-                                <label for="multigen_next_chunk">
-                                    <small><span >Next chunks (tokens)</span></small>
-                                    <input id="multigen_next_chunks" type="number" class="text_pole textarea_compact" min="1" max="512" />
-                                </label>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1714,11 +1664,6 @@
                                     <span >Message Timer</span>
                                 </label>
 
-                                <label for="messageTimestampsEnabled" class="checkbox_label">
-                                    <input id="messageTimestampsEnabled" type="checkbox" />
-                                    <span >Chat Timestamps</span>
-                                </label>
-
                                 <label for="mesIDDisplayEnabled" class="checkbox_label">
                                     <input id="mesIDDisplayEnabled" type="checkbox" />
                                     <span >Show Message IDs</span>
@@ -2024,6 +1969,7 @@
                         <div id="rm_button_selected_ch">
                             <h2></h2>
                         </div>
+                        <i id="hideCharPanelAvatarButton" class="fa-solid fa-eye right_menu_button"></i>
                     </div>
                 </div>
                 <!-- end group peeking cope structure-->
@@ -2259,7 +2205,7 @@
 
                 <div id="rm_character_import" class="right_menu" style="display: none;">
                     <form id="form_import" action="javascript:void(null);" method="post" enctype="multipart/form-data">
-                        <input multiple type="file" id="character_import_file" accept=".json, image/png, image/webp" name="avatar">
+                        <input multiple type="file" id="character_import_file" accept=".json, image/png" name="avatar">
                         <input id="character_import_file_type" name="file_type" class="text_pole" maxlength="999" size="2" value="" autocomplete="off">
                     </form>
                 </div>
@@ -2289,12 +2235,11 @@
                         <div class="rm_tag_controls">
                             <div class="tags rm_tag_filter"></div>
                         </div>
-                        <!-- a div containing a dynamically updated count of characters currently displayed -->
-                        <div class="flex-container alignitemscenter">
-                            <div id="rm_character_count"></div>
-                            <i id="charListGridToggle" class="fa-solid fa-table-cells-large menu_button" title="Toggle character grid view"></i>
-                        </div>
                         <hr>
+                    </div>
+
+                    <div id="rm_print_characters_pagination">
+                        <i id="charListGridToggle" class="fa-solid fa-table-cells-large menu_button" title="Toggle character grid view"></i>
                     </div>
 
                     <div id="rm_print_characters_block" class="flexFlowColumn"></div>
@@ -2844,7 +2789,6 @@
                 <div class="ch_name flex-container justifySpaceBetween">
                     <div class="flex-container flex1 alignitemscenter">
                         <span class="name_text">${characterName}</span>
-                        <small class="timestamp"></small>
                     </div>
 
                     <div class="mes_buttons">
@@ -3187,7 +3131,6 @@
     <div id="export_format_popup" class="list-group">
         <div class="export_format list-group-item" data-format="png">PNG</div>
         <div class="export_format list-group-item" data-format="json">JSON</div>
-        <div class="export_format list-group-item" data-format="webp">WEBP</div>
     </div>
 
     <div id="zoomed_avatar_template" class="template_element">

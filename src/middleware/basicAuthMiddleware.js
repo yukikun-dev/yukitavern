@@ -29,14 +29,9 @@ const basicAuthMiddleware = function (request, response, callback) {
     }
 
     const Buffer = require("buffer").Buffer;
-    const [username, password] = Buffer.from(credentials, "base64")
-        .toString("utf8")
-        .split(":");
+    const [username, password] = Buffer.from(credentials, "base64").toString("utf8").split(":");
 
-    if (
-        username === config.basicAuthUser.username &&
-        password === config.basicAuthUser.password
-    ) {
+    if (username === config.basicAuthUser.username && password === config.basicAuthUser.password) {
         return callback();
     } else {
         return unauthorizedResponse(response);
