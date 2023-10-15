@@ -282,18 +282,6 @@
                                         <span >
                                             Alternative server URL (leave empty to use the default value).<br>
                                         </span>
-                                        <div id="ReverseProxyWarningMessage" class="reverse_proxy_warning">
-                                            <b >
-                                                Remove your real OAI API Key from the API panel BEFORE typing anything
-                                                into this box.
-                                            </b>
-                                            <hr>
-                                            <b >
-                                                We cannot provide support for problems encountered while using an
-                                                unofficial OpenAI proxy.
-
-                                            </b>
-                                        </div>
                                     </div>
                                     <div class="wide100p">
                                         <input id="openai_reverse_proxy" type="text" class="text_pole" placeholder="https://api.openai.com/v1" maxlength="100" />
@@ -1031,11 +1019,6 @@
                             <div class="flex-container">
                                 <input id="api_key_openai" name="api_key_openai" class="text_pole flex1" maxlength="500" value="" type="text" autocomplete="off">
                                 <div title="Clear your API key"  class="menu_button fa-solid fa-circle-xmark clear-api-key" data-key="api_key_openai"></div>
-                            </div>
-                            <div id="ReverseProxyWarningMessage2" class="reverse_proxy_warning">
-                                <b >
-                                    Use "Proxy password" field instead. This input will be ignored.
-                                </b>
                             </div>
                             <div data-for="api_key_openai" class="neutral_warning">
                                 For privacy reasons, your API key will be hidden after you reload the page.

@@ -4467,10 +4467,6 @@ toolcool-color-picker {
     flex-grow: 1;
 }
 
-#ReverseProxyWarningMessage {
-    display: none;
-}
-
 .reverse_proxy_warning {
     color: red;
     background-color: black;
