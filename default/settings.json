@@ -268,7 +268,6 @@
     "openai_max_context": 4095,
     "openai_max_tokens": 300,
     "nsfw_toggle": true,
-    "enhance_definitions": false,
     "wrap_in_quotes": false,
     "send_if_empty": "",
     "nsfw_first": false,

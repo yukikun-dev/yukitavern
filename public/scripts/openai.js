@@ -106,7 +106,6 @@ const default_settings = {
     openai_max_context: max_4k,
     openai_max_tokens: 300,
     nsfw_toggle: true,
-    enhance_definitions: false,
     wrap_in_quotes: false,
     send_if_empty: "",
     nsfw_first: false,
@@ -143,7 +142,6 @@ const oai_settings = {
     openai_max_context: max_4k,
     openai_max_tokens: 300,
     nsfw_toggle: true,
-    enhance_definitions: false,
     wrap_in_quotes: false,
     send_if_empty: "",
     nsfw_first: false,
@@ -347,16 +345,7 @@ async function prepareOpenAIMessages({
 } = {}) {
     const isImpersonate = type == "impersonate";
     let this_max_context = oai_settings.openai_max_context;
-    let enhance_definitions_prompt = "";
     let nsfw_toggle_prompt = oai_settings.nsfw_toggle ? oai_settings.nsfw_prompt : oai_settings.nsfw_avoidance_prompt;
-
-    // Experimental but kinda works
-    if (oai_settings.enhance_definitions) {
-        enhance_definitions_prompt =
-            "If you have more knowledge of " +
-            name2 +
-            ", add to the character's lore and personality to enhance them but keep the Character Sheet's definitions absolute.";
-    }
 
     const wiBefore = formatWorldInfo(worldInfoBefore);
     const wiAfter = formatWorldInfo(worldInfoAfter);
@@ -364,7 +353,6 @@ async function prepareOpenAIMessages({
     let whole_prompt = getSystemPrompt(
         systemPrompt,
         nsfw_toggle_prompt,
-        enhance_definitions_prompt,
         wiBefore,
         storyString,
         wiAfter,
@@ -565,7 +553,6 @@ async function prepareOpenAIMessages({
 function getSystemPrompt(
     systemPrompt,
     nsfw_toggle_prompt,
-    enhance_definitions_prompt,
     wiBefore,
     storyString,
     wiAfter,
@@ -577,35 +564,15 @@ function getSystemPrompt(
     let whole_prompt = [];
 
     if (isImpersonate) {
-        whole_prompt = [
-            nsfw_toggle_prompt,
-            enhance_definitions_prompt + "\n\n" + wiBefore,
-            storyString,
-            wiAfter,
-            extensionPrompt,
-        ];
+        whole_prompt = [nsfw_toggle_prompt, wiBefore, storyString, wiAfter, extensionPrompt];
     } else {
         // If it's toggled, NSFW prompt goes first.
         if (oai_settings.nsfw_first) {
-            whole_prompt = [
-                nsfw_toggle_prompt,
-                prompt,
-                enhance_definitions_prompt + "\n\n" + wiBefore,
-                storyString,
-                wiAfter,
-                extensionPrompt,
-            ];
+            whole_prompt = [nsfw_toggle_prompt, prompt, wiBefore, storyString, wiAfter, extensionPrompt];
         } else {
-            whole_prompt = [
-                prompt,
-                nsfw_toggle_prompt,
-                enhance_definitions_prompt,
-                "\n",
-                wiBefore,
-                storyString,
-                wiAfter,
-                extensionPrompt,
-            ].filter((elem) => elem);
+            whole_prompt = [prompt, nsfw_toggle_prompt, wiBefore, storyString, wiAfter, extensionPrompt].filter(
+                (elem) => elem,
+            );
         }
     }
     return whole_prompt;
@@ -1095,7 +1062,6 @@ function loadOpenAISettings(data, settings) {
     if (settings.nsfw_toggle !== undefined) oai_settings.nsfw_toggle = !!settings.nsfw_toggle;
     if (settings.keep_example_dialogue !== undefined)
         oai_settings.keep_example_dialogue = !!settings.keep_example_dialogue;
-    if (settings.enhance_definitions !== undefined) oai_settings.enhance_definitions = !!settings.enhance_definitions;
     if (settings.wrap_in_quotes !== undefined) oai_settings.wrap_in_quotes = !!settings.wrap_in_quotes;
     if (settings.nsfw_first !== undefined) oai_settings.nsfw_first = !!settings.nsfw_first;
     if (settings.openai_model !== undefined) oai_settings.openai_model = settings.openai_model;
@@ -1119,7 +1085,6 @@ function loadOpenAISettings(data, settings) {
 
     $("#nsfw_toggle").prop("checked", oai_settings.nsfw_toggle);
     $("#keep_example_dialogue").prop("checked", oai_settings.keep_example_dialogue);
-    $("#enhance_definitions").prop("checked", oai_settings.enhance_definitions);
     $("#wrap_in_quotes").prop("checked", oai_settings.wrap_in_quotes);
     $("#nsfw_first").prop("checked", oai_settings.nsfw_first);
     $("#jailbreak_system").prop("checked", oai_settings.jailbreak_system);
@@ -1262,7 +1227,6 @@ async function saveOpenAIPreset(name, settings) {
         openai_max_context: settings.openai_max_context,
         openai_max_tokens: settings.openai_max_tokens,
         nsfw_toggle: settings.nsfw_toggle,
-        enhance_definitions: settings.enhance_definitions,
         wrap_in_quotes: settings.wrap_in_quotes,
         send_if_empty: settings.send_if_empty,
         nsfw_first: settings.nsfw_first,
@@ -1605,7 +1569,6 @@ function onSettingsPresetChange() {
         openai_max_context: ["#openai_max_context", "openai_max_context", false],
         openai_max_tokens: ["#openai_max_tokens", "openai_max_tokens", false],
         nsfw_toggle: ["#nsfw_toggle", "nsfw_toggle", true],
-        enhance_definitions: ["#enhance_definitions", "enhance_definitions", true],
         wrap_in_quotes: ["#wrap_in_quotes", "wrap_in_quotes", true],
         send_if_empty: ["#send_if_empty_textarea", "send_if_empty", false],
         nsfw_first: ["#nsfw_first", "nsfw_first", true],
@@ -1913,11 +1876,6 @@ $(document).ready(function () {
 
     $("#nsfw_toggle").on("change", function () {
         oai_settings.nsfw_toggle = !!$("#nsfw_toggle").prop("checked");
-        saveSettingsDebounced();
-    });
-
-    $("#enhance_definitions").on("change", function () {
-        oai_settings.enhance_definitions = !!$("#enhance_definitions").prop("checked");
         saveSettingsDebounced();
     });
 
