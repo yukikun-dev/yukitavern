@@ -100,8 +100,8 @@ const commandExistsSync = require("command-exists").sync;
 
 const _ = require("lodash");
 
-// import from statsHelpers.js
-const statsHelpers = require("./statsHelpers.js");
+// import from statsHelpers.ts
+const statsHelpers = require("./statsHelpers.ts");
 
 const characterCardParser = require("./src/character-card-parser.js");
 const config = require(path.join(process.cwd(), "./config.conf"));
