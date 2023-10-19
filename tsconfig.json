@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "target": "ESNext", // Specify ECMAScript target version
-        "module": "NodeNext", // Specify module code generation
+        "target": "ES6", // Specify ECMAScript target version
+        "module": "CommonJS", // Specify module code generation
         "outDir": "./dist", // Redirect output structure to this directory
         "rootDir": "./src", // Specify the root directory of input files
         "esModuleInterop": true, // Enables emit interoperability between CommonJS and ES Modules
@@ -15,12 +15,12 @@
         "strictFunctionTypes": false, // Enable strict checking of function types
         "strictPropertyInitialization": false, // Enable strict checking of property initialization in classes
         "strictBindCallApply": false, // Enable strict 'bind', 'call', and 'apply' methods on functions
-        "moduleResolution": "NodeNext", // Use Node.js-style module resolution
+        // "moduleResolution": "NodeNext", // Use Node.js-style module resolution
         // "allowImportingTsExtensions": true, // Allow importing .ts files even when .d.ts files are present
-        "allowJs": true, // Allow JavaScript files to be a part of your program
+        // "allowJs": true, // Allow JavaScript files to be a part of your program
         // "noEmit": true, // Do not emit outputs
         "resolveJsonModule": true, // Include modules imported with .json extension
-        "isolatedModules": true, // Transpile each file as a separate module\
+        // "isolatedModules": true, // Transpile each file as a separate module\
         "noEmitOnError": false // Do not emit outputs if any type checking errors were reported
     },
     "include": [

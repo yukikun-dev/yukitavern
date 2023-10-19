@@ -33,8 +33,6 @@ import sanitize from "sanitize-filename";
 import { SentencePieceProcessor } from "sentencepiece-js";
 import { TextDecoder } from "util";
 import WebSocket from "ws";
-import { hideBin } from "yargs/helpers";
-import yargs from "yargs/yargs";
 import yauzl from "yauzl";
 import { parse } from "./character-card-parser.js";
 import contentManager from "./content-manager.js";
@@ -65,39 +63,17 @@ function createDefaultFiles() {
     }
 }
 
-const cliArguments = await yargs(hideBin(process.argv))
-    .option("disableCsrf", {
-        type: "boolean",
-        default: false,
-        describe: "Disables CSRF protection",
-    })
-    .option("ssl", {
-        type: "boolean",
-        default: false,
-        describe: "Enables SSL",
-    })
-    .option("certPath", {
-        type: "string",
-        default: "certs/cert.pem",
-        describe: "Path to your certificate file.",
-    })
-    .option("keyPath", {
-        type: "string",
-        default: "certs/privkey.pem",
-        describe: "Path to your private key file.",
-    }).argv;
-
 const app = express();
 
 app.use(compression());
 app.use(responseTime());
 
-import config from "./config.json" assert { type: "json" };
+import config from "./config.json";
 
 const server_port = process.env.SILLY_TAVERN_PORT || config.port;
 
 const whitelistMode = config.whitelistMode;
-const autorun = config.autorun && !cliArguments.ssl;
+const autorun = config.autorun && !config.ssl;
 const enableExtensions = config.enableExtensions;
 const listen = config.listen;
 const allowKeysExposure = config.allowKeysExposure;
@@ -119,15 +95,6 @@ function get_mancer_headers() {
     const api_key_mancer = readSecret(SECRET_KEYS.MANCER);
     return api_key_mancer ? { "X-API-KEY": api_key_mancer } : {};
 }
-
-//RossAscends: Added function to format dates used in files and chat timestamps to a humanized format.
-//Mostly I wanted this to be for file names, but couldn't figure out exactly where the filename save code was as everything seemed to be connected.
-//During testing, this performs the same as previous date.now() structure.
-//It also does not break old characters/chats, as the code just uses whatever timestamp exists in the chat.
-//New chats made with characters will use this new formatting.
-//Useable variable is (( humanizedISO8601Datetime ))
-
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const CHARS_PER_TOKEN = 3.35;
 
@@ -279,7 +246,7 @@ const directories = {
 };
 
 // CSRF Protection //
-if (cliArguments.disableCsrf === false) {
+if (config.disableCsrf === false) {
     const CSRF_SECRET = crypto.randomBytes(8).toString("hex");
     const COOKIES_SECRET = crypto.randomBytes(8).toString("hex");
 
@@ -297,7 +264,7 @@ if (cliArguments.disableCsrf === false) {
 
     app.get("/csrf-token", (req, res) => {
         res.json({
-            token: generateToken(res),
+            token: generateToken(res, req),
         });
     });
 
@@ -557,7 +524,7 @@ app.post("/getchat", jsonParser, function (request, response) {
     }
 });
 
-app.post("/getstatus", jsonParser, async function (request, response_getstatus = response) {
+app.post("/getstatus", jsonParser, async function (request, response_getstatus) {
     if (!request.body) return response_getstatus.sendStatus(400);
     api_server = request.body.api_server;
     const main_api = request.body.main_api;
@@ -3028,10 +2995,10 @@ async function postAsync(url, args) {
 }
 
 const tavernUrl = new URL(
-    (cliArguments.ssl ? "https://" : "http://") + (listen ? "0.0.0.0" : "127.0.0.1") + (":" + server_port),
+    (config.ssl ? "https://" : "http://") + (listen ? "0.0.0.0" : "127.0.0.1") + (":" + server_port),
 );
 
-const autorunUrl = new URL((cliArguments.ssl ? "https://" : "http://") + "127.0.0.1" + (":" + server_port));
+const autorunUrl = new URL((config.ssl ? "https://" : "http://") + "127.0.0.1" + (":" + server_port));
 
 const setupTasks = async function () {
     backupSettings();
@@ -3048,14 +3015,6 @@ const setupTasks = async function () {
     ]);
 
     await statsHelpers.loadStatsFile(directories.chats, directories.characters);
-
-    // Set up event listeners for a graceful shutdown
-    process.on("SIGINT", statsHelpers.writeStatsToFileAndExit);
-    process.on("SIGTERM", statsHelpers.writeStatsToFileAndExit);
-    process.on("uncaughtException", (err) => {
-        console.error("Uncaught exception:", err);
-        statsHelpers.writeStatsToFileAndExit();
-    });
 
     setInterval(statsHelpers.saveStatsToFile, 5 * 60 * 1000);
 
@@ -3075,12 +3034,12 @@ if (listen && !config.whitelistMode && !config.basicAuthMode) {
         process.exit(1);
     }
 }
-if (true === cliArguments.ssl)
+if (true === config.ssl)
     https
         .createServer(
             {
-                cert: fs.readFileSync(cliArguments.certPath),
-                key: fs.readFileSync(cliArguments.keyPath),
+                cert: fs.readFileSync(config.certPath),
+                key: fs.readFileSync(config.keyPath),
             },
             app,
         )

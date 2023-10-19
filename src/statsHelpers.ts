@@ -5,7 +5,6 @@ const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 const readdir = util.promisify(fs.readdir);
 import crypto from "crypto";
-import process from "process";
 
 let charStats = {};
 let lastSaveTimestamp = 0;
@@ -117,16 +116,6 @@ async function saveStatsToFile(charStats: { timestamp?: any }) {
     if (charStats.timestamp > lastSaveTimestamp) {
         await writeFile(statsFilePath, JSON.stringify(charStats));
         lastSaveTimestamp = Date.now();
-    }
-}
-
-async function writeStatsToFileAndExit(charStats: undefined) {
-    try {
-        await saveStatsToFile(charStats);
-    } catch (err) {
-        console.error("Failed to write stats to file:", err);
-    } finally {
-        process.exit();
     }
 }
 
@@ -299,7 +288,6 @@ function calculateTotalGenTimeAndWordCount(
 export {
     saveStatsToFile,
     loadStatsFile,
-    writeStatsToFileAndExit,
     getCharStats,
     setCharStats,
     calculateStats,

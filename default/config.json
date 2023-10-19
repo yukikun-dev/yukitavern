@@ -12,5 +12,9 @@
     "enableExtensions": true,
     "listen": true,
     "allowKeysExposure": false,
-    "securityOverride": true
+    "securityOverride": false,
+    "disableCsrf": false,
+    "ssl": false,
+    "certPath": "certs/cert.pem",
+    "keyPath": "certs/privkey.pem"
 }

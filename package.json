@@ -31,6 +31,7 @@
         "sanitize-filename": "^1.6.3",
         "sentencepiece-js": "^1.1.0",
         "simple-git": "^3.19.1",
+        "typescript": "^5.2.2",
         "uniqolor": "^1.1.0",
         "ws": "^8.13.0",
         "yargs": "^17.7.1",
@@ -42,7 +43,7 @@
         }
     },
     "name": "yukitavern",
-    "type": "module",
+    "type": "commonjs",
     "license": "AGPL-3.0",
     "repository": {
         "type": "git",
@@ -50,9 +51,10 @@
     },
     "version": "1.9.7",
     "scripts": {
-        "start": "node server.ts",
-        "start-multi": "node server.ts --disableCsrf",
-        "pkg": "pkg --compress Gzip --no-bytecode --public ."
+        "start": "node dist/server.js",
+        "start-multi": "node dist/server.js --disableCsrf",
+        "build": "tsc",
+        "pkg": "npm run build; pkg --compress Gzip --no-bytecode --public ."
     },
     "bin": {
         "yukitavern": "./dist/server.js"
@@ -61,7 +63,7 @@
         "no-path-concat": "off",
         "no-var": "off"
     },
-    "main": "server.ts",
+    "main": "dist/server.js",
     "pkg": {
         "targets": [
             "node18-linux-x64",
@@ -73,7 +75,7 @@
         ],
         "outputPath": "dist",
         "scripts": [
-            "server.ts"
+            "dist/server.s"
         ]
     },
     "devDependencies": {
