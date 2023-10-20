@@ -7,7 +7,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import crypto from "crypto";
 import { doubleCsrf } from "csrf-csrf";
-import DeviceDetector from "device-detector-js";
 import express from "express";
 import fs from "fs";
 import http from "http";
@@ -38,8 +37,7 @@ import { parse } from "./character-card-parser.js";
 import contentManager from "./content-manager.js";
 import basicAuthMiddleware from "./middleware/basicAuthMiddleware.js";
 import * as statsHelpers from "./statsHelpers.js";
-
-const baseDir = process.cwd();
+import { baseDir, directories } from "./utils/directories";
 
 createDefaultFiles();
 
@@ -64,6 +62,9 @@ function createDefaultFiles() {
 }
 
 const app = express();
+
+import index from "./routes/index.js";
+app.use("/", index);
 
 app.use(compression());
 app.use(responseTime());
@@ -224,26 +225,6 @@ const AVATAR_WIDTH = 400;
 const AVATAR_HEIGHT = 600;
 const jsonParser = express.json({ limit: "100mb" });
 const urlencodedParser = express.urlencoded({ extended: true, limit: "100mb" });
-const directories = {
-    worlds: path.join(baseDir, "public", "worlds"),
-    avatars: path.join(baseDir, "public", "User Avatars"),
-    groups: path.join(baseDir, "public", "groups"),
-    groupChats: path.join(baseDir, "public", "group chats"),
-    chats: path.join(baseDir, "public", "chats"),
-    characters: path.join(baseDir, "public", "characters"),
-    backgrounds: path.join(baseDir, "public", "backgrounds"),
-    openAI_Settings: path.join(baseDir, "public", "OpenAI Settings"),
-    textGen_Settings: path.join(baseDir, "public", "TextGen Settings"),
-    thumbnails: path.join(baseDir, "thumbnails"),
-    thumbnailsBg: path.join(baseDir, "thumbnails", "bg"),
-    thumbnailsAvatar: path.join(baseDir, "thumbnails", "avatar"),
-    themes: path.join(baseDir, "public", "themes"),
-    extensions: path.join(baseDir, "public", "scripts", "extensions"),
-    context: path.join(baseDir, "public", "context"),
-    backups: path.join(baseDir, "backups"),
-    quickreplies: path.join(baseDir, "public", "QuickReplies"),
-    uploads: path.join(baseDir, "uploads"),
-};
 
 // CSRF Protection //
 if (config.disableCsrf === false) {
@@ -344,18 +325,6 @@ app.use("/characters", (req, res) => {
     });
 });
 app.use(multer({ dest: "uploads", limits: { fieldSize: 10 * 1024 * 1024 } }).single("avatar"));
-app.get("/", function (request, response) {
-    response.sendFile(path.join(baseDir, "/public/index.html"));
-});
-app.get("/notes/*", function (request, response) {
-    response.sendFile(path.join(baseDir, "/public" + request.url + ".html"));
-});
-app.get("/deviceinfo", function (request, response) {
-    const userAgent = request.header("user-agent");
-    const deviceDetector = new DeviceDetector();
-    const deviceInfo = deviceDetector.parse(userAgent);
-    return response.send(deviceInfo);
-});
 
 //************** Text generation web UI
 app.post("/generate_textgenerationwebui", jsonParser, async function (request, response_generate) {
@@ -2253,36 +2222,6 @@ app.get("/get_sprites", jsonParser, function (request, response) {
     }
 });
 
-function getThumbnailFolder(type) {
-    let thumbnailFolder;
-
-    switch (type) {
-        case "bg":
-            thumbnailFolder = directories.thumbnailsBg;
-            break;
-        case "avatar":
-            thumbnailFolder = directories.thumbnailsAvatar;
-            break;
-    }
-
-    return thumbnailFolder;
-}
-
-function getOriginalFolder(type) {
-    let originalFolder;
-
-    switch (type) {
-        case "bg":
-            originalFolder = directories.backgrounds;
-            break;
-        case "avatar":
-            originalFolder = directories.characters;
-            break;
-    }
-
-    return originalFolder;
-}
-
 function invalidateThumbnail(type, file) {
     const folder = getThumbnailFolder(type);
     const pathToThumbnail = path.join(folder, file);
@@ -2312,87 +2251,6 @@ async function ensureThumbnailCache() {
     await Promise.all(tasks);
     console.log(`Done! Generated: ${bgFiles.length} preview images`);
 }
-
-async function generateThumbnail(type, file) {
-    const pathToCachedFile = path.join(getThumbnailFolder(type), file);
-    const pathToOriginalFile = path.join(getOriginalFolder(type), file);
-
-    const cachedFileExists = fs.existsSync(pathToCachedFile);
-    const originalFileExists = fs.existsSync(pathToOriginalFile);
-
-    // to handle cases when original image was updated after thumb creation
-    let shouldRegenerate = false;
-
-    if (cachedFileExists && originalFileExists) {
-        const originalStat = fs.statSync(pathToOriginalFile);
-        const cachedStat = fs.statSync(pathToCachedFile);
-
-        if (originalStat.mtimeMs > cachedStat.ctimeMs) {
-            //console.log('Original file changed. Regenerating thumbnail...');
-            shouldRegenerate = true;
-        }
-    }
-
-    if (cachedFileExists && !shouldRegenerate) {
-        return pathToCachedFile;
-    }
-
-    if (!originalFileExists) {
-        return null;
-    }
-
-    const imageSizes = { bg: [160, 90], avatar: [96, 144] };
-    const mySize = imageSizes[type];
-
-    try {
-        let buffer;
-
-        try {
-            const image = await jimp.read(pathToOriginalFile);
-            buffer = await image.cover(mySize[0], mySize[1]).quality(95).getBufferAsync(mime.lookup("jpg"));
-        } catch (inner) {
-            console.warn(`Thumbnailer can not process the image: ${pathToOriginalFile}. Using original size`);
-            buffer = fs.readFileSync(pathToOriginalFile);
-        }
-
-        fs.writeFileSync(pathToCachedFile, buffer);
-    } catch (outer) {
-        return null;
-    }
-
-    return pathToCachedFile;
-}
-
-app.get("/thumbnail", jsonParser, async function (request, response) {
-    const type = request.query.type;
-    const file = sanitize(request.query.file.toString());
-
-    if (!type || !file) {
-        return response.sendStatus(400);
-    }
-
-    if (!(type == "bg" || type == "avatar")) {
-        return response.sendStatus(400);
-    }
-
-    if (sanitize(file) !== file) {
-        console.error("Malicious filename prevented");
-        return response.sendStatus(403);
-    }
-
-    if (config.disableThumbnails == true) {
-        const pathToOriginalFile = path.join(getOriginalFolder(type), file);
-        return response.sendFile(pathToOriginalFile);
-    }
-
-    const pathToCachedFile = await generateThumbnail(type, file);
-
-    if (!pathToCachedFile) {
-        return response.sendStatus(404);
-    }
-
-    return response.sendFile(pathToCachedFile);
-});
 
 /* OpenAI */
 app.post("/getstatus_openai", jsonParser, function (request, response_getstatus_openai) {
