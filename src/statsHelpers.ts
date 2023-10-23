@@ -113,7 +113,7 @@ async function loadStatsFile(chatsPath: string, charactersPath: string) {
 }
 
 async function saveStatsToFile(charStats: { timestamp?: any }) {
-    if (charStats.timestamp > lastSaveTimestamp) {
+    if (charStats && charStats.timestamp > lastSaveTimestamp) {
         await writeFile(statsFilePath, JSON.stringify(charStats));
         lastSaveTimestamp = Date.now();
     }

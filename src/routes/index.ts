@@ -1,30 +1,34 @@
 import DeviceDetector from "device-detector-js";
 import express from "express";
-import fs from "fs";
-import jimp from "jimp";
-import mime from "mime-types";
 import path from "path";
 import sanitize from "sanitize-filename";
-import config from "../config.json";
-import { baseDir, directories } from "../utils/directories";
+import config from "../utils/config.js";
+import { baseDir, directories } from "../utils/directories.js";
+import { jsonParser } from "../utils/common.js";
+import fs from "fs";
+import mime from "mime-types";
+import jimp from "jimp";
+import { get_mancer_headers } from "../utils/promptUtils.js";
+import { getThumbnailFolder } from "../utils/imageUtils.js";
 
-const router = express.Router();
+const app = express();
+export default app;
 
-router.get("/", function (_, response) {
+app.get("/", function (_, response) {
     response.sendFile(path.join(baseDir, "/public/index.html"));
 });
 
-router.get("/notes/*", function (request, response) {
+app.get("/notes/*", function (request, response) {
     response.sendFile(path.join(baseDir, "/public" + request.url + ".html"));
 });
-router.get("/deviceinfo", function (request, response) {
+app.get("/deviceinfo", function (request, response) {
     const userAgent = request.header("user-agent");
     const deviceDetector = new DeviceDetector();
     const deviceInfo = deviceDetector.parse(userAgent);
     return response.send(deviceInfo);
 });
 
-router.get("/thumbnail", express.json({ limit: "100mb" }), async function (request, response) {
+app.get("/thumbnail", express.json({ limit: "100mb" }), async function (request, response) {
     const type = request.query.type;
     const file = sanitize(request.query.file.toString());
 
@@ -70,22 +74,7 @@ function getOriginalFolder(type) {
     return originalFolder;
 }
 
-function getThumbnailFolder(type) {
-    let thumbnailFolder;
-
-    switch (type) {
-        case "bg":
-            thumbnailFolder = directories.thumbnailsBg;
-            break;
-        case "avatar":
-            thumbnailFolder = directories.thumbnailsAvatar;
-            break;
-    }
-
-    return thumbnailFolder;
-}
-
-async function generateThumbnail(type, file) {
+export async function generateThumbnail(type, file) {
     const pathToCachedFile = path.join(getThumbnailFolder(type), file);
     const pathToOriginalFile = path.join(getOriginalFolder(type), file);
 
@@ -121,7 +110,7 @@ async function generateThumbnail(type, file) {
 
         try {
             const image = await jimp.read(pathToOriginalFile);
-            buffer = await image.cover(mySize[0], mySize[1]).quality(95).getBufferAsync(mime.lookup("jpg"));
+            buffer = await image.cover(mySize[0], mySize[1]).quality(95).getBufferAsync(mime.lookup("jpg").toString());
         } catch (inner) {
             console.warn(`Thumbnailer can not process the image: ${pathToOriginalFile}. Using original size`);
             buffer = fs.readFileSync(pathToOriginalFile);
@@ -134,5 +123,3 @@ async function generateThumbnail(type, file) {
 
     return pathToCachedFile;
 }
-
-export default router;

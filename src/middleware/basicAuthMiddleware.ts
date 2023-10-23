@@ -1,4 +1,4 @@
-import config from "../config.json";
+import config from "../utils/config.js";
 import { Buffer } from "buffer";
 
 const unauthorizedResponse = (res) => {
