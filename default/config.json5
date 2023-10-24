@@ -1,0 +1,20 @@
+{
+    port: 56565, // Port to listen on
+    whitelist: ["127.0.0.1"], // List of IP addresses to allow access to
+    whitelistMode: false, // If true, only allow access to IP addresses in the whitelist
+    basicAuthMode: false, // If true, use basic auth to protect the site
+    basicAuthUser: {
+        username: "user", // Username for basic auth
+        password: "password", // Password for basic auth
+    },
+    disableThumbnails: false, // If true, use full size images instead of thumbnails
+    autorun: true, // If true, automatically open the site in the default browser
+    enableExtensions: false, // If true, enable extensions
+    listen: false, // If true, listen on all interfaces
+    allowKeysExposure: false, // If true, allow the keys to be exposed via the API
+    securityOverride: false, // Required if whitelist and basicAuthMode are both disabled
+    disableCsrf: true, // If true, disable CSRF protection
+    ssl: false, // If true, use HTTPS instead of HTTP
+    certPath: "certs/cert.pem", // Path to SSL certificate
+    keyPath: "certs/privkey.pem", // Path to SSL private key
+}
