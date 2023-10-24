@@ -4,11 +4,9 @@ import path from "path";
 import sanitize from "sanitize-filename";
 import config from "../utils/config.js";
 import { baseDir, directories } from "../utils/directories.js";
-import { jsonParser } from "../utils/common.js";
 import fs from "fs";
 import mime from "mime-types";
 import jimp from "jimp";
-import { get_mancer_headers } from "../utils/promptUtils.js";
 import { getThumbnailFolder } from "../utils/imageUtils.js";
 
 const app = express();

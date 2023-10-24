@@ -23,6 +23,7 @@ import { parse } from "../character-card-parser.js";
 let characters = {};
 
 const app = express();
+app.use(multer({ dest: "uploads", limits: { fieldSize: 10 * 1024 * 1024 } }).single("avatar"));
 export default app;
 
 function charaFormatData(data) {
@@ -445,7 +446,7 @@ async function charaWrite(img_url, data, target_img, response = undefined, mes =
         const base64EncodedData = Buffer.from(data, "utf8").toString("base64");
         chunks.splice(-1, 0, PNGtext.encode("chara", base64EncodedData));
 
-        fs.writeFileSync(directories.characters + target_img + ".png", Buffer.from(encode(chunks)));
+        fs.writeFileSync(path.join(directories.characters, target_img + ".png"), Buffer.from(encode(chunks)));
         if (response !== undefined) response.send(mes);
         return true;
     } catch (err) {
@@ -758,7 +759,7 @@ app.post("/exportcharacter", jsonParser, async function (request, response) {
 
     switch (request.body.format) {
         case "png":
-            return response.sendFile(filename, { root: directories.characters });
+            return response.sendFile(filename);
         case "json": {
             try {
                 let json = await charaRead(filename);
@@ -968,8 +969,6 @@ app.use("/characters", (req, res) => {
         res.send(data);
     });
 });
-
-app.use(multer({ dest: "uploads", limits: { fieldSize: 10 * 1024 * 1024 } }).single("avatar"));
 
 const calculateChatSize = (charDir) => {
     let chatSize = 0;

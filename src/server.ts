@@ -18,9 +18,24 @@ import process from "process";
 import responseTime from "response-time";
 import contentManager from "./content-manager.js";
 import basicAuthMiddleware from "./middleware/basicAuthMiddleware.js";
-import { generateThumbnail } from "./routes/index.js";
-import { writeSecret } from "./routes/secretRoutes.js";
+import backgroundRoutes from "./routes/backgroundRoutes.js";
+import characterRoutes from "./routes/characterRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
+import extensionsRoutes from "./routes/extensionsRoutes.js";
+import generateRoutes from "./routes/generateRoutes.js";
+import groupChatRoutes from "./routes/groupChatRoutes.js";
+import index, { generateThumbnail } from "./routes/index.js";
+import openAiRoutes from "./routes/openAiRoutes.js";
+import presetRoutes from "./routes/presetRoutes.js";
+import secretRoutes, { writeSecret } from "./routes/secretRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
+import spriteRoutes from "./routes/spriteRoutes.js";
+import statsRoutes from "./routes/statsRoutes.js";
+import tokenizeRoutes from "./routes/tokenizeRoutes.js";
+import userAvatarRoutes from "./routes/userAvatarRoutes.js";
+import worldRoutes from "./routes/worldRoutes.js";
 import * as statsHelpers from "./statsHelpers.js";
+import config from "./utils/config.js";
 import { SECRET_KEYS } from "./utils/constants.js";
 import { baseDir, directories } from "./utils/directories.js";
 
@@ -50,44 +65,8 @@ function createDefaultFiles() {
 
 const app = express();
 
-import backgroundRoutes from "./routes/backgroundRoutes.js";
-import characterRoutes from "./routes/characterRoutes.js";
-import chatRoutes from "./routes/chatRoutes.js";
-import extensionsRoutes from "./routes/extensionsRoutes.js";
-import generateRoutes from "./routes/generateRoutes.js";
-import groupChatRoutes from "./routes/groupChatRoutes.js";
-import index from "./routes/index.js";
-import openAiRoutes from "./routes/openAiRoutes.js";
-import presetRoutes from "./routes/presetRoutes.js";
-import secretRoutes from "./routes/secretRoutes.js";
-import settingsRoutes from "./routes/settingsRoutes.js";
-import spriteRoutes from "./routes/spriteRoutes.js";
-import statsRoutes from "./routes/statsRoutes.js";
-import tokenizeRoutes from "./routes/tokenizeRoutes.js";
-import userAvatarRoutes from "./routes/userAvatarRoutes.js";
-import worldRoutes from "./routes/worldRoutes.js";
-
-app.use("/", index);
-app.use("/", spriteRoutes);
-app.use("/", secretRoutes);
-app.use("/", chatRoutes);
-app.use("/", settingsRoutes);
-app.use("/", backgroundRoutes);
-app.use("/", characterRoutes);
-app.use("/", groupChatRoutes);
-app.use("/", generateRoutes);
-app.use("/", worldRoutes);
-app.use("/", userAvatarRoutes);
-app.use("/", tokenizeRoutes);
-app.use("/", openAiRoutes);
-app.use("/", statsRoutes);
-app.use("/", presetRoutes);
-app.use("/", extensionsRoutes);
-
 app.use(compression());
 app.use(responseTime());
-
-import config from "./utils/config.js";
 
 const server_port = process.env.SILLY_TAVERN_PORT || config.port;
 
@@ -189,15 +168,6 @@ app.use("/backgrounds", (req, res) => {
         res.send(data);
     });
 });
-
-//***************** Main functions
-
-/**
- * Discover the extension folders
- * If the folder is called third-party, search for subfolders instead
- */
-
-/* OpenAI */
 
 const tavernUrl = new URL(
     (config.ssl ? "https://" : "http://") + (listen ? "0.0.0.0" : "127.0.0.1") + (":" + server_port),
@@ -336,3 +306,20 @@ async function ensureThumbnailCache() {
     await Promise.all(tasks);
     console.log(`Done! Generated: ${bgFiles.length} preview images`);
 }
+
+app.use("/", index);
+app.use("/", spriteRoutes);
+app.use("/", secretRoutes);
+app.use("/", chatRoutes);
+app.use("/", settingsRoutes);
+app.use("/", backgroundRoutes);
+app.use("/", characterRoutes);
+app.use("/", groupChatRoutes);
+app.use("/", generateRoutes);
+app.use("/", worldRoutes);
+app.use("/", userAvatarRoutes);
+app.use("/", tokenizeRoutes);
+app.use("/", openAiRoutes);
+app.use("/", statsRoutes);
+app.use("/", presetRoutes);
+app.use("/", extensionsRoutes);
