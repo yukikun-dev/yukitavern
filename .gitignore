@@ -15,6 +15,7 @@ public/stats.json
 /uploads/
 *.jsonl
 /config.conf
+/src/config.json
 .DS_Store
 public/settings.json
 /thumbnails

@@ -1,9 +1,10 @@
-const fs = require("fs");
+import fs from "fs";
 
-const extract = require("png-chunks-extract");
-const PNGtext = require("png-chunk-text");
+import extract from "png-chunks-extract";
+import PNGtext from "png-chunk-text";
+import { Buffer } from "buffer";
 
-const parse = async (cardUrl, format) => {
+export async function parse(cardUrl: fs.PathOrFileDescriptor, format: string) {
     var fileFormat = format ? format : "png";
 
     switch (fileFormat) {
@@ -12,10 +13,10 @@ const parse = async (cardUrl, format) => {
             const chunks = extract(buffer);
 
             const textChunks = chunks
-                .filter(function (chunk) {
+                .filter(function (chunk: { name: string }) {
                     return chunk.name === "tEXt";
                 })
-                .map(function (chunk) {
+                .map(function (chunk: { data: any }) {
                     return PNGtext.decode(chunk.data);
                 });
 
@@ -24,13 +25,8 @@ const parse = async (cardUrl, format) => {
                 throw new Error("No PNG metadata.");
             }
 
-            const Buffer = require("buffer").Buffer;
             return Buffer.from(textChunks[0].text, "base64").toString("utf8");
         default:
             break;
     }
-};
-
-module.exports = {
-    parse: parse,
-};
+}

@@ -1,21 +1,12 @@
-/**
- * When applied, this middleware will ensure the request contains the required header for basic authentication and only
- * allow access to the endpoint after successful authentication.
- */
-
-//const {dirname} = require('path');
-//const appDir = dirname(require.main.filename);
-//const config = require(appDir + '/config.conf');
-const path = require("path");
-const process = require("process");
-const config = require(path.join(process.cwd(), "./config.conf"));
+import config from "../utils/config.js";
+import { Buffer } from "buffer";
 
 const unauthorizedResponse = (res) => {
     res.set("WWW-Authenticate", 'Basic realm="yukitavern", charset="UTF-8"');
     return res.status(401).send("Authentication required");
 };
 
-const basicAuthMiddleware = function (request, response, callback) {
+export default function basicAuthMiddleware(request, response, callback) {
     const authHeader = request.headers.authorization;
 
     if (!authHeader) {
@@ -28,7 +19,6 @@ const basicAuthMiddleware = function (request, response, callback) {
         return unauthorizedResponse(response);
     }
 
-    const Buffer = require("buffer").Buffer;
     const [username, password] = Buffer.from(credentials, "base64").toString("utf8").split(":");
 
     if (username === config.basicAuthUser.username && password === config.basicAuthUser.password) {
@@ -36,6 +26,4 @@ const basicAuthMiddleware = function (request, response, callback) {
     } else {
         return unauthorizedResponse(response);
     }
-};
-
-module.exports = basicAuthMiddleware;
+}

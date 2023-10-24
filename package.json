@@ -31,6 +31,7 @@
         "sanitize-filename": "^1.6.3",
         "sentencepiece-js": "^1.1.0",
         "simple-git": "^3.19.1",
+        "typescript": "^5.2.2",
         "uniqolor": "^1.1.0",
         "ws": "^8.13.0",
         "yargs": "^17.7.1",
@@ -42,7 +43,7 @@
         }
     },
     "name": "yukitavern",
-    "type": "commonjs",
+    "type": "module",
     "license": "AGPL-3.0",
     "repository": {
         "type": "git",
@@ -50,18 +51,19 @@
     },
     "version": "1.9.7",
     "scripts": {
-        "start": "node server.js",
-        "start-multi": "node server.js --disableCsrf",
-        "pkg": "pkg --compress Gzip --no-bytecode --public ."
+        "start": "node dist/server.js",
+        "start-multi": "node dist/server.js --disableCsrf",
+        "build": "tsc",
+        "pkg": "npm run build; pkg --compress Gzip --no-bytecode --public ."
     },
     "bin": {
-        "yukitavern": "./server.js"
+        "yukitavern": "./dist/server.js"
     },
     "rules": {
         "no-path-concat": "off",
         "no-var": "off"
     },
-    "main": "server.js",
+    "main": "dist/server.js",
     "pkg": {
         "targets": [
             "node18-linux-x64",
@@ -73,10 +75,33 @@
         ],
         "outputPath": "dist",
         "scripts": [
-            "server.js"
+            "dist/server.s"
         ]
     },
     "devDependencies": {
+        "@types/axios": "^0.14.0",
+        "@types/command-exists": "^1.2.2",
+        "@types/compression": "^1.7.4",
+        "@types/cookie-parser": "^1.4.5",
+        "@types/cors": "^2.8.15",
+        "@types/express": "^4.17.20",
+        "@types/jimp": "^0.2.28",
+        "@types/jquery": "^3.5.24",
+        "@types/json5": "^2.2.0",
+        "@types/lodash": "^4.14.200",
+        "@types/mime-types": "^2.1.3",
+        "@types/multer": "^1.4.9",
+        "@types/node-fetch": "^2.6.7",
+        "@types/open": "^6.2.1",
+        "@types/png-chunk-text": "^1.0.2",
+        "@types/png-chunks-encode": "^1.0.1",
+        "@types/png-chunks-extract": "^1.0.1",
+        "@types/response-time": "^2.3.7",
+        "@types/sanitize-filename": "^1.6.3",
+        "@types/typescript": "^2.0.0",
+        "@types/ws": "^8.5.8",
+        "@types/yargs": "^17.0.29",
+        "@types/yauzl": "^2.10.2",
         "eslint": "^8.50.0",
         "eslint-config-prettier": "^9.0.0",
         "eslint-plugin-prettier": "^5.0.0",
