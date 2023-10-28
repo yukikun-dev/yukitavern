@@ -19,7 +19,7 @@ app.post("/savechat", jsonParser, function (request, response) {
         let chat_data = request.body.chat;
         let jsonlData = chat_data.map(JSON.stringify).join("\n");
         fs.writeFileSync(
-            `${directories.chats + sanitize(dir_name)}/${sanitize(String(request.body.file_name))}.jsonl`,
+            `${path.join(directories.chats, sanitize(dir_name))}/${sanitize(String(request.body.file_name))}.jsonl`,
             jsonlData,
             "utf8",
         );
@@ -33,11 +33,11 @@ app.post("/savechat", jsonParser, function (request, response) {
 app.post("/getchat", jsonParser, function (request, response) {
     try {
         const dirName = String(request.body.avatar_url).replace(".png", "");
-        const chatDirExists = fs.existsSync(directories.chats + dirName);
+        const chatDirExists = fs.existsSync(path.join(directories.chats, dirName));
 
         //if no chat dir for the character is found, make one with the character name
         if (!chatDirExists) {
-            fs.mkdirSync(directories.chats + dirName);
+            fs.mkdirSync(path.join(directories.chats, dirName));
             return response.send({});
         }
 
@@ -45,7 +45,7 @@ app.post("/getchat", jsonParser, function (request, response) {
             return response.send({});
         }
 
-        const fileName = `${directories.chats + dirName}/${sanitize(String(request.body.file_name))}.jsonl`;
+        const fileName = `${path.join(directories.chats, dirName)}/${sanitize(String(request.body.file_name))}.jsonl`;
         const chatFileExists = fs.existsSync(fileName);
 
         if (!chatFileExists) {
@@ -77,7 +77,7 @@ app.post("/delchat", jsonParser, function (request, response) {
     }
 
     const dirName = String(request.body.avatar_url).replace(".png", "");
-    const fileName = `${directories.chats + dirName}/${sanitize(String(request.body.chatfile))}`;
+    const fileName = `${path.join(directories.chats, dirName)}/${sanitize(String(request.body.chatfile))}`;
     const chatFileExists = fs.existsSync(fileName);
 
     if (!chatFileExists) {
@@ -206,9 +206,10 @@ app.post("/importchat", urlencodedParser, function (request, response) {
                     const errors = [];
                     newChats.forEach((chat) =>
                         fs.writeFile(
-                            `${
-                                directories.chats + avatar_url
-                            }/${ch_name} - ${humanizedISO8601DateTime()} imported.jsonl`,
+                            `${path.join(
+                                directories.chats,
+                                avatar_url,
+                            )}/${ch_name} - ${humanizedISO8601DateTime()} imported.jsonl`,
                             chat.map(JSON.stringify).join("\n"),
                             "utf8",
                             (err) => err ?? errors.push(err),
@@ -256,7 +257,10 @@ app.post("/importchat", urlencodedParser, function (request, response) {
                     }
 
                     fs.writeFileSync(
-                        `${directories.chats + avatar_url}/${ch_name} - ${humanizedISO8601DateTime()} imported.jsonl`,
+                        `${path.join(
+                            directories.chats,
+                            avatar_url,
+                        )}/${ch_name} - ${humanizedISO8601DateTime()} imported.jsonl`,
                         chat.map((message) => JSON.stringify(message, null, 2)).join("\n"),
                         "utf8",
                     );
@@ -269,7 +273,7 @@ app.post("/importchat", urlencodedParser, function (request, response) {
         }
         if (format === "jsonl") {
             //console.log(humanizedISO8601DateTime()+':imported chat format is JSONL');
-            const fileStream = fs.createReadStream("./uploads/" + filedata.filename);
+            const fileStream = fs.createReadStream(path.join(directories.uploads, filedata.filename));
             const rl = readline.createInterface({
                 input: fileStream,
                 crlfDelay: Infinity,
@@ -281,7 +285,7 @@ app.post("/importchat", urlencodedParser, function (request, response) {
                 if (jsonData.user_name !== undefined || jsonData.name !== undefined) {
                     fs.copyFile(
                         `./uploads/${filedata.filename}`,
-                        `${directories.chats + avatar_url}/${ch_name} - ${humanizedISO8601DateTime()}.jsonl`,
+                        `${path.join(directories.chats, avatar_url)}/${ch_name} - ${humanizedISO8601DateTime()}.jsonl`,
                         (err) => {
                             if (err) {
                                 response.send({ error: true });
