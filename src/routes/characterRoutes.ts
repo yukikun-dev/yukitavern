@@ -153,7 +153,7 @@ app.post("/createcharacter", urlencodedParser, function (request, response) {
     const internalName = getPngName(request.body.ch_name);
     const avatarName = `${internalName}.png`;
     const defaultAvatar = path.join(baseDir, "public", "img", "ai4.png");
-    const chatsPath = directories.chats + internalName; //path.join(directories.chats, internalName);
+    const chatsPath = path.join(directories.chats, internalName);
 
     if (!fs.existsSync(chatsPath)) fs.mkdirSync(chatsPath);
 
@@ -401,7 +401,7 @@ app.post("/deletecharacter", jsonParser, async function (request, response) {
         return response.sendStatus(403);
     }
 
-    const avatarPath = directories.characters + request.body.avatar_url;
+    const avatarPath = path.join(directories.characters, request.body.avatar_url);
     if (!fs.existsSync(avatarPath)) {
         return response.sendStatus(400);
     }
@@ -544,7 +544,7 @@ app.post("/importcharacter", urlencodedParser, async function (request, response
 
     let png_name = "";
     let filedata = request.file;
-    let uploadPath = path.join(baseDir, "uploads", filedata.filename);
+    let uploadPath = path.join(directories.uploads, filedata.filename);
     var format = request.body.file_type;
     const defaultAvatarPath = path.join(baseDir, "public", "img", "ai4.png");
     //console.log(format);
@@ -778,7 +778,7 @@ app.post("/getallchatsofcharacter", jsonParser, function (request, response) {
     if (!request.body) return response.sendStatus(400);
 
     var char_dir = request.body.avatar_url.replace(".png", "");
-    fs.readdir(directories.chats + char_dir, (err, files) => {
+    fs.readdir(path.join(directories.chats, char_dir), (err, files) => {
         if (err) {
             console.log("found error in history loading");
             console.error(err);
@@ -798,9 +798,9 @@ app.post("/getallchatsofcharacter", jsonParser, function (request, response) {
             //console.log('found '+ii+' chat logs to load');
             for (let i = jsonFiles.length - 1; i >= 0; i--) {
                 const file = jsonFiles[i];
-                const fileStream = fs.createReadStream(directories.chats + char_dir + "/" + file);
+                const fileStream = fs.createReadStream(path.join(directories.chats, char_dir, file));
 
-                const fullPathAndFile = directories.chats + char_dir + "/" + file;
+                const fullPathAndFile = path.join(directories.chats, char_dir, file);
                 const stats = fs.statSync(fullPathAndFile);
                 const fileSizeInKB = (stats.size / 1024).toFixed(2) + "kb";
 
