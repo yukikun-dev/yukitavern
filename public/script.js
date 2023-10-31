@@ -6603,9 +6603,11 @@ setInterval(displayOverrideWarnings, 5000);
 // ...or when the chat changes
 eventSource.on(event_types.CHAT_CHANGED, displayOverrideWarnings);
 
-function importCharacter(file) {
+async function importCharacter(file) {
+    console.log("Importing character");
     const ext = file.name.match(/\.(\w+)$/);
     if (!ext || (ext[1].toLowerCase() != "json" && ext[1].toLowerCase() != "png")) {
+        console.log("Invalid file type");
         return;
     }
 
@@ -6615,50 +6617,44 @@ function importCharacter(file) {
     formData.append("avatar", file);
     formData.append("file_type", format);
 
-    jQuery.ajax({
+    const data = await jQuery.ajax({
         type: "POST",
         url: "/importcharacter",
         data: formData,
-        async: false,
-        beforeSend: function () {},
+        async: true,
         cache: false,
         contentType: false,
         processData: false,
-        success: async function (data) {
-            if (data.error) {
-                toastr.error("The file is likely invalid or corrupted.", "Could not import character");
-                return;
-            }
-
-            if (data.file_name !== undefined) {
-                $("#character_search_bar").val("").trigger("input");
-                $("#rm_info_block").transition({ opacity: 0, duration: 0 });
-                var $prev_img = $("#avatar_div_div").clone();
-                $prev_img.children("img").attr("src", "characters/" + data.file_name + ".png");
-                $("#rm_info_avatar").append($prev_img);
-
-                let oldSelectedChar = null;
-                if (this_chid != undefined && this_chid != "invalid-safety-id") {
-                    oldSelectedChar = characters[this_chid].avatar;
-                }
-
-                await getCharacters();
-                select_rm_info(`char_import`, data.file_name, oldSelectedChar);
-                if (power_user.import_card_tags) {
-                    let currentContext = getContext();
-                    let avatarFileName = `${data.file_name}.png`;
-                    let importedCharacter = currentContext.characters.find(
-                        (character) => character.avatar === avatarFileName,
-                    );
-                    await importTags(importedCharacter);
-                }
-                $("#rm_info_block").transition({ opacity: 1, duration: 1000 });
-            }
-        },
-        error: function (jqXHR, exception) {
-            $("#create_button").removeAttr("disabled");
-        },
     });
+
+    if (data.error) {
+        toastr.error("The file is likely invalid or corrupted.", "Could not import character");
+        return;
+    }
+
+    if (data.file_name !== undefined) {
+        $("#character_search_bar").val("").trigger("input");
+
+        let oldSelectedChar = null;
+        if (this_chid != undefined && this_chid != "invalid-safety-id") {
+            oldSelectedChar = characters[this_chid].avatar;
+        }
+
+        console.log("Refreshing character list...");
+        await getCharacters();
+
+        select_rm_info(`char_import`, data.file_name, oldSelectedChar);
+        if (power_user.import_card_tags) {
+            console.log("Importing tags...");
+            let currentContext = getContext();
+            let avatarFileName = `${data.file_name}.png`;
+            let importedCharacter = currentContext.characters.find((character) => character.avatar === avatarFileName);
+            await importTags(importedCharacter);
+        }
+    }
+    console.log("Refreshing character list...");
+    await getCharacters();
+    toastr.success("Character imported successfully");
 }
 
 async function importFromURL(items, files) {
