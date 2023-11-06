@@ -78,6 +78,7 @@ const max_4k = 4095;
 const max_8k = 8191;
 const max_16k = 16383;
 const max_32k = 32767;
+const max_128k = 127999;
 const claude_max = 8000; // We have a proper tokenizer, so theoretically could be larger (up to 9k)
 const claude_100k_max = 99000;
 const unlocked_max = 100 * 1024;
@@ -1613,6 +1614,8 @@ function getMaxContextOpenAI(value) {
         return max_8k;
     } else if (["gpt-4-32k", "gpt-4-32k-0314", "gpt-4-32k-0613"].includes(value)) {
         return max_32k;
+    } else if (["gpt-4-1106-preview"].includes(value)) {
+        return max_128k;
     } else if (["gpt-3.5-turbo-16k", "gpt-3.5-turbo-16k-0613"].includes(value)) {
         return max_16k;
     } else if (value == "code-davinci-002") {
