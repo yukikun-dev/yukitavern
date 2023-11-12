@@ -202,7 +202,7 @@ impl eframe::App for MyApp {
                         ui.label("Port: ")
                             .on_hover_text("Port number for YukiTavern to listen on.");
                         ui.add(
-                            egui::Slider::new(&mut self.config.port, 8000..=65535)
+                            egui::Slider::new(&mut self.config.port, 1024..=65535)
                                 .drag_value_speed(1.),
                         );
                     });
