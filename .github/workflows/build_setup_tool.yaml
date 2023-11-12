@@ -11,6 +11,9 @@ jobs:
                     - macos-latest
                 rust:
                     - stable
+        defaults:
+            run:
+                working-directory: setup
         steps:
             - uses: actions/checkout@v2
             - name: Install Rust toolchain
@@ -36,6 +39,9 @@ jobs:
     release:
         needs: build
         runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: setup
         steps:
             - name: Download all artifacts
               uses: actions/download-artifact@v2
