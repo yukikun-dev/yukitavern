@@ -28,6 +28,8 @@ jobs:
                   override: true
             - name: Build
               run: cargo build --release --verbose
+            - name: List build artifacts
+              run: ls target/release/
             - name: Upload artifact (Linux & macOS)
               if: matrix.os != 'windows-latest'
               uses: actions/upload-artifact@v2
@@ -55,7 +57,8 @@ jobs:
               id: create_release
               uses: actions/create-release@v1
               env:
-                  TOKEN: ${{ secrets.TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
               with:
                   tag_name: ${{ github.ref }}
                   release_name: Release ${{ github.ref }}
@@ -65,7 +68,8 @@ jobs:
               if: contains(matrix.os, 'windows') == false
               uses: actions/upload-release-asset@v1
               env:
-                  TOKEN: ${{ secrets.TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
                   asset_path: ./artifacts/setup-${{ matrix.os }}
@@ -75,7 +79,8 @@ jobs:
               if: contains(matrix.os, 'windows')
               uses: actions/upload-release-asset@v1
               env:
-                  TOKEN: ${{ secrets.TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
                   asset_path: ./artifacts/setup-${{ matrix.os }}.exe

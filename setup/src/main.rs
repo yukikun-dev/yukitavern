@@ -1,4 +1,4 @@
-use anyhow::{Error, Result};
+use anyhow::Result;
 use egui;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
