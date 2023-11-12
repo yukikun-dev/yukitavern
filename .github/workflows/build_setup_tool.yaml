@@ -18,7 +18,7 @@ jobs:
             - uses: actions/checkout@v2
             - name: Install dependencies (Ubuntu)
               if: matrix.os == 'ubuntu-latest'
-              run: sudo apt-get update && sudo apt-get install -y libatk1.0-dev libgtk-3-dev build-essential pkg-config libg11-mesa-dev
+              run: sudo apt-get update && sudo apt-get install -y libatk1.0-dev libgtk-3-dev build-essential pkg-config
 
             - name: Install Rust toolchain
               uses: actions-rs/toolchain@v1
