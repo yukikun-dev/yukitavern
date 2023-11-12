@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import { directories } from "../utils/directories.js";
 import { jsonParser } from "../utils/common.js";
-import json5 from "json5";
 import sanitize from "sanitize-filename";
 import { humanizedISO8601DateTime } from "../utils/common.js";
 import { urlencodedParser } from "../utils/common.js";
@@ -25,7 +24,7 @@ app.post("/getgroups", jsonParser, (_, response) => {
         try {
             const filePath = path.join(directories.groups, file);
             const fileContents = fs.readFileSync(filePath, "utf8");
-            const group = json5.parse(fileContents);
+            const group = JSON.parse(fileContents);
             const groupStat = fs.statSync(filePath);
             group["date_added"] = groupStat.birthtimeMs;
 
@@ -108,7 +107,7 @@ app.post("/getgroupchat", jsonParser, (request, response) => {
         const lines = data.split("\n");
 
         // Iterate through the array of strings and parse each line as JSON
-        const jsonData = lines.map((line) => json5.parse(line));
+        const jsonData = lines.map((line) => JSON.parse(line));
         return response.send(jsonData);
     } else {
         return response.send([]);
@@ -159,7 +158,7 @@ app.post("/deletegroup", jsonParser, async (request, response) => {
 
     try {
         // Delete group chats
-        const group = json5.parse(fs.readFileSync(pathToGroup).toString());
+        const group = JSON.parse(fs.readFileSync(pathToGroup).toString());
 
         if (group && Array.isArray(group.chats)) {
             for (const chat of group.chats) {

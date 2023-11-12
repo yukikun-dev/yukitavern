@@ -16,7 +16,6 @@ import { urlencodedParser } from "../utils/common.js";
 import { AVATAR_HEIGHT, AVATAR_WIDTH } from "../utils/constants.js";
 import jimp from "jimp";
 import { baseDir } from "../utils/directories.js";
-import json5 from "json5";
 import readline from "readline";
 import { parse } from "../character-card-parser.js";
 
@@ -208,7 +207,7 @@ app.post("/renamecharacter", jsonParser, async function (request, response) {
     try {
         // Read old file, replace name int it
         const rawOldData = await charaRead(oldAvatarPath);
-        const oldData = getCharaCardV2(json5.parse(rawOldData));
+        const oldData = getCharaCardV2(JSON.parse(rawOldData));
         _.set(oldData, "data.name", newName);
         _.set(oldData, "name", newName);
         const newData = JSON.stringify(oldData);
@@ -487,7 +486,7 @@ async function charaRead(img_url: string, input_format: string = "png") {
 const processCharacter = async (item, i) => {
     try {
         const img_data = await charaRead(path.join(directories.characters, item));
-        let jsonObject = getCharaCardV2(json5.parse(img_data));
+        let jsonObject = getCharaCardV2(JSON.parse(img_data));
         jsonObject.avatar = item;
         characters[i] = jsonObject;
         characters[i]["json_data"] = img_data;
@@ -556,7 +555,7 @@ app.post("/importcharacter", urlencodedParser, async function (request, response
                     response.send({ error: true });
                 }
 
-                let jsonData = json5.parse(data);
+                let jsonData = JSON.parse(data);
 
                 if (jsonData.spec !== undefined) {
                     console.log("importing from v2 json");
@@ -652,7 +651,7 @@ app.post("/importcharacter", urlencodedParser, async function (request, response
         } else {
             try {
                 var img_data = await charaRead(uploadPath, format);
-                let jsonData = json5.parse(img_data);
+                let jsonData = JSON.parse(img_data);
 
                 jsonData.name = sanitize(jsonData.data?.name || jsonData.name);
                 png_name = getPngName(jsonData.name);
@@ -763,7 +762,7 @@ app.post("/exportcharacter", jsonParser, async function (request, response) {
         case "json": {
             try {
                 let json = await charaRead(filename);
-                let jsonObject = getCharaCardV2(json5.parse(json));
+                let jsonObject = getCharaCardV2(JSON.parse(json));
                 return response.type("json").send(jsonObject);
             } catch {
                 return response.sendStatus(400);

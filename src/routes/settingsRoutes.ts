@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import { baseDir, directories } from "../utils/directories.js";
 import { jsonParser } from "../utils/common.js";
-import json5 from "json5";
 import config from "../utils/config.js";
 import sanitize from "sanitize-filename";
 
@@ -71,7 +70,7 @@ function readPresetsFromDirectory(directoryPath, options: any = {}) {
     files.forEach((item) => {
         try {
             const file = fs.readFileSync(path.join(directoryPath, item), "utf8");
-            json5.parse(file);
+            JSON.parse(file);
             fileContents.push(file);
             fileNames.push(removeFileExtension ? item.replace(/\.[^/.]+$/, "") : item);
         } catch {
@@ -98,7 +97,7 @@ function readAndParseFromDirectory(directoryPath, fileExtension = ".json") {
     files.forEach((item) => {
         try {
             const file = fs.readFileSync(path.join(directoryPath, item), "utf-8");
-            parsedFiles.push(fileExtension == ".json" ? json5.parse(file) : file);
+            parsedFiles.push(fileExtension == ".json" ? JSON.parse(file) : file);
         } catch {
             // skip
         }

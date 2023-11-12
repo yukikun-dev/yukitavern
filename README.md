@@ -27,8 +27,12 @@ npm run start
 
 ### Bun 🐇 (Linux only 🐧)
 
-Might be faster than Node. Run Typescript directly with `bun src/server.ts`.
+Might be faster than Node. Run Typescript directly:
+
+```sh
+bun src/server.ts
+```
 
 ## Configuration
 
-Edit the `config.json5` file in the root of the YukiTavern installation. Make sure it's valid [json5](https://json5.org/).
+Run the setup.exe binary or edit the `config.json` file in the root of the YukiTavern installation.

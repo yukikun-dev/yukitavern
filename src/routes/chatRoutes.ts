@@ -7,7 +7,6 @@ import sanitize from "sanitize-filename";
 import { humanizedISO8601DateTime } from "../utils/common.js";
 import { urlencodedParser } from "../utils/common.js";
 import readline from "readline";
-import json5 from "json5";
 import { tryParse } from "../utils/common.js";
 
 const app = express();
@@ -176,7 +175,7 @@ app.post("/importchat", urlencodedParser, function (request, response) {
                     response.send({ error: true });
                 }
 
-                const jsonData = json5.parse(data);
+                const jsonData = JSON.parse(data);
                 if (jsonData.histories !== undefined) {
                     //console.log('/importchat confirms JSON histories are defined');
                     const chat = {
@@ -280,7 +279,7 @@ app.post("/importchat", urlencodedParser, function (request, response) {
             });
 
             rl.once("line", (line) => {
-                let jsonData = json5.parse(line);
+                let jsonData = JSON.parse(line);
 
                 if (jsonData.user_name !== undefined || jsonData.name !== undefined) {
                     fs.copyFile(

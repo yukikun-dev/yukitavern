@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import json5 from "json5";
 import { directories } from "../utils/directories.js";
 
 export function readWorldInfoFile(worldInfoName) {
@@ -16,6 +15,6 @@ export function readWorldInfoFile(worldInfoName) {
     }
 
     const worldInfoText = fs.readFileSync(pathToWorldInfo, "utf8");
-    const worldInfo = json5.parse(worldInfoText);
+    const worldInfo = JSON.parse(worldInfoText);
     return worldInfo;
 }

@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import { baseDir, directories } from "../utils/directories.js";
 import { jsonParser } from "../utils/common.js";
-import json5 from "json5";
 import sanitize from "sanitize-filename";
 import { urlencodedParser } from "../utils/common.js";
 import { readWorldInfoFile } from "../controllers/worlds.js";
@@ -26,7 +25,7 @@ app.post("/importworldinfo", urlencodedParser, (request, response) => {
     }
 
     try {
-        const worldContent = json5.parse(fileContents);
+        const worldContent = JSON.parse(fileContents);
         if (!("entries" in worldContent)) {
             throw new Error("File must contain a world info entries list");
         }

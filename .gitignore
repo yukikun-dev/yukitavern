@@ -15,6 +15,7 @@ public/stats.json
 /uploads/
 *.jsonl
 /config.conf
+/config.json
 /src/config.json
 .DS_Store
 public/settings.json
@@ -26,3 +27,4 @@ secrets.json
 /backups/
 public/QuickReplies/
 content.log
+target/

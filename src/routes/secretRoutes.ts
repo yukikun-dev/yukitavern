@@ -42,7 +42,7 @@ app.post("/readsecretstate", jsonParser, (_, response) => {
 app.post("/viewsecrets", jsonParser, async (_, response) => {
     if (!config.allowKeysExposure) {
         console.error(
-            "secrets.json could not be viewed unless the value of allowKeysExposure in config.json5 is set to true",
+            "secrets.json could not be viewed unless the value of allowKeysExposure in config.json is set to true",
         );
         return response.sendStatus(403);
     }

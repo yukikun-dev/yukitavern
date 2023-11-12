@@ -1,5 +1,4 @@
 import express from "express";
-import json5 from "json5";
 import fs from "fs";
 import { SECRETS_FILE } from "./constants.js";
 
@@ -46,7 +45,7 @@ export function humanizedISO8601DateTime() {
 
 export function tryParse(str) {
     try {
-        return json5.parse(str);
+        return JSON.parse(str);
     } catch {
         return undefined;
     }

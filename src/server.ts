@@ -47,7 +47,7 @@ function createDefaultFiles() {
     const files = {
         settings: path.join(baseDir, "public", "settings.json"),
         bg_load: path.join(baseDir, "public", "css", "bg_load.css"),
-        config: path.join(baseDir, "config.json5"),
+        config: path.join(baseDir, "config.json"),
     };
 
     for (const file of Object.values(files)) {
@@ -142,14 +142,14 @@ app.use(function (req, res, next) {
         console.log(
             "Forbidden: Connection attempt from " +
                 clientIp +
-                ". If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.json5 in root of yukitavern folder.\n",
+                ". If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.json in root of yukitavern folder.\n",
         );
         return res
             .status(403)
             .send(
                 "<b>Forbidden</b>: Connection attempt from <b>" +
                     clientIp +
-                    "</b>. If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.json5 in root of yukitavern folder.",
+                    "</b>. If you are attempting to connect, please add your IP address in whitelist or disable whitelist mode in config.json in root of yukitavern folder.",
             );
     }
     next();

@@ -22,10 +22,9 @@
 
 import path from "path";
 import fs from "fs";
-import json5 from "json5";
 
 import { baseDir } from "./directories.js";
-const configPath = path.join(baseDir, "config.json5");
+const configPath = path.join(baseDir, "config.json");
 
 if (!fs.existsSync(configPath)) {
     const defaultFilePath = path.join("default", path.parse(configPath).base);
@@ -33,6 +32,6 @@ if (!fs.existsSync(configPath)) {
     console.log(`Created default file: ${configPath}`);
 }
 
-const config = json5.parse(fs.readFileSync(configPath).toString());
+const config = JSON.parse(fs.readFileSync(configPath).toString());
 
 export default config;

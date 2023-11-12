@@ -2,7 +2,6 @@ import express from "express";
 import { jsonParser } from "../utils/common.js";
 import _ from "lodash";
 import { postAsync } from "../utils/common.js";
-import json5 from "json5";
 import { get_mancer_headers } from "../utils/promptUtils.js";
 import WebSocket from "ws";
 import { Client } from "node-rest-client";
@@ -59,7 +58,7 @@ app.post("/generate_textgenerationwebui", jsonParser, async function (request, r
                 }
 
                 const rawMessage = (await new Promise((resolve) => websocket.once("message", resolve))) as string;
-                const message = json5.parse(rawMessage);
+                const message = JSON.parse(rawMessage);
 
                 switch (message.event) {
                     case "text_stream":
