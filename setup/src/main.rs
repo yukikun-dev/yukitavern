@@ -42,11 +42,6 @@ struct Config {
     key_path: PathBuf,
 }
 
-struct IpList {
-    ips: Vec<IpAddr>,
-    ip_strings: Vec<String>,
-}
-
 enum ConfigSource {
     Default,
     File,
@@ -121,7 +116,11 @@ impl eframe::App for MyApp {
                 egui::ScrollArea::horizontal().show(ui, |ui| {
                     // ui.heading("YukiTavern Configuration");
                     ui.horizontal(|ui| {
-                        if ui.button("Save").clicked() {
+                        if ui
+                            .button("Save")
+                            .on_hover_text("Save the current configuration to config.json.")
+                            .clicked()
+                        {
                             self.config.cert_path = PathBuf::from(&self.temp_cert_path);
                             self.config.key_path = PathBuf::from(&self.temp_key_path);
                             match save_config(&self.config) {
@@ -144,7 +143,11 @@ impl eframe::App for MyApp {
 
                         ui.add_space(20.);
 
-                        if ui.button("Reset").clicked() {
+                        if ui
+                            .button("Reset")
+                            .on_hover_text("Reset the configuration to the values in config.json.")
+                            .clicked()
+                        {
                             let (config, source) = load_config();
                             self.config = config;
                             self.temp_cert_path =
@@ -172,7 +175,13 @@ impl eframe::App for MyApp {
 
                         ui.add_space(20.);
 
-                        if ui.button("Defaults").clicked() {
+                        if ui
+                            .button("Defaults")
+                            .on_hover_text(
+                                "Reset the configuration to the default values.\n(won't affect config.json unless you save)",
+                            )
+                            .clicked()
+                        {
                             self.config = Config::default();
                             self.temp_cert_path =
                                 self.config.cert_path.to_string_lossy().into_owned();
@@ -237,8 +246,7 @@ impl eframe::App for MyApp {
                     if !self.config.whitelist_mode && !self.config.basic_auth_mode {
                         ui.colored_label(
                             egui::Color32::RED,
-                            "Warning: YT will be exposed to all devices on the network
-                    unless either whitelist or basic auth mode are enabled.",
+                            "Warning: YT will be exposed to all devices on the network\nunless either whitelist or basic auth mode are enabled.",
                         );
                         self.config.security_override = true;
                     }
