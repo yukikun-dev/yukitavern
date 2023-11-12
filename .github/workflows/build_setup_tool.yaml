@@ -53,17 +53,18 @@ jobs:
               uses: actions/download-artifact@v2
               with:
                   path: artifacts
+            - name: Generate tag name
+              id: gen_tag
+              run: echo "::set-output name=tag::$(date +'%Y%m%d%H%M%S')"
+              shell: bash
+
             - name: Create Release
-              id: create_release
               uses: actions/create-release@v1
+              with:
+                  tag_name: ${{ steps.gen_tag.outputs.tag }}
+                  release_name: Release ${{ steps.gen_tag.outputs.tag }}
               env:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
-
-              with:
-                  tag_name: ${{ github.ref }}
-                  release_name: Release ${{ github.ref }}
-                  draft: false
-                  prerelease: false
             - name: Upload Release Asset (Linux & macOS)
               if: contains(matrix.os, 'windows') == false
               uses: actions/upload-release-asset@v1
