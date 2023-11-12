@@ -57,7 +57,7 @@ jobs:
               id: create_release
               uses: actions/create-release@v1
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
               with:
                   tag_name: ${{ github.ref }}
@@ -68,7 +68,7 @@ jobs:
               if: contains(matrix.os, 'windows') == false
               uses: actions/upload-release-asset@v1
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -79,7 +79,7 @@ jobs:
               if: contains(matrix.os, 'windows')
               uses: actions/upload-release-asset@v1
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
