@@ -66,25 +66,16 @@ jobs:
                   release_name: Release ${{ env.RELEASE_NAME }}
               env:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
-            - name: Upload Release Asset (Linux & macOS)
-              if: contains(matrix.os, 'windows') == false
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./artifacts/setup-${{ matrix.os }}
-                  asset_name: setup-${{ matrix.os }}
-                  asset_content_type: application/octet-stream
-            - name: Upload Release Asset (Windows)
-              if: contains(matrix.os, 'windows')
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
-
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./artifacts/setup-${{ matrix.os }}.exe
-                  asset_name: setup-${{ matrix.os }}.exe
-                  asset_content_type: application/octet-stream
+            - name: Upload Release Assets
+              run: |
+                  for file in artifacts/*; do
+                      filename=$(basename "$file")
+                      echo "Uploading $filename"
+                      curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                          -H "Content-Type: $(file -b --mime-type "$file")" \
+                          --data-binary @"$file" \
+                          "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
+                  done
+                  env:
+                      GITHUB_TOKEN: ${{ secrets.TOKEN }}
