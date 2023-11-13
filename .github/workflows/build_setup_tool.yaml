@@ -67,15 +67,35 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
-            - name: Upload Release Assets
-              run: |
-                  for file in artifacts/*; do
-                      filename=$(basename "$file")
-                      echo "Uploading $filename"
-                      curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                          -H "Content-Type: $(file -b --mime-type "$file")" \
-                          --data-binary @"$file" \
-                          "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
-                  done
-                  env:
-                      GITHUB_TOKEN: ${{ secrets.TOKEN }}
+            - name: Upload Release Asset (Windows)
+              if: contains(github.ref, 'tags/')
+              uses: actions/upload-release-asset@v1
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./artifacts/setup-windows-latest.exe
+                  asset_name: setup-windows-latest.exe
+                  asset_content_type: application/octet-stream
+              env:
+                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+            - name: Upload Release Asset (macOS)
+              if: contains(github.ref, 'tags/')
+              uses: actions/upload-release-asset@v1
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./artifacts/setup-macos-latest
+                  asset_name: setup-macos-latest
+                  asset_content_type: application/octet-stream
+              env:
+                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+            - name: Upload Release Asset (Ubuntu)
+              if: contains(github.ref, 'tags/')
+              uses: actions/upload-release-asset@v1
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./artifacts/setup-ubuntu-latest
+                  asset_name: setup-ubuntu-latest
+                  asset_content_type: application/octet-stream
+              env:
+                  GITHUB_TOKEN: ${{ secrets.TOKEN }}
