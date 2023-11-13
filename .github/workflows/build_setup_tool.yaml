@@ -71,7 +71,7 @@ jobs:
               uses: actions/upload-release-asset@v1
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./artifacts/setup-windows-latest.exe
+                  asset_path: ./artifacts
                   asset_name: setup-windows-latest.exe
                   asset_content_type: application/octet-stream
               env:
@@ -81,7 +81,7 @@ jobs:
               uses: actions/upload-release-asset@v1
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./artifacts/setup-macos-latest
+                  asset_path: ./artifacts
                   asset_name: setup-macos-latest
                   asset_content_type: application/octet-stream
               env:
@@ -91,7 +91,7 @@ jobs:
               uses: actions/upload-release-asset@v1
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./artifacts/setup-ubuntu-latest
+                  asset_path: ./artifacts
                   asset_name: setup-ubuntu-latest
                   asset_content_type: application/octet-stream
               env:
