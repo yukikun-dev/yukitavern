@@ -48,8 +48,6 @@ jobs:
         steps:
             - name: Download all artifacts
               uses: actions/download-artifact@v2
-              with:
-                  path: artifacts
             - name: Generate Release Name
               id: gen_release_name
               run: |
@@ -71,7 +69,7 @@ jobs:
               uses: actions/upload-release-asset@v1
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./artifacts
+                  asset_path: ./setup-windows-latest.exe
                   asset_name: setup-windows-latest.exe
                   asset_content_type: application/octet-stream
               env:
@@ -81,7 +79,7 @@ jobs:
               uses: actions/upload-release-asset@v1
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./artifacts
+                  asset_path: ./setup-macos-latest
                   asset_name: setup-macos-latest
                   asset_content_type: application/octet-stream
               env:
@@ -91,7 +89,7 @@ jobs:
               uses: actions/upload-release-asset@v1
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./artifacts
+                  asset_path: ./setup-ubuntu-latest
                   asset_name: setup-ubuntu-latest
                   asset_content_type: application/octet-stream
               env:
