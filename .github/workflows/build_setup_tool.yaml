@@ -68,7 +68,6 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
             - name: Upload Release Asset (Windows)
-              if: contains(github.ref, 'tags/')
               uses: actions/upload-release-asset@v1
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -79,7 +78,6 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
             - name: Upload Release Asset (macOS)
-              if: contains(github.ref, 'tags/')
               uses: actions/upload-release-asset@v1
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -90,7 +88,6 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
             - name: Upload Release Asset (Ubuntu)
-              if: contains(github.ref, 'tags/')
               uses: actions/upload-release-asset@v1
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
