@@ -47,14 +47,14 @@ jobs:
               uses: actions/upload-artifact@v2
               with:
                   name: setup-${{ matrix.os }}
-                  path: setup/target/release/setup
+                  path: setup/target/release/setup-${{ matrix.os }}
 
             - name: Upload artifact (Windows)
               if: matrix.os == 'windows-latest'
               uses: actions/upload-artifact@v2
               with:
                   name: setup-${{ matrix.os }}.exe
-                  path: setup/target/release/setup.exe
+                  path: setup/target/release/setup-${{ matrix.os }}.exe
     release:
         needs: build
         runs-on: ubuntu-latest
