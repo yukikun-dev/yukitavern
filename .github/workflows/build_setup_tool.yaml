@@ -46,11 +46,22 @@ jobs:
         needs: build
         runs-on: ubuntu-latest
         steps:
-            - name: Download all artifacts
+            - name: Download artifact (Windows)
               uses: actions/download-artifact@v2
               with:
-                  name: setup-*
-                  path: setup
+                  name: setup-windows-latest.exe
+                  path: setup-windows-latest.exe
+            - name: Download artifact (Linux)
+              uses: actions/download-artifact@v2
+              with:
+                  name: setup-ubuntu-latest
+                  path: setup-ubuntu-latest
+            - name: Download artifact (macOS)
+              uses: actions/download-artifact@v2
+              with:
+                  name: setup-macos-latest
+                  path: setup-macos-latest
+
             - name: Generate Release Name
               id: gen_release_name
               run: |
