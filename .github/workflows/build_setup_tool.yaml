@@ -59,9 +59,20 @@ jobs:
         needs: build
         runs-on: ubuntu-latest
         steps:
-            - name: Download all artifacts
+            - name: Download artifact (Windows)
               uses: actions/download-artifact@v2
               with:
+                  name: setup-windows-latest.exe
+                  path: ./
+            - name: Download artifact (Linux)
+              uses: actions/download-artifact@v2
+              with:
+                  name: setup-ubuntu-latest
+                  path: ./
+            - name: Download artifact (macOS)
+              uses: actions/download-artifact@v2
+              with:
+                  name: setup-macos-latest
                   path: ./
 
             - name: chmod
