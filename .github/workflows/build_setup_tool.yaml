@@ -62,6 +62,13 @@ jobs:
                   name: setup-macos-latest
                   path: ./
 
+            - name: chmod
+              run: |
+                  ls -l
+                  chmod +x setup-windows-latest.exe
+                  chmod +x setup-macos-latest
+                  chmod +x setup-ubuntu-latest
+
             - name: Generate Release Name
               id: gen_release_name
               run: |
@@ -69,13 +76,6 @@ jobs:
                   echo "RELEASE_NAME=$(date +%s)" >> $GITHUB_ENV
                   # Or use the commit SHA
                   # echo "RELEASE_NAME=${GITHUB_SHA}" >> $GITHUB_ENV
-
-            - name: chmod
-              run: |
-                  chmod +x setup-windows-latest.exe
-                  chmod +x setup-macos-latest
-                  chmod +x setup-ubuntu-latest
-                  ls -l
 
             - name: Create Release
               id: create_release
