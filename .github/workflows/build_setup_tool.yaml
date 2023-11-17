@@ -31,13 +31,13 @@ jobs:
               if: matrix.os != 'windows-latest'
               run: |
                   cargo build --release --verbose
-                  mv target/release/setup setup-${{ matrix.os }}
+                  mv target/release/setup target/release/setup-${{ matrix.os }}
 
             - name: Build (Windows)
               if: matrix.os == 'windows-latest'
               run: |
                   cargo build --release --verbose
-                  mv target/release/setup.exe setup-${{ matrix.os }}.exe
+                  mv target/release/setup.exe target/release/setup-${{ matrix.os }}.exe
 
             - name: List build artifacts
               run: ls target/release/
