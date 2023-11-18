@@ -28,3 +28,6 @@ secrets.json
 public/QuickReplies/
 content.log
 target/
+setup-windows-latest.exe
+setup-macos-latest
+setup-ubuntu-latest
