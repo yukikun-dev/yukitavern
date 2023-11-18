@@ -25,3 +25,4 @@ secrets.json
 /backups/
 public/QuickReplies/
 content.log
+target/
