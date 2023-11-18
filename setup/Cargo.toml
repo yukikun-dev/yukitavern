@@ -13,3 +13,8 @@ regex      = "1.10.2"
 rfd        = "0.12.1"
 serde      = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"
+
+[profile.release]
+lto       = true
+opt-level = "z"
+panic     = "abort"

@@ -1,5 +1,10 @@
 name: Rust Build and Release
-on: push
+on:
+    push:
+        branches:
+            - "**"
+        tags-ignore:
+            - "*"
 jobs:
     build:
         runs-on: ${{ matrix.os }}
@@ -31,12 +36,14 @@ jobs:
               if: matrix.os != 'windows-latest'
               run: |
                   cargo build --release --verbose
+                  strip target/release/setup
                   mv target/release/setup target/release/setup-${{ matrix.os }}
 
             - name: Build (Windows)
               if: matrix.os == 'windows-latest'
               run: |
                   cargo build --release --verbose
+                  strip target/release/setup.exe
                   mv target/release/setup.exe target/release/setup-${{ matrix.os }}.exe
 
             - name: List build artifacts
