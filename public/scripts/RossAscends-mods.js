@@ -696,6 +696,15 @@ $("document").ready(function () {
         }
     });
 
+    var chatbarInFocus = false;
+    $("#send_textarea").focus(function () {
+        chatbarInFocus = true;
+    });
+
+    $("#send_textarea").blur(function () {
+        chatbarInFocus = false;
+    });
+
     setTimeout(() => {
         OpenNavPanels();
     }, 300);
@@ -844,10 +853,10 @@ $("document").ready(function () {
             //swipes left
             if (
                 $(".swipe_left:last").css("display") === "flex" &&
+                $("#send_textarea").val() === "" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none" &&
-                (!isInputElementInFocus() || isInputElementEmpty()) &&
-                !isEditing()
+                !isInputElementInFocus()
             ) {
                 $(".swipe_left:last").click();
             }
@@ -856,10 +865,10 @@ $("document").ready(function () {
             //swipes right
             if (
                 $(".swipe_right:last").css("display") === "flex" &&
+                $("#send_textarea").val() === "" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none" &&
-                (!isInputElementInFocus() || isInputElementEmpty()) &&
-                !isEditing()
+                !isInputElementInFocus()
             ) {
                 $(".swipe_right:last").click();
             }
@@ -868,8 +877,8 @@ $("document").ready(function () {
         if (event.ctrlKey && event.key == "ArrowUp") {
             //edits last USER message if chatbar is empty and focused
             if (
-                isInputElementInFocus() &&
-                isInputElementEmpty() &&
+                $("#send_textarea").val() === "" &&
+                chatbarInFocus === true &&
                 ($(".swipe_right:last").css("display") === "flex" || $(".last_mes").attr("is_system") === "true") &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none"
@@ -886,8 +895,8 @@ $("document").ready(function () {
         if (event.key == "ArrowUp") {
             //edits last message if chatbar is empty and focused
             if (
-                isInputElementInFocus() &&
-                isInputElementEmpty() &&
+                $("#send_textarea").val() === "" &&
+                chatbarInFocus === true &&
                 $(".swipe_right:last").css("display") === "flex" &&
                 $("#character_popup").css("display") === "none" &&
                 $("#shadow_select_chat_popup").css("display") === "none"
